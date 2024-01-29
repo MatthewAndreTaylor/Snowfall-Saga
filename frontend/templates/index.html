@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content=""width=device-width, initial-scale="1.0"/>
+        <link
+        href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap"
+        rel="stylesheet"/>
+        <link rel="stylesheet" href="/static/style.css" />
+        <title>Snowfall Saga</title>
+    </head>
+    <body>
+        <div class="game-container"></div>
+        <div class="player-info">
+            <div>
+                <label for="player-name">Your Name</label>
+                <input id="player-name" maxlength="10" type="text" />
+            </div>
+        </div>
+        <div class="user-list-container">
+            <div id="user-box" class="chat-box">
+                {% for username, id in usernames %}
+                    <p id="{{ id }}">{{ username }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="chat" class="chat-container">
+            <div id="chat-box" class="chat-box">
+                {% for message in messages %}
+                    <p class="message">{{ message }}</p>
+                {% endfor %}
+            </div>
+            <div>
+                <input id="chat-message" type="text" />
+                <button type="button" name="chat-send" id="chat-send" maxlength="100">Send</button>
+            </div>
+        </div>
+        <script src="/static/KeyPressListener.js"></script>
+        <script src="/static/main.js" type="module"></script>
+    </body>
+</html>
