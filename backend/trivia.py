@@ -1,26 +1,33 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
+# app.py (Flask backend)
+
+from flask import Flask, jsonify
+from flask_cors import CORS
+import random
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+CORS(app)  # Enable CORS for all routes
 
-players = []
+# Sample questions and answers (replace with your actual data or connect to a database)
+questions = [
+    {"id": 1, "question": "What is the capital of France?", "answers": ["Paris", "Berlin", "Madrid", "Rome"]},
+    {"id": 2, "question": "What is 2 + 2?", "answers": ["4", "6", "8", "10"]},
+    # Add more questions as needed
+]
 
+@app.route('/questions', methods=['GET'])
+def get_questions():
+    # Return a list of questions without answers for the TriviaGamepad.js questions list
+    questions_list = [{"id": q["id"], "question": q["question"]} for q in questions]
+    return jsonify(questions_list)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-@socketio.on('join_lobby')
-def handle_join_lobby(data):
-    username = data['username']
-    players.append(username)
-    emit('update_players', {'players': players}, broadcast=True)
-
-    if len(players) == 4:
-        emit('start_game', broadcast=True)
-
+@app.route('/questions/<int:question_id>/answers', methods=['GET'])
+def get_answers(question_id):
+    # Return the answers for a specific question
+    question = next((q for q in questions if q["id"] == question_id), None)
+    if question:
+        return jsonify({"choices": question["answers"]})
+    else:
+        return jsonify({"error": "Question not found"}), 404
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    app.run(debug=True)
