@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Tester</title>
+</head>
+<body>
+    <h1>WebSocket Tester</h1>
+    <p id="message"></p>
+    <ul id="usersList"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/trivia/game');
+        var username = '';
+
+        socket.on('connect', function() {
+            // Connection established, print a message on the screen
+            document.getElementById('message').innerText = 'Connected to WebSocket Server';
+            username = sessionStorage.getItem('username');
+            socket.emit('register', username);
+        });
+
+        socket.on('disconnect', function() {
+            // Connection lost, print a message on the screen
+            document.getElementById('message').innerText = 'Disconnected from WebSocket Server';
+        });
+
+        socket.on('hi', function() {
+            console.log('Received hi from the server');
+        });
+
+        socket.addEventListener("user_list", (event) => {
+            console.log('Received user list event:', event);
+            displayUsersList(event);
+        });
+
+        function displayUsersList(userList) {
+            console.log('Received user list:', userList);
+
+            const usersList = document.getElementById("usersList");
+
+            // Check if userList is defined before attempting to iterate over it
+            if (userList) {
+                console.log('Number of users:', userList.length);
+
+                usersList.innerHTML = '';
+
+                for (const user of userList) {
+                    console.log('Adding user:', user);
+                    const node = document.createElement("li");
+                    const textnode = document.createTextNode(user);
+                    node.appendChild(textnode);
+                    usersList.appendChild(node);
+                }
+
+                // Set display property to 'block' for the <ul> element
+                usersList.style.display = 'block';
+            } else {
+                console.log('User list is undefined or empty.');
+            }
+        }
+    </script>
+</body>
+</html>
