@@ -11,13 +11,16 @@
 html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    background: url(./images/snow.png) repeat center center, 
-    linear-gradient(180deg, var(--color1) -50%, var(--color2) 69.71%, var(--color3) 150%);
+    height: 100vh;
     font-family: 'Source Sans Pro', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+body {
+  background: url(./images/snow.png) repeat center center, 
+    linear-gradient(180deg, var(--color1) -50%, var(--color2) 69.71%, var(--color3) 150%);
 }
 
 .game-container {
@@ -82,7 +85,6 @@ button:active {
 
 .user-list-container, .chat-container {
     position: fixed;
-    right: 0;
     margin: 20px;
     padding: 1em;
     display: flex;
@@ -90,6 +92,7 @@ button:active {
     gap: 0.5em;
     width: 300px;
     z-index: 2;
+    right: 0;
 }
 
 .chat-container {
@@ -116,8 +119,10 @@ p {
 .message {
     background-color: #546aea;
     color: #fff;
-    border-radius: 15% 20%;
+    border-radius: 10px;
     padding: 0.5em;
+    text-wrap: balance;
+    overflow-wrap: break-word;
 }
 
 #chat-message {
@@ -192,8 +197,14 @@ p {
 
   .Character_message-container {
     position: absolute;
-    top: -30px;
+    top: -50px;
     left: -5px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .Character_message {
     font-size: 5px;
     padding: 1px 2px 1px;
     border-radius: 3px;
@@ -202,4 +213,8 @@ p {
     font-weight: bold;
     text-transform: uppercase;
     white-space: nowrap;
+  }
+
+  .hidden {
+    display: none;
   }

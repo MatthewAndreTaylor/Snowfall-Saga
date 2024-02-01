@@ -17,9 +17,11 @@ function randomChoice(arr) {
 const playerColors = ["blue", "red", "orange", "yellow", "green", "purple"];
 
 let playerId;
+let timeoutId;
 let playerRef;
 let players = {};
 let playerElements = {};
+let timeoutIds = [];
 const gameContainer = document.querySelector(".game-container");
 const nameInput = document.querySelector("#player-name");
 const messageInput = document.querySelector("#chat-message");
@@ -67,10 +69,9 @@ socket.addEventListener("message", (event) => {
                     <div class="Character_shadow grid-cell"></div>
                     <div class="Character_sprite grid-cell"></div>
                     <div class="Character_name-container">
-                        <span class="Character_name">guest</span>
+                        <span class="Character_name">${ players[key].name || "guest"}</span>
                     </div>
-                    <div class="Character_message-container">
-                        <span class="Character_message"></span>
+                    <div class="Character_message-container hidden">
                     </div>
                     <div class="Character_you-arrow"></div>`;
                     playerElements[characterState.id] = characterElement;
@@ -104,9 +105,19 @@ socket.addEventListener("message", (event) => {
             chatBox.scrollTop = chatBox.scrollHeight;
 
             const playerWhoSent = playerElements[data.id];
-            console.log(playerWhoSent.innerHTML);
-            playerWhoSent.querySelector(".Character_message").innerText = data.message;
-            console.log(playerWhoSent.innerHTML);
+
+            const messageContainer = playerWhoSent.querySelector(".Character_message-container");
+
+            if (messageContainer.getElementsByClassName("Character_message").length === 3) {
+                messageContainer.removeChild(playerWhoSent.querySelector(".Character_message"));
+            }
+
+            const bubbleNode = document.createElement("span");
+            bubbleNode.appendChild(document.createTextNode(data.message));
+            bubbleNode.classList.add("Character_message");
+            messageContainer.appendChild(bubbleNode);
+
+            playerWhoSent.querySelector(".Character_message-container").classList.remove("hidden");
             break
         case 'playersMove':
             players = data.value || {}
@@ -119,6 +130,15 @@ socket.addEventListener("message", (event) => {
             const left = 16 * moveState.x + "px";
             const top = 16 * moveState.y + "px";
             el.style.transform = `translate3d(${left}, ${top}, 0)`;
+            break
+        case 'timeoutMessage':
+            const timeoutElements = playerElements[data.id];
+            const messageNode = timeoutElements.querySelector(".Character_message");
+            const containerNode = timeoutElements.querySelector(".Character_message-container");
+            containerNode.removeChild(messageNode);
+            if (containerNode.getElementsByClassName("Character_message").length === 0) {
+                containerNode.classList.add("hidden");
+            }
             break
     }
 });
@@ -167,8 +187,22 @@ nameInput.addEventListener("change", (e) => {
 
 messageInput.addEventListener("keydown", (e) => {
     if (e.key === 'Enter') {
+        if (timeoutIds.length === 3) {
+            clearTimeout(timeoutIds.at(0));
+            timeoutIds = timeoutIds.slice(1);
+        }
         console.log("Entered keydown event");
         const sender = players[playerId];
+
+        timeoutId = setTimeout(() => {
+            const message = {
+                type: 'timeoutMessage',
+                id: playerId
+            };
+            socket.send(JSON.stringify(message));
+            timeoutIds = timeoutIds.slice(1);
+        }, 5000);
+        timeoutIds.push(timeoutId);
 
         const message = {
             type: 'newMessage',

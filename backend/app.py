@@ -14,7 +14,7 @@ usernames = []
 
 @app.route('/', methods=['GET',"POST"])
 def home():
-    return render_template("../frontend/templates/index.html", messages=messages, usernames=usernames)
+    return render_template("index.html", messages=messages, usernames=usernames)
 
 @sock.route('/echo')
 def echo(connection):
@@ -50,6 +50,9 @@ def echo(connection):
                 player_id = data['value']['id']
                 players[player_id] = data['value']
                 send_to_all_clients({'type': 'playersMove', 'value': players, 'id': data['id']})
+            elif data['type'] == 'timeoutMessage':
+                player_id = data['id']
+                send_to_all_clients({'type': 'timeoutMessage', 'id': player_id})
 
         except (ConnectionError, ConnectionClosed):
             clients.remove(connection)
