@@ -17,7 +17,7 @@ def index():
 
 @app.route('/trivia/game')
 def render_game():
-    return render_template('test/testgame.html')
+    return render_template('test/testgame.html', game_id=game_info['game_id'])
 
 
 @socketio.on('connect', namespace='/trivia')
@@ -30,7 +30,7 @@ def start_game():
     print('Starting the game')
     # socketio.emit('switch_page',  game_info, namespace='/trivia')
     game_info['game_id'] += 1
-    trivia_game(socketio, users.copy(), game_info.copy())
+    socketio.start_background_task(trivia_game(socketio, users.copy(), game_info.copy()))
     socketio.emit('switch_page', {'url': 'trivia/game'}, namespace='/trivia')
 
 

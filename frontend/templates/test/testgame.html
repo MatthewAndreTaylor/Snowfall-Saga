@@ -12,7 +12,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
     <script>
-        const socket = io.connect('http://' + document.domain + ':' + location.port + '/trivia/game');
+        const id = '{{ game_id }}';
+        console.log(id);
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/trivia/game/' + id);
         var username = '';
 
         socket.on('connect', function() {
@@ -34,6 +36,10 @@
         socket.addEventListener("user_list", (event) => {
             console.log('Received user list event:', event);
             displayUsersList(event);
+        });
+
+        socket.on('question', function(question) {
+            console.log('Received question' + question.question);
         });
 
         function displayUsersList(userList) {
@@ -61,6 +67,57 @@
                 console.log('User list is undefined or empty.');
             }
         }
+
+        function displayQuestion(question) {
+            // Display question
+            const questionElement = document.createElement('p');
+            questionElement.textContent = question['question'];
+            document.body.appendChild(questionElement);
+
+            // Display options as buttons
+            for (let i = 1; i <= 4; i++) {
+                const optionKey = 'option' + i;
+                const optionButton = document.createElement('button');
+                optionButton.textContent = question[optionKey];
+                optionButton.addEventListener('click', () => {
+                    sendAnswer(optionKey);
+                    // Hide the buttons after clicking
+                    hideButtons();
+                });
+                document.body.appendChild(optionButton);
+            }
+
+            function hideButtons() {
+                // Select all buttons and hide them
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => {
+                    button.style.display = 'none';
+                });
+            }
+        }
+
+        function sendAnswer(selectedOption) {
+            socket.emit('answer', selectedOption);
+        }
+
+        // Listen for 'question' event from the server
+        socket.on('question', (question) => {
+            console.log('Received question from server:', question);
+            displayQuestion(question);
+        });
+
+        socket.on('correct', function() {
+            const correctTextElement = document.createElement('p');
+            correctTextElement.textContent = 'Correct';
+            document.body.appendChild(correctTextElement);
+        });
+
+        socket.on('incorrect', function() {
+            const correctTextElement = document.createElement('p');
+            correctTextElement.textContent = 'Inorrect';
+            document.body.appendChild(correctTextElement);
+        });
+
     </script>
 </body>
 </html>
