@@ -1,0 +1,3 @@
+flask==3.0.1
+CORS==1.0.1
+flask_cors==4.0.0
