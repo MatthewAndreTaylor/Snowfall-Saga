@@ -2,5 +2,3 @@
     config file and then making the request to backend
 
 > In Trivia.js axios needs to be pip installed 
-
-> For backend CORS needs to be pip install and check if Flask needs to be pip install or not 
