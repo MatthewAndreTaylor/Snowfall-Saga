@@ -1,0 +1,13 @@
+name: 'Assert Branch Naming Convention'
+on: pull_request
+
+jobs:
+  branch-naming-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: deepakputhraya/action-branch-name@master
+        with:
+          regex: '^.*-u\d+$'
+          ignore: master,development
+          min_length: 5
+          max_length: 20
