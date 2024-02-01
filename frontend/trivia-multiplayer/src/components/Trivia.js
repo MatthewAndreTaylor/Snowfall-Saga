@@ -42,22 +42,23 @@ const Trivia = () => {
     // Clear the existing timer before selecting a new question
     clearTimeout(timer);
 
-    // Fetch the answer choices for the selected question
+    // Fetch the answer choices and correct answer for the selected question
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/questions/${selectedQuestion.id}/answers`);
-      setAnswerChoices(response.data.choices); // Assuming the response has a 'choices' property
-      setSelectedQuestion(selectedQuestion);
+      const response = await axios.get(`http://127.0.0.1:5000/questions/${selectedQuestion.id}/options`);
+      const { choices, answer } = response.data;
+      setAnswerChoices(choices);
+      setSelectedQuestion({ ...selectedQuestion, answer }); // Include the correct answer in the selectedQuestion state
 
       // Start the timer for 15 seconds
       setTimer(setTimeout(() => {
         // Move on to the next question after 15 seconds
         handleNextQuestion();
       }, 15000));
-      
+
       // Reset the countdown to 15 seconds when a new question is selected
       setCountdown(15);
     } catch (error) {
-      console.error('Error fetching answers:', error);
+      console.error('Error fetching options and answer:', error);
     }
   };
 
@@ -76,34 +77,43 @@ const Trivia = () => {
   };
 
   const handleAnswer = () => {
-    // Add logic to send user's answer to the server if needed
+    // Check if the user's answer matches the correct answer
+    const isCorrect = userAnswer === selectedQuestion.answer;
 
-    // For simplicity, let's assume a successful request and move on to the next question
-    setUserAnswer('');
-    handleNextQuestion();
+    // Flash effect based on correctness
+    if (isCorrect) {
+      document.body.classList.add('correct-flash');
+      setTimeout(() => {
+        document.body.classList.remove('correct-flash');
+        // Add any additional logic needed after the flash
+        setUserAnswer('');
+        handleNextQuestion();
+      }, 1000); // Adjust the duration as needed
+    } else {
+      document.body.classList.add('incorrect-flash');
+      setTimeout(() => {
+        document.body.classList.remove('incorrect-flash');
+        // Add any additional logic needed after the flash
+        setUserAnswer('');
+        handleNextQuestion();
+      }, 1000); // Adjust the duration as needed
+    }
   };
+
 
   return (
     <div>
       <h1>Trivia Game</h1>
-      <div>
-        <h2>Questions</h2>
-        <ul>
-          {questions.map((q) => (
-            <li key={q.id} onClick={() => handleQuestionSelect(q)}>
-              {q.question}
-            </li>
-          ))}
-        </ul>
-      </div>
       {selectedQuestion && (
         <div>
           <h2>Selected Question</h2>
           <p>{selectedQuestion.question}</p>
-          <div className="countdown">{countdown}s</div>
-          <form>
+          <div className="countdown-container">
+            <div className="countdown-text">{countdown}s</div>
+          </div>
+          <form className="answer-form">
             {answerChoices.map((choice, index) => (
-              <label key={index}>
+              <label key={index} className="answer-choice">
                 <input
                   type="radio"
                   value={choice}
@@ -114,9 +124,21 @@ const Trivia = () => {
               </label>
             ))}
           </form>
-          <button onClick={handleAnswer}>Submit Answer</button>
+          <button className="submit-button" onClick={handleAnswer}>
+            Submit Answer
+          </button>
         </div>
       )}
+      <div>
+        <h2>Questions</h2>
+        <ul className="question-list">
+          {questions.map((q) => (
+            <li key={q.id} onClick={() => handleQuestionSelect(q)}>
+              {q.question}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

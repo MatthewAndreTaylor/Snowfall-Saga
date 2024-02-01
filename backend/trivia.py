@@ -9,8 +9,8 @@ CORS(app)  # Enable CORS for all routes
 
 # Sample questions and answers (replace with your actual data or connect to a database)
 questions = [
-    {"id": 1, "question": "What is the capital of France?", "answers": ["Paris", "Berlin", "Madrid", "Rome"]},
-    {"id": 2, "question": "What is 2 + 2?", "answers": ["4", "6", "8", "10"]},
+    {"id": 1, "question": "What is the capital of France?", "options": ["Paris", "Berlin", "Madrid", "Rome"], "answer": "Paris"},
+    {"id": 2, "question": "What is 2 + 2?", "options": ["4", "6", "8", "10"], "answer": 4},
     # Add more questions as needed
 ]
 
@@ -20,12 +20,12 @@ def get_questions():
     questions_list = [{"id": q["id"], "question": q["question"]} for q in questions]
     return jsonify(questions_list)
 
-@app.route('/questions/<int:question_id>/answers', methods=['GET'])
+@app.route('/questions/<int:question_id>/options', methods=['GET'])
 def get_answers(question_id):
     # Return the answers for a specific question
     question = next((q for q in questions if q["id"] == question_id), None)
     if question:
-        return jsonify({"choices": question["answers"]})
+        return jsonify({"choices": question["options"], "answer": question["answer"]})
     else:
         return jsonify({"error": "Question not found"}), 404
 

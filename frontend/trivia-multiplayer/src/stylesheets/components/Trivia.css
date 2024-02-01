@@ -86,4 +86,72 @@ body {
     background-color: #27ae60;
   }
   
+  .countdown-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
   
+  .countdown-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e74c3c;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+  }
+  
+  .answer-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .answer-choice {
+    position: relative;
+    padding: 20px;
+    background-color: #3498db;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .answer-choice:hover {
+    background-color: #2980b9;
+  }
+  
+  input[type="radio"] {
+    display: none;
+  }
+  
+  input[type="radio"]:checked + .answer-choice {
+    background-color: #2ecc71;
+  }
+  
+  .submit-button {
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 18px;
+    background-color: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #27ae60;
+  }
+
+  /* The flashing for user action*/
+  .correct-flash {
+    background-color: #2ecc71 !important;
+  }
+  
+  .incorrect-flash {
+    background-color: #e74c3c !important;
+  }
