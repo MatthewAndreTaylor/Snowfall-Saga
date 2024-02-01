@@ -4,7 +4,7 @@ const socket = new WebSocket(`ws://${location.host}/echo`);
 function generateUUID() {
     let uuid = "";
     const possible = "abcdef0123456789";
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 16; i++) {
         uuid += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return uuid;
@@ -23,15 +23,15 @@ let playerElements = {};
 const gameContainer = document.querySelector(".game-container");
 const nameInput = document.querySelector("#player-name");
 
-function handleArrowPress(deltaX, deltaY) {
-    players[playerId].x = players[playerId].x + deltaX;
-    players[playerId].y = players[playerId].y + deltaY;
-    if (deltaX === 1) {
+function handleMove(newX, newY) {
+    if (newX > players[playerId].x) {
         players[playerId].direction = "right";
     }
-    else if (deltaX === -1) {
+    else if (newX < players[playerId].x) {
       players[playerId].direction = "left";
     }
+    players[playerId].x = newX;
+    players[playerId].y = newY;
     const message = {
         type: 'playerUpdate',
         value: players[playerId]
@@ -41,7 +41,7 @@ function handleArrowPress(deltaX, deltaY) {
 
 socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data);
-    console.log(data);
+    //console.log(data);
 
     switch (data.type) {
         case 'playersUpdate':
@@ -53,8 +53,8 @@ socket.addEventListener("message", (event) => {
                     el.querySelector(".Character_name").innerText = characterState.name;
                     el.setAttribute("data-color", characterState.color);
                     el.setAttribute("data-direction", characterState.direction);
-                    const left = 16 * characterState.x + "px";
-                    const top = 16 * characterState.y + "px";
+                    const left = characterState.x + "px";
+                    const top = characterState.y + "px";
                     el.style.transform = `translate3d(${left}, ${top}, 0)`;
                 } else {
                     const characterElement = document.createElement("div");
@@ -69,8 +69,8 @@ socket.addEventListener("message", (event) => {
                     playerElements[characterState.id] = characterElement;
                     characterElement.setAttribute("data-color", characterState.color);
                     characterElement.setAttribute("data-direction", characterState.direction);
-                    const left = 16 * characterState.x + "px";
-                    const top = 16 * characterState.y + "px";
+                    const left = characterState.x + "px";
+                    const top = characterState.y + "px";
                     characterElement.style.transform = `translate3d(${left}, ${top}, 0)`;
                     if (characterState.id === playerId) {
                       characterElement.classList.add("you");
@@ -128,11 +128,10 @@ nameInput.addEventListener("change", (e) => {
   socket.send(JSON.stringify(message));
 });
 
-new KeyPressListener("ArrowLeft", () => handleArrowPress(-1, 0));
-new KeyPressListener("KeyA", () => handleArrowPress(-1, 0));
-new KeyPressListener("ArrowUp", () => handleArrowPress(0, -1));
-new KeyPressListener("KeyW", () => handleArrowPress(0, -1));
-new KeyPressListener("ArrowRight", () => handleArrowPress(1, 0));
-new KeyPressListener("KeyD", () => handleArrowPress(1, 0));
-new KeyPressListener("ArrowDown", () => handleArrowPress(0, 1));
-new KeyPressListener("KeyS", () => handleArrowPress(0, 1));
+gameContainer.addEventListener("click", (event) => {
+    const clickX = (event.clientX - gameContainer.getBoundingClientRect().left - 16) / 3;
+    const clickY = (event.clientY - gameContainer.getBoundingClientRect().top - 16) / 3;
+    console.log(clickX, clickY)
+    handleMove(clickX, clickY);
+})
+
