@@ -1,8 +1,9 @@
 # app.py (Flask backend)
 
+import random
+
 from flask import Flask, jsonify
 from flask_cors import CORS
-import random
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
