@@ -24,16 +24,6 @@ const gameContainer = document.querySelector(".game-container");
 const nameInput = document.querySelector("#player-name");
 
 function handleMove(newX, newY) {
-  const button = document.querySelector("#trivia").getBoundingClientRect();
-  if (
-    newX < button.right &&
-    newX > button.left &&
-    newY < button.bottom &&
-    newY > button.top
-  ) {
-    return;
-  }
-
   if (newX > players[playerId].x) {
     players[playerId].direction = "right";
   } else if (newX < players[playerId].x) {
@@ -139,9 +129,7 @@ nameInput.addEventListener("change", (e) => {
 });
 
 gameContainer.addEventListener("click", (event) => {
-  // const clickX = (event.clientX - gameContainer.getBoundingClientRect().left - 16) / 3;
-  // const clickY = (event.clientY - gameContainer.getBoundingClientRect().top - 16) / 3;
-  const clickX = event.clientX - 16;
-  const clickY = event.clientY - 16;
+  const clickX = (event.clientX - 16) / 3;
+  const clickY = (event.clientY - 16) / 3;
   handleMove(clickX, clickY);
 });
