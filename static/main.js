@@ -4,7 +4,7 @@ const socket = new WebSocket(`ws://${location.host}/echo`);
 function generateUUID() {
   let uuid = "";
   const possible = "abcdef0123456789";
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 18; i++) {
     uuid += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return uuid;
