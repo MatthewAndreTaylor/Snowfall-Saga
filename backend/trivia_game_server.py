@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO, join_room
-from flask import request, sessions
+from flask import request, session, sessions
 from curd import TriviaDB
 
 
