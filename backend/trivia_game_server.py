@@ -6,6 +6,7 @@ import random
 def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
     points = {}
     namespace = f'/trivia/game/{game_info['game_id']}'
+    answers = {}
     trivia_questions = [
         {'question': 'What is the capital of France?', 'option1': 'Berlin', 'option2': 'Madrid', 'option3': 'Rome',
          'option4': 'Paris', 'correct': 'option4'},
@@ -63,6 +64,8 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
         if session.get('username') in users:
             users.pop(session.get('username'))
             update_room_user_list()
+        if session.get('username') in answers:
+            answers.pop(session.get('username'))
 
     @socketio.on('register', namespace=namespace)
     def register_user(username):
@@ -77,8 +80,8 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
         while question_number <= game_info['num_questions']:
             question = random.choice(trivia_questions)
             socketio.emit('question', question, room=game_info['game_id'], namespace=namespace)
+            answers.clear()
 
-            answers = {}
             @socketio.on('answer', namespace=namespace)
             def receive_answer(answer):
                 if session.get('username') in users:
