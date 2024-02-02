@@ -1,35 +1,45 @@
 * {
-  box-sizing:border-box;
+  box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: linear-gradient(180deg, #64BEFF -50%, #6e96ff 69.71%, #2a65ff 150%);
-  font-family: 'Source Sans Pro', sans-serif;
+  background: linear-gradient(180deg,
+      #64beff -50%,
+      #6e96ff 69.71%,
+      #2a65ff 150%);
+  font-family: "Source Sans Pro", sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .game-container {
-  position: relative;
-  width: 240px;
-  height: 208px;
+  /* position: relative; */
+  /* width: 240px; */
+  /* height: 208px; */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: url(images/map.png) no-repeat no-repeat;
-  scale: 3;
+  background-size: cover;
+  /* scale: 3; */
   image-rendering: pixelated;
 }
 
 .player-info {
   position: absolute;
   top: 0;
-  left:0;
+  left: 0;
   padding: 1em;
   display: flex;
   gap: 0.5em;
-  align-items: flex-end
+  align-items: flex-end;
 }
 
 label {
@@ -54,21 +64,35 @@ input[type="text"] {
   width: 150px;
   text-transform: uppercase;
 }
+
 input[type="text"]:focus {
   border-color: #f000ff;
 }
 
-button {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  background: #59ff5a;
-  border: 0;
-  border-bottom: 2px solid #1e830b;
+/* button { */
+/*   padding-left: 0.5em; */
+/*   padding-right: 0.5em; */
+/*   background: #59ff5a; */
+/*   border: 0; */
+/*   border-bottom: 2px solid #1e830b; */
+/*   cursor: pointer; */
+/* } */
+
+/* button:active { */
+/*   position: relative; */
+/*   top: 1px; */
+/* } */
+
+.minigame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #000;
+  background: #ff5a5a;
+  width: 10%;
+  height: 10%;
   cursor: pointer;
-}
-button:active {
-  position: relative;
-  top: 1px;
 }
 
 /* Characters */
@@ -77,48 +101,60 @@ button:active {
   width: 18px;
   height: 28px;
 }
+
 .Character {
   transition: transform 0.9s ease-in-out;
 }
+
 .Character.you {
   z-index: 1;
 }
+
 .Character.you .Character_you-arrow {
   display: block;
 }
+
 .Character_you-arrow {
   display: none;
   position: absolute;
-  top:-30px;
+  top: -30px;
   left: 3px;
   width: 7px;
   height: 5px;
   background: url(images/arrow.png) no-repeat no-repeat;
 }
+
 .Character_sprite {
   overflow: hidden;
   top: -16px;
   right: 2px;
   background: url(images/characters.png);
 }
+
 .Character[data-direction="right"] .Character_sprite {
   background-position-x: 18px;
 }
+
 .Character[data-color="red"] .Character_sprite {
   background-position-y: -28px;
 }
+
 .Character[data-color="orange"] .Character_sprite {
   background-position-y: -56px;
 }
+
 .Character[data-color="yellow"] .Character_sprite {
   background-position-y: -84px;
 }
+
 .Character[data-color="green"] .Character_sprite {
   background-position-y: -112px;
 }
+
 .Character[data-color="purple"] .Character_sprite {
   background-position-y: -140px;
 }
+
 .Character_shadow {
   background: url(images/shadow.png) no-repeat no-repeat;
 }
