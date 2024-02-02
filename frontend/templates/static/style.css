@@ -1,220 +1,221 @@
 :root {
-    --color1: rgba(235, 241, 245, 0.4);
-    --color2: rgba(127, 162, 252, 0.6);
-    --color3: rgba(42, 101, 255, 0.8);
+  --color1: rgba(235, 241, 245, 0.4);
+  --color2: rgba(127, 162, 252, 0.6);
+  --color3: rgba(42, 101, 255, 0.8);
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    font-family: 'Source Sans Pro', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: 'Source Sans Pro', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 body {
-  background: url(./images/snow.png) repeat center center, 
-    linear-gradient(180deg, var(--color1) -50%, var(--color2) 69.71%, var(--color3) 150%);
+background: url(./images/snow.png) repeat center center, 
+  linear-gradient(180deg, var(--color1) -50%, var(--color2) 69.71%, var(--color3) 150%);
 }
 
 .game-container {
-    position: relative;
-    width: 240px;
-    height: 208px;
-    bottom: 0;
-    left: 0;
-    transform: scale(3);
-    image-rendering: pixelated;
+  position: relative;
+  width: 240px;
+  height: 208px;
+  bottom: 0;
+  left: 0;
+  transform: scale(3);
+  image-rendering: pixelated;
 }
 
 .player-info {
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 1em;
-    display: flex;
-    gap: 0.5em;
-    align-items: flex-end
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 1em;
+  display: flex;
+  gap: 0.5em;
+  align-items: flex-end
 }
 
 label {
-    display: block;
-    font-weight: bold;
-  }
-  
+  display: block;
+  font-weight: bold;
+}
+
 input[type="text"],
 button {
-    font-family: inherit;
-    font-weight: bold;
-    font-size: 18px;
-    height: 44px;
-    border-radius: 4px;
-    outline: 0;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 18px;
+  height: 44px;
+  border-radius: 4px;
+  outline: 0;
 }
 
 input[type="text"] {
-    outline: 0;
-    padding-left: 0.5em;
-    border: 3px solid #222034;
-    width: 150px;
-    text-transform: uppercase;
+  outline: 0;
+  padding-left: 0.5em;
+  border: 3px solid #222034;
+  width: 150px;
+  text-transform: uppercase;
 }
 input[type="text"]:focus {
-    border-color: #ff6f00;
+  border-color: #ff6f00;
 }
 
 button {
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    background: #546aea;
-    border: 0;
-    border-bottom: 2px solid #1e830b;
-    cursor: pointer;
-    color: #fff;
-  }
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background: #546aea;
+  border: 0;
+  border-bottom: 2px solid #1e830b;
+  cursor: pointer;
+  color: #fff;
+}
 button:active {
-    position: relative;
-    top: 1px;
+  position: relative;
+  top: 1px;
 }
 
 .user-list-container, .chat-container {
-    position: fixed;
-    margin: 20px;
-    padding: 1em;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5em;
-    width: 300px;
-    z-index: 2;
-    right: 0;
+  position: fixed;
+  margin: 20px;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 300px;
+  z-index: 2;
+  right: 0;
 }
 
 .chat-container {
-    bottom: 0;
+  bottom: 0;
 }
 
 .user-list-container {
-    top: 0;
+  top: 0;
 }
 
 .chat-box {
-    background-color: rgba(255, 255, 255, 0.5);
-    overflow-y: auto;
-    height: 200px;
-    padding: 0.25em;
-    display: flex;
-    flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.5);
+  overflow-y: auto;
+  height: 200px;
+  padding: 0.25em;
+  display: flex;
+  flex-direction: column;
 }
 
 p {
-    bottom: 0;
+  bottom: 0;
 }
 
 .message {
-    background-color: #546aea;
-    color: #fff;
-    border-radius: 10px;
-    padding: 0.5em;
-    text-wrap: balance;
-    overflow-wrap: break-word;
+  background-color: #546aea;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.5em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
 }
 
 #chat-message {
-    font-size: 13px;
-    width: 75%;
+  font-size: 13px;
+  width: 75%;
 }
 
 /* Characters */
 .grid-cell {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-  }
-  .Character {
-    transition: transform 0.4s;
-  }
-  .Character.you {
-    z-index: 1;
-  }
-  .Character.you .Character_you-arrow {
-    display: block;
-  }
-  .Character_you-arrow {
-    display: none;
-    position: absolute;
-    top:-18px;
-    left: 5px;
-    width: 7px;
-    height: 5px;
-    background: url(images/arrow.png) no-repeat no-repeat;
-  }
-  .Character_sprite {
-    overflow: hidden;
-    top: -3px;
-    background: url(images/characters.png);
-  }
-  .Character[data-direction="right"] .Character_sprite {
-    background-position-x: 16px;
-  }
-  .Character[data-color="red"] .Character_sprite {
-    background-position-y: -16px;
-  }
-  .Character[data-color="orange"] .Character_sprite {
-    background-position-y: -32px;
-  }
-  .Character[data-color="yellow"] .Character_sprite {
-    background-position-y: -48px;
-  }
-  .Character[data-color="green"] .Character_sprite {
-    background-position-y: -64px;
-  }
-  .Character[data-color="purple"] .Character_sprite {
-    background-position-y: -80px;
-  }
-  .Character_shadow {
-    background: url(images/shadow.png) no-repeat no-repeat;
-  }
-  
-  .Character_name-container {
-    position: absolute;
-    top: -12px;
-    left: -1px;
-    font-size: 5px;
-    padding: 1px 2px 1px;
-    border-radius: 3px;
-    background: #333;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
+  position: absolute;
+  width: 16px;
+  height: 16px;
+}
+.Character {
+  transition: transform 0.4s;
+}
+.Character.you {
+  z-index: 1;
+}
+.Character.you .Character_you-arrow {
+  display: block;
+}
+.Character_you-arrow {
+  display: none;
+  position: absolute;
+  top:-18px;
+  left: 5px;
+  width: 7px;
+  height: 5px;
+  background: url(images/arrow.png) no-repeat no-repeat;
+}
+.Character_sprite {
+  overflow: hidden;
+  top: -3px;
+  background: url(images/characters.png);
+}
+.Character[data-direction="right"] .Character_sprite {
+  background-position-x: 16px;
+}
+.Character[data-color="red"] .Character_sprite {
+  background-position-y: -16px;
+}
+.Character[data-color="orange"] .Character_sprite {
+  background-position-y: -32px;
+}
+.Character[data-color="yellow"] .Character_sprite {
+  background-position-y: -48px;
+}
+.Character[data-color="green"] .Character_sprite {
+  background-position-y: -64px;
+}
+.Character[data-color="purple"] .Character_sprite {
+  background-position-y: -80px;
+}
+.Character_shadow {
+  background: url(images/shadow.png) no-repeat no-repeat;
+}
 
-  .Character_message-container {
-    position: absolute;
-    top: -50px;
-    left: -5px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
+.Character_name-container {
+  position: absolute;
+  top: -12px;
+  left: -1px;
+  font-size: 5px;
+  padding: 1px 2px 1px;
+  border-radius: 3px;
+  background: #333;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 
-  .Character_message {
-    font-size: 5px;
-    padding: 1px 2px 1px;
-    border-radius: 3px;
-    background: #546aea;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
+.Character_message-container {
+  position: absolute;
+  top: -50px;
+  left: -5px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
 
-  .hidden {
-    display: none;
-  }
+.Character_message {
+  font-size: 5px;
+  padding: 1px 2px 1px;
+  border-radius: 3px;
+  background: #546aea;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hidden {
+  display: none;
+}

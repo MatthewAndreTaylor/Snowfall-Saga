@@ -48,7 +48,6 @@ function handleArrowPress(deltaX, deltaY) {
 
 socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data);
-    console.log(data);
 
     switch (data.type) {
         case 'playersUpdate':
@@ -57,8 +56,7 @@ socket.addEventListener("message", (event) => {
             if (!checkUser) {
                 userBox.innerHTML += `<p id="${data.id}">${players[data.id].name}</p>`;
             } else {
-                checkUser.remove();
-                userBox.innerHTML += `<p id="${data.id}">${players[data.id].name}</p>`;
+                checkUser.innerText = `${players[data.id].name}`;
             }
             Object.keys(players).forEach((key) => {
                 const characterState = players[key];
@@ -92,8 +90,7 @@ socket.addEventListener("message", (event) => {
             break
         case 'playerRemoved':
             const key = data.id;
-            const removeUser = document.getElementById(`${key}`);
-            removeUser.remove();
+            document.getElementById(`${key}`).remove();
             gameContainer.removeChild(playerElements[key]);
             delete playerElements[key];
             break
@@ -174,6 +171,7 @@ nameInput.addEventListener("change", (e) => {
     const oldName = players[playerId].name;
     const newName = e.target.value || "guest";
     nameInput.value = newName;
+
     const updated_player = players[playerId];
     updated_player.name = newName
 
@@ -191,7 +189,6 @@ messageInput.addEventListener("keydown", (e) => {
             clearTimeout(timeoutIds.at(0));
             timeoutIds = timeoutIds.slice(1);
         }
-        console.log("Entered keydown event");
         const sender = players[playerId];
 
         timeoutId = setTimeout(() => {
