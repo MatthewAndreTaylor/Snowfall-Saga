@@ -62,7 +62,7 @@ input[type="text"]:focus {
 /* Characters */
 .grid-cell {
   position: absolute;
-  width: 17px;
+  width: 22px;
   height: 28px;
 }
 
@@ -81,6 +81,29 @@ input[type="text"]:focus {
 
 .Character.you .Character_you-arrow {
   display: block;
+}
+
+.Character.you:hover .Character_sprite {
+  background: url(images/throw.gif);
+  [data-direction="right"] & {
+    background-position-x: 22px;
+    right: 5px;
+  }
+  [data-color="red"] & {
+    background-position-y: -28px;
+  }
+  [data-color="orange"] & {
+    background-position-y: -56px;
+  }
+  [data-color="yellow"] & {
+    background-position-y: -84px;
+  }
+  [data-color="green"] & {
+    background-position-y: -112px;
+  }
+  [data-color="purple"] & {
+    background-position-y: -140px;
+  }
 }
 
 .Character_you-arrow {
@@ -115,7 +138,7 @@ input[type="text"]:focus {
 }
 
 .Character[data-direction="right"] .Character_sprite {
-  background-position-x: 17px;
+  background-position-x: 23px;
 }
 
 .Character[data-color="red"] .Character_sprite {
