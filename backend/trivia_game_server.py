@@ -7,7 +7,7 @@ db = TriviaDB('trivia_db.db')
 
 def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
     points = {}
-    namespace = "/trivia/game/" + game_info['game_id']
+    namespace = "/trivia/game/" + str(game_info['game_id'])
 
     @socketio.on('connect', namespace=namespace)
     def connect():

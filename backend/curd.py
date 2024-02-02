@@ -16,7 +16,7 @@ class TriviaDB:
         Args:
             db_path: A string path to the SQLite database file.
         """
-        self.conn = sqlite3.connect(db_path)
+        self.conn = sqlite3.connect(db_path, check_same_thread=False)
         self.cursor = self.conn.cursor()
 
     def close(self):
