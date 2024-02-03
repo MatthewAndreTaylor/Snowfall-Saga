@@ -5,7 +5,7 @@ import random
 
 def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
     points = {}
-    namespace = f'/trivia/game/{game_info['game_id']}'
+    namespace = f"/trivia/game/{game_info['game_id']}"
     answers = {}
     trivia_questions = [
         {'question': 'What is the capital of France?', 'option1': 'Berlin', 'option2': 'Madrid', 'option3': 'Rome',

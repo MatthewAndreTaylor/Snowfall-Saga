@@ -1,4 +1,0 @@
-> In Trivia.js make the "const response = await axios.get('http://localhost:12000/questions');" dynamic by grabbing the ip and port from a 
-    config file and then making the request to backend
-
-> In Trivia.js axios needs to be pip installed 
