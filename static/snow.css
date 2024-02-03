@@ -1,0 +1,25 @@
+.snowflake {
+    display: block;
+    color: #236194;
+    position: absolute;
+    top: -1em;
+    -webkit-user-select: text;
+    user-select: none;
+    pointer-events: none;
+}
+
+@keyframes snowflake-fall {
+    0% {top: -1em;}
+    100% {top: 100vh; opacity: 0.01;}
+}
+
+@keyframes snowflake-shake {
+    0% {transform: translateX(0);}
+    33% {transform: translateX(-120px);}
+    100% {transform: translateX(120px);}
+}
+
+@keyframes snowflake-wind-w {
+    0% {transform: translateX(-240px);}
+    100% {transform: translateX(240px);}
+}
