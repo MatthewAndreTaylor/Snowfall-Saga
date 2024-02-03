@@ -38,7 +38,7 @@ label {
   font-weight: bold;
 }
 
-input[type="text"] {
+input[type="text"], button {
   font-family: inherit;
   font-weight: bold;
   font-size: 18px;
@@ -57,6 +57,20 @@ input[type="text"] {
 
 input[type="text"]:focus {
   border-color: #f000ff;
+}
+
+button {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  background: #546aea;
+  border: 0;
+  border-bottom: 2px solid #1e830b;
+  cursor: pointer;
+  color: #fff;
+}
+button:active {
+  position: relative;
+  top: 1px;
 }
 
 .user-list-container, .chat-container {
