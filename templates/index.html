@@ -18,6 +18,24 @@
       <input id="player-name" maxlength="10" type="text" />
     </div>
   </div>
+  <div class="user-list-container">
+    <div id="user-box" class="chat-box">
+        {% for username, id in usernames %}
+            <p id="{{ id }}">{{ username }}</p>
+        {% endfor %}
+    </div>
+    </div>
+    <div id="chat" class="chat-container">
+        <div id="chat-box" class="chat-box">
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        </div>
+        <div>
+            <input id="chat-message" type="text" maxlength="100" />
+            <button type="button" name="chat-send" id="chat-send">Send</button>
+        </div>
+    </div>
     <script type="module" src="/static/main.js"></script>
     <script src="/static/snow.js"></script>
   </body>

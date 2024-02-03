@@ -20,8 +20,14 @@ let playerId;
 let playerRef;
 let players = {};
 let playerElements = {};
+let timeoutId;
+let timeoutIds = [];
 const gameContainer = document.querySelector(".game-container");
 const nameInput = document.querySelector("#player-name");
+const messageInput = document.querySelector("#chat-message");
+const userBox = document.querySelector("#user-box");
+const chatSend = document.querySelector("#chat-send");
+const chatBox = document.querySelector("#chat-box");
 
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {
@@ -45,6 +51,12 @@ socket.addEventListener("message", (event) => {
   switch (data.type) {
     case "playersUpdate":
       players = data.value || {};
+      const checkUser = document.getElementById(`${data.id}`);
+      if (!checkUser) {
+          userBox.innerHTML += `<p id="${data.id}">${players[data.id].name}</p>`;
+      } else {
+          checkUser.innerText = `${players[data.id].name}`;
+      }
       Object.keys(players).forEach((key) => {
         const characterState = players[key];
         if (key in playerElements) {
@@ -62,8 +74,9 @@ socket.addEventListener("message", (event) => {
                     <div class="Character_shadow grid-cell"></div>
                     <div class="Character_sprite grid-cell"></div>
                     <div class="Character_name-container">
-                        <span class="Character_name">guest</span>
+                    <span class="Character_name">${ players[key].name || "guest"}</span>
                     </div>
+                    <div class="Character_message-container hidden"></div>
                     <div class="Character_you-arrow"></div>`;
           playerElements[characterState.id] = characterElement;
           characterElement.setAttribute("data-color", characterState.color);
@@ -83,9 +96,41 @@ socket.addEventListener("message", (event) => {
       break;
     case "playerRemoved":
       const key = data.id;
+      document.getElementById(`${key}`).remove();
       gameContainer.removeChild(playerElements[key]);
       delete playerElements[key];
       break;
+    case 'newMessage':
+        const node = document.createElement("p");
+        node.appendChild(document.createTextNode(data.message));
+        node.classList.add("message");
+        chatBox.appendChild(node);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        const playerWhoSent = playerElements[data.id];
+
+        const messageContainer = playerWhoSent.querySelector(".Character_message-container");
+
+        if (messageContainer.getElementsByClassName("Character_message").length === 3) {
+            messageContainer.removeChild(playerWhoSent.querySelector(".Character_message"));
+        }
+
+        const bubbleNode = document.createElement("span");
+        bubbleNode.appendChild(document.createTextNode(data.message));
+        bubbleNode.classList.add("Character_message");
+        messageContainer.appendChild(bubbleNode);
+
+        playerWhoSent.querySelector(".Character_message-container").classList.remove("hidden");
+        break
+      case 'timeoutMessage':
+        const timeoutElements = playerElements[data.id];
+        const messageNode = timeoutElements.querySelector(".Character_message");
+        const containerNode = timeoutElements.querySelector(".Character_message-container");
+        containerNode.removeChild(messageNode);
+        if (containerNode.getElementsByClassName("Character_message").length === 0) {
+            containerNode.classList.add("hidden");
+        }
+        break
   }
 });
 
@@ -116,6 +161,7 @@ socket.addEventListener("close", (event) => {
 });
 
 nameInput.addEventListener("change", (e) => {
+  const oldName = players[playerId].name;
   const newName = e.target.value || "guest";
   nameInput.value = newName;
   const updated_player = players[playerId];
@@ -124,7 +170,64 @@ nameInput.addEventListener("change", (e) => {
   const message = {
     type: "playerUpdate",
     value: updated_player,
+    oldname: oldName
   };
+  socket.send(JSON.stringify(message));
+});
+
+messageInput.addEventListener("keydown", (e) => {
+  if (e.key === 'Enter') {
+      if (timeoutIds.length === 3) {
+          clearTimeout(timeoutIds.at(0));
+          timeoutIds = timeoutIds.slice(1);
+      }
+      const sender = players[playerId];
+
+      timeoutId = setTimeout(() => {
+          const message = {
+              type: 'timeoutMessage',
+              id: playerId
+          };
+          socket.send(JSON.stringify(message));
+          timeoutIds = timeoutIds.slice(1);
+      }, 5000);
+      timeoutIds.push(timeoutId);
+
+      const message = {
+          type: 'newMessage',
+          sender: sender.name,
+          data: e.target.value,
+          id: playerId
+      };
+      e.target.value = '';
+      socket.send(JSON.stringify(message));
+  }
+});
+
+chatSend.addEventListener("click", () => {
+  if (timeoutIds.length === 3) {
+    clearTimeout(timeoutIds.at(0));
+    timeoutIds = timeoutIds.slice(1);
+  }
+  const sender = players[playerId];
+
+  timeoutId = setTimeout(() => {
+      const message = {
+          type: 'timeoutMessage',
+          id: playerId
+      };
+      socket.send(JSON.stringify(message));
+      timeoutIds = timeoutIds.slice(1);
+  }, 5000);
+  timeoutIds.push(timeoutId);
+
+  const message = {
+      type: 'newMessage',
+      sender: sender.name,
+      data: e.target.value,
+      id: playerId
+  };
+  e.target.value = '';
   socket.send(JSON.stringify(message));
 });
 
