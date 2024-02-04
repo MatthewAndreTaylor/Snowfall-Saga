@@ -96,9 +96,9 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
             for user in users:
                 if answers[user] == question['correct']:
                     points[user] += 10
-                    socketio.emit('correct', room=users[user], namespace=namespace)
+                    socketio.emit('correct', points, room=users[user], namespace=namespace)
                 else:
-                    socketio.emit('incorrect', room=users[user], namespace=namespace)
+                    socketio.emit('incorrect', points, room=users[user], namespace=namespace)
 
             question_number += 1
 
