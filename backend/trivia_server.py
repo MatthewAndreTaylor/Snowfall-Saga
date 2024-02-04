@@ -4,16 +4,21 @@ from flask_socketio import SocketIO
 from trivia_game_server import trivia_game
 
 app = Flask(__name__, template_folder='../frontend/templates', static_folder='../frontend/static')
-socketio = SocketIO(app)
+socketio = SocketIO(app, )
 
 users = {}
 user_queue = []
 game_info = {'num_questions': 10, 'timer': 10, 'game_id': 0}
 
+current_user = {'username': "JOE"}
 
-@app.route('/')
+@app.route('/trivia', methods=["GET", "POST"])
 def index():
-    return render_template('test/username.html')
+    if request.method == "POST":
+        print("Got HERE")
+        current_user['username'] = request.json['username']
+
+    return render_template('test/username.html', username=current_user['username'])
 
 
 
@@ -80,4 +85,4 @@ def update_party_leader():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True, port=9999)

@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, UserMixin, login_required, current_user
@@ -28,6 +29,9 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 @login_manager.user_loader
 def load_user(user_id: int):
@@ -87,7 +91,9 @@ def index():
 @app.route("/trivia", methods=["GET"])
 @login_required
 def trivia():
-    return f"Sending '{current_user.username}' with id: {current_user.id} into trivia"
+    print(current_user)
+    requests.post("http://127.0.0.1:9999/trivia" , json=current_user.as_dict())
+    return redirect("http://127.0.0.1:9999/trivia")
 
 @sock.route("/echo")
 def echo(connection):
