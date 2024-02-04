@@ -1,26 +1,101 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, UserMixin, login_required, current_user
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
+from  collections import deque
+import hashlib
+import hmac
 import json
 
 app = Flask(__name__)
+app.secret_key = 'MYSECRET'
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///accounts.db"
+
 sock = Sock(app)
 
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+secret_salt = 'mattsSecretSauce'
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+
+@login_manager.user_loader
+def load_user(user_id: int):
+    return User.query.filter_by(id=int(user_id)).first()
+
+# Store player information
 players = {}
+
+# set of all client connections
 clients = set()
-connection_dict = {}
+
+# previous messages before the player spawned are saved
+message_cache = deque(maxlen=6)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+
+    username = request.form.get('username')
+    password = request.form.get('password')
+    user = User.query.filter_by(username=username).first()
+
+    # Hash the users password
+    password = hmac.new(secret_salt.encode(), password.encode(), hashlib.sha512).hexdigest()
+
+    if user and hmac.compare_digest(user.password, password):
+        login_user(user)
+        return redirect('/')
+    return redirect('/login')
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    existing_user = User.query.filter_by(username=username).first()
+
+    if existing_user:
+        return "Username already exists. Please choose a different username."
+
+    # Hashing the user's password before adding it to the database
+    password = hmac.new(secret_salt.encode(), password.encode(), hashlib.sha512).hexdigest()
+    new_user = User(username=username, password=password)
+    db.session.add(new_user)
+    db.session.commit()
+    return redirect('/login')
+
+
+@app.route("/", methods=["GET"])
+@login_required
 def home():
-    return render_template("index.html")
+    return render_template("index.html", player_id=current_user.id)
 
 
 @sock.route("/echo")
 def echo(connection):
-    if connection not in clients:
-        clients.add(connection)
-        print(f"Added connection {connection}")
+    if connection in clients or current_user.id in players:
+        return
+
+    clients.add(connection)
+    players[current_user.id] = {"name": current_user.username, "id": current_user.id}
+    print(f"{current_user.username} joined with connection {connection}")
+
+    # Send the last few messages a player missed before they spawned
+    for message in message_cache:
+        connection.send(json.dumps(message))
 
     while True:
         try:
@@ -28,27 +103,31 @@ def echo(connection):
             data = json.loads(event)
 
             if data["type"] == "playerUpdate":
-                player_id = data["value"]["id"]
-                if player_id not in players:
-                    connection_dict[connection] = player_id
-                players[player_id] = data["value"]
+                players[current_user.id].update(data["value"])
                 send_to_all_clients({"type": "playersUpdate", "value": players})
+
             elif data["type"] == "playerRemoved":
                 player_id = data["id"]
-                del players[data["id"]]
+                if player_id in players:
+                    del players[player_id]
                 send_to_all_clients({"type": "playerRemoved", "id": player_id})
 
-        except (ConnectionError, ConnectionClosed):
+            elif data["type"] == "newMessage":
+                text = data["text"]
+
+                new_message = {"type": "newMessage", "text": text, "id": current_user.id, "name": current_user.username}
+                message_cache.append(new_message)
+                send_to_all_clients(new_message)
+
+        except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
-            player_id = connection_dict[connection]
-            send_to_all_clients({"type": "playerRemoved", "id": player_id})
-            del connection_dict[connection]
-            del players[player_id]
-            print(f"Remove connection {connection}")
+            send_to_all_clients({"type": "playerRemoved", "id": current_user.id})
+            del players[current_user.id]
+            print(f"Removed connection {connection}")
             break
 
 
-def send_to_all_clients(message):
+def send_to_all_clients(message: dict):
     for client in clients:
         client.send(json.dumps(message))
 
