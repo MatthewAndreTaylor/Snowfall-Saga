@@ -4,7 +4,7 @@ dist
 .vscode
 .tox
 .pytest_cache
-*__pycache__/*
+__pycache__/*
 *.so
 *.pyd
 *.egg-info
@@ -13,3 +13,5 @@ dist
 venv
 instance
 .DS_Store
+__pycache__
+*.pyc
