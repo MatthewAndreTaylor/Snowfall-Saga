@@ -17,6 +17,22 @@ const chatBox = document.querySelector("#chat-box");
 const messageInput = document.querySelector("#chat-input");
 
 function handleMove(newX, newY) {
+  const button = document.querySelector(".christmas-tree-button");
+  const buttonX = (button.getBoundingClientRect().left - 16) / 3;
+  const buttonY = (button.getBoundingClientRect().top - 16) / 3;
+  const buttonWidth = (button.getBoundingClientRect().width - 16) / 3;
+  const buttonHeight = (button.getBoundingClientRect().height - 16) / 3;
+
+  if (
+    newX < buttonX + buttonWidth &&
+    newX > buttonX &&
+    newY < buttonY + buttonHeight &&
+    newY > buttonY
+  ) {
+    newX = buttonX - 10;
+    newY = buttonY + buttonHeight / 2;
+  }
+
   if (newX > players[playerId].x) {
     players[playerId].direction = "right";
   } else if (newX < players[playerId].x) {
@@ -33,7 +49,6 @@ function handleMove(newX, newY) {
 
 socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  //console.log(data);
 
   switch (data.type) {
     case "playersUpdate":
