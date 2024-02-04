@@ -29,7 +29,7 @@ def handle_connect():
 
 @app.route('/trivia/game')
 def render_game():
-    return render_template('test/testgame.html', game_id=game_info['game_id'])
+    return render_template('test/testtestgame.html', game_id=game_info['game_id'])
 
 @socketio.on('start_game', namespace='/trivia')
 def start_game():

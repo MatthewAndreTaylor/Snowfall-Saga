@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Tester</title>
+</head>
+<body>
+    <h1>WebSocket Tester</h1>
+    <p id="message"></p>
+    <ul id="usersList"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script>
+        const id = '{{ game_id }}';
+        console.log(id);
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/trivia/game/' + id);
+        var username = '';
+
+        socket.on('connect', function() {
+            // Connection established, print a message on the screen
+            document.getElementById('message').innerText = 'Connected to WebSocket Server';
+            username = sessionStorage.getItem('username');
+            socket.emit('register', username);
+        });
+
+        socket.on('disconnect', function() {
+            // Connection lost, print a message on the screen
+            document.getElementById('message').innerText = 'Disconnected from WebSocket Server';
+        });
+
+        socket.on('hi', function() {
+            console.log('Received hi from the server');
+        });
+
+        socket.addEventListener("user_list", (event) => {
+            console.log('Received user list event:', event);
+            displayUsersList(event);
+        });
+
+        socket.on('question', function(question) {
+            console.log('Received question' + question.question);
+        });
+
+        function displayUsersList(userList) {
+            console.log('Received user list:', userList);
+
+            const usersList = document.getElementById("usersList");
+
+            // Check if userList is defined before attempting to iterate over it
+            if (userList) {
+                console.log('Number of users:', userList.length);
+
+                usersList.innerHTML = '';
+
+                for (const user of userList) {
+                    console.log('Adding user:', user);
+                    const node = document.createElement("li");
+                    const textnode = document.createTextNode(user);
+                    node.appendChild(textnode);
+                    usersList.appendChild(node);
+                }
+
+                // Set display property to 'block' for the <ul> element
+                usersList.style.display = 'block';
+            } else {
+                console.log('User list is undefined or empty.');
+            }
+        }
+
+        function displayQuestion(question) {
+            // Display question
+            const questionElement = document.createElement('p');
+            questionElement.textContent = question['question'];
+            document.body.appendChild(questionElement);
+
+            // Display options as buttons
+            for (let i = 1; i <= 4; i++) {
+                const optionKey = 'option' + i;
+                const optionButton = document.createElement('button');
+                optionButton.textContent = question[optionKey];
+                optionButton.addEventListener('click', () => {
+                    sendAnswer(optionKey);
+                    // Hide the buttons after clicking
+                    hideButtons();
+                });
+                document.body.appendChild(optionButton);
+            }
+
+            function hideButtons() {
+                // Select all buttons and hide them
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => {
+                    button.style.display = 'none';
+                });
+            }
+        }
+
+        function sendAnswer(selectedOption) {
+            socket.emit('answer', selectedOption);
+        }
+
+        // Listen for 'question' event from the server
+        socket.on('question', (question) => {
+            console.log('Received question from server:', question);
+            displayQuestion(question);
+        });
+
+        socket.on('correct', function() {
+            const correctTextElement = document.createElement('p');
+            correctTextElement.textContent = 'Correct';
+            document.body.appendChild(correctTextElement);
+
+        });
+
+        socket.on('incorrect', function() {
+            const correctTextElement = document.createElement('p');
+            correctTextElement.textContent = 'Inorrect';
+            document.body.appendChild(correctTextElement);
+
+        });
+
+    </script>
+</body>
+</html>
