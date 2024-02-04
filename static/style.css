@@ -4,12 +4,8 @@
 
 html,
 body {
-html,
-body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: "Source Sans Pro", sans-serif;
   height: 100%;
   font-family: "Source Sans Pro", sans-serif;
   display: flex;
@@ -20,12 +16,7 @@ body {
 .game-container {
   position: fixed;
   top: 0;
-  position: fixed;
-  top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: url(images/map.png);
   width: 100vw;
   height: 100vh;
   background: url(images/map.png);
@@ -33,7 +24,6 @@ body {
 }
 
 .player-info {
-  position: absolute;
   position: absolute;
   top: 0;
   left: 0;
@@ -68,7 +58,6 @@ input {
 }
 
 .chat-box {
-  background-color: rgba(119, 138, 198, 0.75);
   background-color: rgba(119, 138, 198, 0.75);
   overflow-y: auto;
   height: 300px;
@@ -114,7 +103,7 @@ input {
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 1;
-  transition: opacity 0.2s ease-in-out; 
+  transition: opacity 0.2s ease-in-out;
 }
 
 .Character_message.fade-out {
@@ -126,27 +115,16 @@ input {
   position: absolute;
   width: 22px;
   height: 28px;
-  width: 22px;
-  height: 28px;
 }
-
 
 .Character {
   scale: 3;
   transition: transform 1.1s ease-in-out;
-  scale: 3;
-  transition: transform 1.1s ease-in-out;
 }
-
 
 .Character.you {
   z-index: 1;
 }
-
-.Character:not(.you):hover {
-  filter: drop-shadow(0 0 0.07rem blue);
-}
-
 
 .Character:not(.you):hover {
   filter: drop-shadow(0 0 0.07rem blue);
@@ -179,34 +157,9 @@ input {
   }
 }
 
-
-.Character.you:hover .Character_sprite {
-  background: url(images/throw.gif);
-  [data-direction="right"] & {
-    background-position-x: 22px;
-    right: 5px;
-  }
-  [data-color="red"] & {
-    background-position-y: -28px;
-  }
-  [data-color="orange"] & {
-    background-position-y: -56px;
-  }
-  [data-color="yellow"] & {
-    background-position-y: -84px;
-  }
-  [data-color="green"] & {
-    background-position-y: -112px;
-  }
-  [data-color="purple"] & {
-    background-position-y: -140px;
-  }
-}
-
 .Character_you-arrow {
   display: none;
   position: absolute;
-  top: -30px;
   top: -30px;
   left: 5px;
   width: 7px;
