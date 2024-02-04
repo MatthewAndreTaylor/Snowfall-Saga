@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const snowflakesContainer = document.querySelector(".game-container");
-    const snowflakeCount = 300;
+    const snowflakeCount = 200;
 
     for (let i = 0; i < snowflakeCount; i++) {
         createSnowflake();

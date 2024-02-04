@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Username List</title>
+</head>
+<body>
+    <h1>Username list</h1>
+    <ul id="usersList"></ul>
+
+    <button id="startButton">Start Game</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript">
+
+        let socket = io.connect('http://' + document.domain + ':' + location.port + '/trivia');
+        let randomUsername = '';
+
+        // Generate and send a username immediately after the socket connection is established
+        socket.on('connect', function() {
+            //randomUsername = generateRandomUsername();
+            randomUsername = `{{ username }}`;
+            console.log(randomUsername);
+            socket.emit('username', randomUsername);
+        });
+
+        socket.addEventListener("user_list", (event) => {
+            console.log('Received user list event:', event);
+            displayUsersList(event);
+        });
+
+        socket.on('num_questions', function(data) {
+            console.log('Received num_questions event:', data);
+            displayNumQuestions(data);
+        });
+
+        socket.on('timer', function(data) {
+            console.log('Received timer event:', data);
+            displayTimer(data);
+        });
+
+        socket.on('party_leader', function() {
+            console.log('Received party leader event.');
+            // Check if the client is the party leader
+            var isLeader = confirm('Do you want to change num_questions or timer?');
+            if (isLeader) {
+                // Prompt the party leader to change num_questions or timer values
+                var newNumQuestions = prompt('Enter new number of questions:');
+                if (newNumQuestions !== null) {
+                    // If the user entered a value, send it to the server
+                    socket.emit('num_questions', parseInt(newNumQuestions));
+                }
+
+                var newTimerValue = prompt('Enter new timer value (in seconds):');
+                if (newTimerValue !== null) {
+                    // If the user entered a value, send it to the server
+                    socket.emit('timer', parseInt(newTimerValue));
+                }
+            }
+        });
+
+
+        function generateRandomUsername() {
+            var adjectives = ['Happy', 'Sunny', 'Lucky', 'Creative', 'Gentle', 'Adaptable', 'Brave', 'Calm', 'Daring', 'Eager', 'Friendly', 'Gentle', 'Happy', 'Inquisitive', 'Joyful', 'Kind', 'Lively', 'Magical', 'Neat', 'Optimistic', 'Playful', 'Quick-witted', 'Radiant', 'Sincere', 'Talented', 'Unique', 'Vivacious', 'Witty', 'Zealous', 'Adventurous', 'Bountiful', 'Cheerful', 'Delightful', 'Energetic', 'Fearless', 'Graceful', 'Harmonious', 'Intuitive', 'Jovial', 'Keen', 'Lively', 'Majestic', 'Nurturing', 'Open-minded', 'Passionate', 'Quirky', 'Resilient', 'Spirited', 'Tender', 'Upbeat', 'Whimsical', 'Admirable', 'Bold', 'Courageous', 'Dazzling', 'Empathetic', 'Fascinating', 'Generous', 'Hopeful', 'Inspiring', 'Joyous', 'Knowledgeable', 'Luminous', 'Mindful', 'Noble', 'Outgoing', 'Passionate', 'Quaint', 'Rejuvenating', 'Sociable', 'Tranquil', 'Understanding', 'Vibrant', 'Wondrous', 'Youthful', 'Ambitious', 'Bright', 'Clever', 'Dynamic', 'Eloquent', 'Fierce', 'Gracious', 'Inventive', 'Keen-eyed', 'Lively', 'Mellow', 'Nifty', 'Observant', 'Poised', 'Quizzical', 'Rational', 'Sunny', 'Thoughtful', 'Unique', 'Versatile', 'Wholesome', 'Yummy', 'Zesty', 'Affable', 'Blissful', 'Creative', 'Determined', 'Enthusiastic', 'Fervent', 'Gregarious'];
+            var nouns = ['Cat', 'Dog', 'Sunflower', 'Explorer', 'Dreamer', 'Apple', 'Banana', 'Car', 'Dog', 'Elephant', 'Flower', 'Guitar', 'House', 'Island', 'Jungle', 'Kite', 'Lighthouse', 'Mountain', 'Notebook', 'Ocean', 'Penguin', 'Quilt', 'Rainbow', 'Sunflower', 'Tree', 'Umbrella', 'Volcano', 'Waterfall', 'Xylophone', 'Yacht', 'Zebra', 'Airplane', 'Book', 'Chair', 'Dolphin', 'Eagle', 'Forest', 'Globe', 'Hat', 'Ice Cream', 'Jellyfish', 'Key', 'Lemon', 'Moon', 'Nest', 'Orange', 'Piano', 'Quasar', 'Rocket', 'Star', 'Train', 'Umbrella', 'Violin', 'Whale', 'X-ray', 'Yogurt', 'Zoo', 'Arrow', 'Bicycle', 'Cloud', 'Dinosaur', 'Envelope', 'Fireworks', 'Giraffe', 'Helicopter', 'Igloo', 'Jigsaw', 'Kangaroo', 'Lighthouse', 'Meteor', 'Nectar', 'Owl', 'Puzzle', 'Quilt', 'Rainbow', 'Saxophone', 'Telescope', 'Unicorn', 'Vegetable', 'Wagon', 'Xylograph', 'Yarn', 'Zeppelin', 'Anchor', 'Balloon', 'Caterpillar', 'Daisy', 'Eggplant', 'Feather', 'Globe', 'Hammock', 'Icicle', 'Jellybean', 'Kangaroo', 'Lemonade', 'Marble', 'Noodle', 'Orchestra', 'Popcorn', 'Quilt', 'Raindrop', 'Sunflower', 'Tornado', 'Umbrella', 'Volcano', 'Watermelon', 'Xylophone', 'Yacht', 'Zigzag'];
+
+            var randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+            var randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+
+            return randomAdjective + randomNoun;
+        }
+
+        function displayUsersList(userList) {
+            console.log('Received user list:', userList);
+
+            const usersList = document.getElementById("usersList");
+
+            // Check if userList is defined before attempting to iterate over it
+            if (userList) {
+                console.log('Number of users:', userList.length);
+
+                usersList.innerHTML = '';
+
+                for (const user of userList) {
+                    console.log('Adding user:', user);
+                    const node = document.createElement("li");
+                    const textnode = document.createTextNode(user);
+                    node.appendChild(textnode);
+                    usersList.appendChild(node);
+                }
+
+                // Set display property to 'block' for the <ul> element
+                usersList.style.display = 'block';
+            } else {
+                console.log('User list is undefined or empty.');
+            }
+        }
+
+        function displayNumQuestions(numQuestions) {
+            console.log('Received num_questions:', numQuestions);
+
+            // Display the num_questions value on the screen
+            const numQuestionsElement = document.createElement("p");
+            const textNode = document.createTextNode(`Number of Questions: ${numQuestions}`);
+            numQuestionsElement.appendChild(textNode);
+            document.body.appendChild(numQuestionsElement);
+        }
+
+        function displayTimer(timerValue) {
+            console.log('Received timer:', timerValue);
+
+            // Display the timer value on the screen
+            const timerElement = document.createElement("p");
+            const textNode = document.createTextNode(`Timer: ${timerValue} seconds`);
+            timerElement.appendChild(textNode);
+            document.body.appendChild(timerElement);
+        }
+
+        document.getElementById('startButton').addEventListener('click', function() {
+            // When the button is clicked, send a "start_game" event to the server
+            socket.emit('start_game');
+        });
+
+        socket.on('switch_page', function(data) {
+            sessionStorage.setItem('username', randomUsername);
+            window.location.href = data.url;
+        });
+    </script>
+</body>
+</html>
