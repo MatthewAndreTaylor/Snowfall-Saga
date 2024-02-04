@@ -49,6 +49,11 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
          'option3': 'Harper Lee', 'option4': 'F. Scott Fitzgerald', 'correct': 'option3'},
     ]
 
+    question_number = 0
+
+    def update_room_user_list():
+        socketio.emit('user_list', list(users.keys()), room=game_info['game_id'], namespace=namespace)
+
     @socketio.on('connect', namespace=namespace)
     def connect():
         print('Client joined the game')
@@ -73,33 +78,53 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
         users[username] = request.sid
         points[username] = 0
         if len(points) == len(users):
-            socketio.start_background_task(run_main_game())
+            socketio.start_background_task(run_main_game)
 
     def run_main_game():
-        question_number = 1
-        while question_number <= game_info['num_questions']:
-            question = random.choice(trivia_questions)
+        nonlocal question_number, points, trivia_questions, answers
+        while question_number < game_info['num_questions']:
+            question = trivia_questions[question_number]
             socketio.emit('question', question, room=game_info['game_id'], namespace=namespace)
             answers.clear()
 
+            correct_option = question['correct']
+
+            @socketio.on('next_question', namespace=namespace)
+            def next_question():
+                nonlocal question_number
+                question_number += 1
+                if question_number <= game_info['num_questions']:
+                    question = trivia_questions[question_number]
+                    socketio.emit('question', question, room=game_info['game_id'], namespace=namespace)
+
+                else:
+                     # Emit the final points and game end event
+                    socketio.emit('final_points', points, room=game_info['game_id'], namespace=namespace)
+                    socketio.emit('game_end', room=game_info['game_id'], namespace=namespace)
+
             @socketio.on('answer', namespace=namespace)
-            def receive_answer(answer):
+            def receive_answer(data):
                 if session.get('username') in users:
-                    print('Received answer from', session.get('username'))
-                    answers[session.get('username')] = answer
+                    selected_option = data.get('option', None)
+
+                    if selected_option == correct_option:
+                        points[session.get('username')] = points.get(session.get('username'), 0) + 10
+                        socketio.emit('correct', points, room=users[session.get('username')], namespace=namespace)
+                    else:
+                        socketio.emit('incorrect', points, room=users[session.get('username')], namespace=namespace)
 
             while len(answers) < len(users):
                 socketio.sleep(1)
 
-            print('Received answers', answers)
-            for user in users:
-                if answers[user] == question['correct']:
-                    points[user] += 10
-                    socketio.emit('correct', points, room=users[user], namespace=namespace)
-                else:
-                    socketio.emit('incorrect', points, room=users[user], namespace=namespace)
-
             question_number += 1
 
-    def update_room_user_list():
-        socketio.emit('user_list', list(users.keys()), room=game_info['game_id'], namespace=namespace)
+            # Emit updated points after each question
+            socketio.emit('updated_points', points, room=game_info['game_id'], namespace=namespace)
+
+            # Check if it's the last question
+            if question_number == game_info['num_questions']:
+                break
+
+            socketio.sleep(2)
+
+    
