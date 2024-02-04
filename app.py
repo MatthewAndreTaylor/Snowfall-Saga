@@ -80,9 +80,14 @@ def register():
 
 @app.route("/", methods=["GET"])
 @login_required
-def home():
+def index():
     return render_template("index.html", player_id=current_user.id)
 
+
+@app.route("/trivia", methods=["GET"])
+@login_required
+def trivia():
+    return f"Sending '{current_user.username}' with id: {current_user.id} into trivia"
 
 @sock.route("/echo")
 def echo(connection):
