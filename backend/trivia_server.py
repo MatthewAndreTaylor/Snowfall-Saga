@@ -1,23 +1,25 @@
+#trivia_server.py
 from flask import Flask, render_template, request, session
 from flask_socketio import SocketIO
 from trivia_game_server import trivia_game
 
-app = Flask(__name__, template_folder='../frontend/templates')
-socketio = SocketIO(app)
+app = Flask(__name__, template_folder='../frontend/templates', static_folder='../frontend/static')
+socketio = SocketIO(app, )
 
 users = {}
 user_queue = []
 game_info = {'num_questions': 10, 'timer': 10, 'game_id': 0}
 
+current_user = {'username': "JOE"}
 
-@app.route('/')
+@app.route('/trivia', methods=["GET", "POST"])
 def index():
-    return render_template('test/username.html')
+    if request.method == "POST":
+        print("Got HERE")
+        current_user['username'] = request.json['username']
 
+    return render_template('test/username.html', username=current_user['username'])
 
-@app.route('/trivia/game')
-def render_game():
-    return render_template('test/testgame.html', game_id=game_info['game_id'])
 
 
 @socketio.on('connect', namespace='/trivia')
@@ -25,13 +27,17 @@ def handle_connect():
     print('Client connected to /trivia:', request.sid)
 
 
+@app.route('/trivia/game')
+def render_game():
+    return render_template('test/testtestgame.html', game_id=game_info['game_id'])
+
 @socketio.on('start_game', namespace='/trivia')
 def start_game():
     print('Starting the game')
-    # socketio.emit('switch_page',  game_info, namespace='/trivia')
     game_info['game_id'] += 1
     socketio.start_background_task(trivia_game(socketio, users.copy(), game_info.copy()))
-    socketio.emit('switch_page', {'url': 'trivia/game'}, namespace='/trivia')
+    socketio.emit('switch_page', {'url': 'trivia/game', 'game_id': game_info['game_id']}, namespace='/trivia')
+
 
 
 @socketio.on('username', namespace='/trivia')
@@ -79,4 +85,4 @@ def update_party_leader():
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True, port=9999)

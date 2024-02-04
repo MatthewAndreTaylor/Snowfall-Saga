@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Snowfall Saga</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" type="text/css">
+  <link rel="stylesheet" href="/static/snow.css" type="text/css">
+</head>
+  <body>
+    <div class="game-container">
+      <a class="christmas-tree-button" href="/trivia"></a>
+    </div>
+    <div id="chat" class="chat-container">
+        <div id="chat-box" class="chat-box"></div>
+        <div>
+            <input id="chat-input" type="text" maxlength="40" />
+        </div>
+    </div>
+    <script>
+      const playerId = "{{ player_id }}";
+    </script>
+    <script src="/static/main.js"></script>
+    <script src="/static/snow.js"></script>
+  </body>
+</html>

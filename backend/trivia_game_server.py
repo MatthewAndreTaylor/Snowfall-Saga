@@ -9,6 +9,9 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
     points = {}
     namespace = "/trivia/game/" + str(game_info['game_id'])
 
+    def update_room_user_list():
+        socketio.emit('user_list', list(users.keys()), room=game_info['game_id'], namespace=namespace)
+
     @socketio.on('connect', namespace=namespace)
     def connect():
         print('Client joined the game')
@@ -31,7 +34,7 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
         users[username] = request.sid
         points[username] = 0
         if len(points) == len(users):
-            socketio.start_background_task(run_main_game())
+            socketio.start_background_task(run_main_game)
 
     def run_main_game():
         question_number = 1
@@ -40,6 +43,7 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
             socketio.emit('question', question, room=game_info['game_id'], namespace=namespace)
 
             answers = {}
+
             @socketio.on('answer', namespace=namespace)
             def receive_answer(answer):
                 if session.get('username') in users:
@@ -53,11 +57,8 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
             for user in users:
                 if answers[user] == question['correct']:
                     points[user] += 10
-                    socketio.emit('correct', room=users[user], namespace=namespace)
+                    socketio.emit('correct', points, room=users[user], namespace=namespace)
                 else:
-                    socketio.emit('incorrect', room=users[user], namespace=namespace)
+                    socketio.emit('incorrect', points, room=users[user], namespace=namespace)
 
             question_number += 1
-
-    def update_room_user_list():
-        socketio.emit('user_list', list(users.keys()), room=game_info['game_id'], namespace=namespace)
