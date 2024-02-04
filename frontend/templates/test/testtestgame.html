@@ -3,12 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Tester</title>
+    <title>Trivia Game</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>WebSocket Tester</h1>
+    <h1>Trivia Game</h1>
     <p id="message"></p>
     <ul id="usersList"></ul>
+    <div id="question-container">
+        <p id="question" class="question"></p>
+    </div>
+    <div id="feedback-container"></div>
+    <div id="snowflakes"></div>
+    <div id="scoreboard">
+        <h2>Scoreboard</h2>
+        <ul id="scoresList" class="score-list"></ul>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
     <script>
@@ -29,10 +39,6 @@
             document.getElementById('message').innerText = 'Disconnected from WebSocket Server';
         });
 
-        socket.on('hi', function() {
-            console.log('Received hi from the server');
-        });
-
         socket.addEventListener("user_list", (event) => {
             console.log('Received user list event:', event);
             displayUsersList(event);
@@ -40,6 +46,10 @@
 
         socket.on('question', function(question) {
             console.log('Received question' + question.question);
+        });
+
+        socket.on('updated_points', function (updatedPoints) {
+                updateScores(updatedPoints);
         });
 
         function displayUsersList(userList) {
@@ -72,7 +82,12 @@
             // Display question
             const questionElement = document.createElement('p');
             questionElement.textContent = question['question'];
-            document.body.appendChild(questionElement);
+            questionElement.classList.add('question');
+            // document.body.appendChild(questionElement);
+
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = ''; // Clear previous content
+            questionContainer.appendChild(questionElement);
 
             // Display options as buttons
             for (let i = 1; i <= 4; i++) {
@@ -106,20 +121,68 @@
             displayQuestion(question);
         });
 
-        socket.on('correct', function() {
-            const correctTextElement = document.createElement('p');
-            correctTextElement.textContent = 'Correct';
-            document.body.appendChild(correctTextElement);
 
+        socket.on('correct', function(updatedPoints) {
+            displayFeedback('Correct', 'correct');
+            updateScores(updatedPoints);
         });
 
-        socket.on('incorrect', function() {
-            const correctTextElement = document.createElement('p');
-            correctTextElement.textContent = 'Inorrect';
-            document.body.appendChild(correctTextElement);
-
+        socket.on('incorrect', function(updatedPoints) {
+            displayFeedback('Incorrect', 'incorrect');
+            updateScores(updatedPoints);
         });
 
+
+        function displayFeedback(message, className) {
+            const feedbackContainer = document.getElementById('feedback-container');
+            feedbackContainer.textContent = message;
+            feedbackContainer.className = className;
+        }
+
+        function updateScores(points) {
+            const scoresList = document.getElementById("scoresList");
+
+            if (points) {
+                scoresList.innerHTML = '';
+
+                for (const [user, score] of Object.entries(points)) {
+                    const node = document.createElement("li");
+                    const textnode = document.createTextNode(`${user}: ${score} points`);
+                    node.appendChild(textnode);
+                    scoresList.appendChild(node);
+                }
+            } else {
+                console.log('Points object is undefined or empty.');
+            }
+        }
+
+    </script>
+    <script>
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.style.width = Math.random() * 10 + 'px';
+            snowflake.style.height = snowflake.style.width;
+            snowflake.style.left = Math.random() * window.innerWidth + 'px';
+            document.getElementById('snowflakes').appendChild(snowflake);
+        }
+
+        for (let i = 0; i < 50; i++) {
+            createSnowflake();
+        }
+
+        function animateSnowflakes() {
+            const snowflakes = document.querySelectorAll('.snowflake');
+
+            snowflakes.forEach(snowflake => {
+                const speed = Math.random() * 5 + 1;
+                const startPosition = Math.random() * window.innerWidth;
+                snowflake.style.left = startPosition + 'px';
+                snowflake.style.animation = `snowfall linear infinite ${speed}s`;
+            });
+        }
+
+        animateSnowflakes();
     </script>
 </body>
 </html>

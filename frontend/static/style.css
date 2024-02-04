@@ -1,8 +1,52 @@
+/* Your existing CSS */
+
+#container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.options-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Add this style for the question container */
+#question-container p.question {
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center; /* Center-align the question */
+    margin-top: 20px; /* Adjust the margin for better spacing */
+}
+
+/* Add this style for the options container */
+.options-container button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.options-container button:hover {
+    background-color: #7fd7f3;
+    transform: scale(1.05);
+}
+
+
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(45deg, #87CEEB, #1E90FF); /* Gradient for a winter sky effect */
+    background: linear-gradient(45deg, #87CEEB, #1E90FF);
     color: #fff;
     overflow: hidden;
 }
@@ -10,6 +54,27 @@ body {
 h1 {
     text-align: center;
     color: #fff;
+    margin-top: 20px; /* Adjust the margin for better spacing */
+}
+
+#usersList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    background-color: #333;
+    text-align: center;
+    border-radius: 15px;
+    margin-top: 20px; /* Adjust the margin for better spacing */
+}
+
+#usersList li {
+    display: inline-block;
+    padding: 15px;
+    margin: 10px;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
 }
 
 #question-container {
@@ -21,43 +86,68 @@ h1 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-#timer {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 20px;
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-}
 
-#result {
+
+#scoreboard {
     text-align: center;
     margin-top: 20px;
-    font-weight: bold;
-    font-size: 24px;
-    position: relative;
-    animation: fadeInOut 2s ease-in-out;
+    background-color: #1E90FF;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
 }
 
-#usersList {
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+h2 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+#scoresList {
     list-style-type: none;
     padding: 0;
     margin: 0;
-    overflow: hidden;
-    background-color: #333;
-    text-align: center;
-    border-radius: 15px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-#usersList li {
-    display: inline-block; 
-    padding: 15px; 
-    margin: 10px; 
-    color: white;
+#scoresList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 10px;
+    color: #333;
     background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px; 
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 18px;
+    transition: transform 0.3s ease-in-out;
+}
+
+#scoresList li:hover {
+    transform: scale(1.05);
+}
+
+/* Add this style for the question container */
+#question-container p.question {
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center; /* Center-align the question */
+    margin-top: 20px; /* Adjust the margin for better spacing */
 }
 
 .options-container {
@@ -93,10 +183,6 @@ button:hover {
 .incorrect-answer {
     background-color: #FF4500;
     color: white;
-}
-
-#question-container p {
-    color: #333;
 }
 
 .snowfall {
@@ -143,18 +229,26 @@ button:hover {
     }
 }
 
-#scoreboard {
+
+/* Add styles for the feedback container */
+#feedback-container {
     text-align: center;
     margin-top: 20px;
-    background-color: #1E90FF; /* Blue color for the scoreboard */
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    animation: fadeIn 2s ease-in-out forwards;
+    font-weight: bold;
+    font-size: 24px;
+    position: relative;
+    animation: fadeInOut 2s ease-in-out;
 }
 
-@keyframes fadeIn {
+#feedback-container.correct {
+    color: #4CAF50;
+}
+
+#feedback-container.incorrect {
+    color: #FF4500;
+}
+
+@keyframes fadeInOut {
     from {
         opacity: 0;
     }
@@ -162,37 +256,3 @@ button:hover {
         opacity: 1;
     }
 }
-
-h2 {
-    color: #fff;
-    margin-bottom: 10px;
-}
-
-#scoresList {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#scoresList li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin: 10px;
-    color: #333; /* Updated text color to make it more visible */
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    width: 300px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    font-size: 18px;
-    transition: transform 0.3s ease-in-out;
-}
-
-#scoresList li:hover {
-    transform: scale(1.05);
-}
-
