@@ -143,3 +143,56 @@ button:hover {
     }
 }
 
+#scoreboard {
+    text-align: center;
+    margin-top: 20px;
+    background-color: #1E90FF; /* Blue color for the scoreboard */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+h2 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+#scoresList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#scoresList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 10px;
+    color: #333; /* Updated text color to make it more visible */
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 18px;
+    transition: transform 0.3s ease-in-out;
+}
+
+#scoresList li:hover {
+    transform: scale(1.05);
+}
+
