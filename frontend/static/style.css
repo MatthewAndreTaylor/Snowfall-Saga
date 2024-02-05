@@ -1,5 +1,3 @@
-/* Your existing CSS */
-
 #container {
     display: flex;
     flex-direction: column;
@@ -13,16 +11,14 @@
     margin-top: 20px;
 }
 
-/* Add this style for the question container */
 #question-container p.question {
     color: #333;
     font-size: 24px;
     font-weight: bold;
-    text-align: center; /* Center-align the question */
-    margin-top: 20px; /* Adjust the margin for better spacing */
+    text-align: center; 
+    margin-top: 20px; 
 }
 
-/* Add this style for the options container */
 .options-container button {
     display: block;
     width: 100%;
@@ -41,7 +37,6 @@
     transform: scale(1.05);
 }
 
-
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -54,7 +49,7 @@ body {
 h1 {
     text-align: center;
     color: #fff;
-    margin-top: 20px; /* Adjust the margin for better spacing */
+    margin-top: 20px; 
 }
 
 #usersList {
@@ -65,7 +60,7 @@ h1 {
     background-color: #333;
     text-align: center;
     border-radius: 15px;
-    margin-top: 20px; /* Adjust the margin for better spacing */
+    margin-top: 20px; 
 }
 
 #usersList li {
@@ -86,151 +81,6 @@ h1 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-
-
-#scoreboard {
-    text-align: center;
-    margin-top: 20px;
-    background-color: #1E90FF;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    animation: fadeIn 2s ease-in-out forwards;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-h2 {
-    color: #fff;
-    margin-bottom: 10px;
-}
-
-#scoresList {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#scoresList li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin: 10px;
-    color: #333;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    width: 300px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    font-size: 18px;
-    transition: transform 0.3s ease-in-out;
-}
-
-#scoresList li:hover {
-    transform: scale(1.05);
-}
-
-/* Add this style for the question container */
-#question-container p.question {
-    color: #333;
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center; /* Center-align the question */
-    margin-top: 20px; /* Adjust the margin for better spacing */
-}
-
-.options-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-top: 20px;
-}
-
-button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    font-size: 18px;
-    text-align: center;
-    cursor: pointer;
-    border: none;
-    border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.9);
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-button:hover {
-    background-color: #7fd7f3;
-    transform: scale(1.05);
-}
-
-.correct-answer {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.incorrect-answer {
-    background-color: #FF4500;
-    color: white;
-}
-
-.snowfall {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1000;
-    background: url('snowflake.png') repeat, url('snowflake2.png') repeat; /* Use multiple snowflake images */
-    animation: snowfall 5s linear infinite;
-}
-
-@keyframes snowfall {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(100vh);
-    }
-}
-
-
-#snowflakes {
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-}
-
-.snowflake {
-    position: absolute;
-    background: #FFF;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: snowfall linear infinite;
-}
-
-/* Animation for snowfall */
-@keyframes snowfall {
-    to {
-        transform: translateY(100vh);
-    }
-}
-
-
-/* Add styles for the feedback container */
 #feedback-container {
     text-align: center;
     margin-top: 20px;
@@ -254,5 +104,114 @@ button:hover {
     }
     to {
         opacity: 1;
+    }
+}
+
+#scoreboard {
+    text-align: center;
+    margin-top: 20px;
+    background-color: #1E90FF;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeIn 2s ease-in-out forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+h2 {
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+#scoresList {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 300px; /* Set a maximum height for the scoreboard */
+    overflow-y: auto; /* Enable vertical scroll if needed */
+}
+
+#scoresList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 10px;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 18px;
+    transition: transform 0.3s ease-in-out;
+}
+
+#scoresList li:hover {
+    transform: scale(1.05);
+}
+
+#question-container p.question {
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center; 
+    margin-top: 20px; 
+}
+
+.snowfall {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    background: url('snowflake.png') repeat, url('snowflake2.png') repeat;
+    animation: snowfall 5s linear infinite;
+}
+
+@keyframes snowfall {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(100vh);
+    }
+}
+
+#snowflakes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.snowflake {
+    position: absolute;
+    background: #FFF;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: snowfall linear infinite;
+}
+
+/* Animation for snowfall */
+@keyframes snowfall {
+    to {
+        transform: translateY(100vh);
     }
 }

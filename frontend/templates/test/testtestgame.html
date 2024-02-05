@@ -10,15 +10,20 @@
     <h1>Trivia Game</h1>
     <p id="message"></p>
     <ul id="usersList"></ul>
-    <div id="question-container">
-        <p id="question" class="question"></p>
+    <div id="container">
+        <div id="question-container">
+            <p id="question" class="question"></p>
+        </div>
+        <div class="options-container">
+        </div>
+        <div id="feedback-container"></div>
     </div>
-    <div id="feedback-container"></div>
-    <div id="snowflakes"></div>
     <div id="scoreboard">
         <h2>Scoreboard</h2>
         <ul id="scoresList" class="score-list"></ul>
     </div>
+
+    <div id="snowflakes"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
     <script>
@@ -89,6 +94,10 @@
             questionContainer.innerHTML = ''; // Clear previous content
             questionContainer.appendChild(questionElement);
 
+            const optionsContainer = document.querySelector('.options-container');
+            optionsContainer.innerHTML = ''; // Clear previous content
+            
+
             // Display options as buttons
             for (let i = 1; i <= 4; i++) {
                 const optionKey = 'option' + i;
@@ -99,12 +108,14 @@
                     // Hide the buttons after clicking
                     hideButtons();
                 });
-                document.body.appendChild(optionButton);
+                // document.body.appendChild(optionButton);
+                optionsContainer.appendChild(optionButton);
             }
 
             function hideButtons() {
                 // Select all buttons and hide them
-                const buttons = document.querySelectorAll('button');
+                // const buttons = document.querySelectorAll('button');
+                const buttons = document.querySelectorAll('.options-container button');
                 buttons.forEach(button => {
                     button.style.display = 'none';
                 });
