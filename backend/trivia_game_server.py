@@ -1,9 +1,9 @@
 from flask_socketio import SocketIO, join_room
 from flask import request, session, sessions
-from curd import TriviaDB
+from questions import TriviaDB
 
 
-db = TriviaDB('trivia_db.db')
+db = TriviaDB('trivia_questions.csv')
 
 def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
     points = {}
