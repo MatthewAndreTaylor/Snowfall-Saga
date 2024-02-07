@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Username List</title>
+    <title>Player List</title>
 </head>
 <body>
-    <h1>Username list</h1>
+    <h1>Player List</h1>
     <ul id="usersList"></ul>
 
     <button id="startButton">Start Game</button>
@@ -35,27 +35,16 @@
             displayNumQuestions(data);
         });
 
-        socket.on('timer', function(data) {
-            console.log('Received timer event:', data);
-            displayTimer(data);
-        });
-
         socket.on('party_leader', function() {
             console.log('Received party leader event.');
             // Check if the client is the party leader
-            var isLeader = confirm('Do you want to change num_questions or timer?');
+            var isLeader = confirm('Do you want to change the number of questions?');
             if (isLeader) {
                 // Prompt the party leader to change num_questions or timer values
                 var newNumQuestions = prompt('Enter new number of questions:');
                 if (newNumQuestions !== null) {
                     // If the user entered a value, send it to the server
                     socket.emit('num_questions', parseInt(newNumQuestions));
-                }
-
-                var newTimerValue = prompt('Enter new timer value (in seconds):');
-                if (newTimerValue !== null) {
-                    // If the user entered a value, send it to the server
-                    socket.emit('timer', parseInt(newTimerValue));
                 }
             }
         });
