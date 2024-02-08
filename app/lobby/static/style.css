@@ -1,0 +1,233 @@
+* {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Source Sans Pro", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .game-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url(images/map.png);
+    image-rendering: pixelated;
+  }
+
+  .player-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1em;
+    display: flex;
+    gap: 0.5em;
+    align-items: flex-end;
+  }
+
+  /* players */
+  .grid-cell {
+    position: absolute;
+    width: 22px;
+    height: 28px;
+  }
+
+  .player {
+    scale: 3;
+    transition: transform 1.1s ease-in-out;
+  }
+
+  .player.you {
+    z-index: 1;
+  }
+
+  .player:not(.you):hover {
+    filter: drop-shadow(0 0 0.07rem blue);
+  }
+
+  .player.you .player_you-arrow {
+    display: block;
+  }
+
+  .player.you:hover .player_sprite {
+    background: url(images/throw.gif);
+    [data-direction="right"] & {
+      background-position-x: 22px;
+      right: 5px;
+    }
+    [data-color="red"] & {
+      background-position-y: -28px;
+    }
+    [data-color="orange"] & {
+      background-position-y: -56px;
+    }
+    [data-color="yellow"] & {
+      background-position-y: -84px;
+    }
+    [data-color="green"] & {
+      background-position-y: -112px;
+    }
+    [data-color="purple"] & {
+      background-position-y: -140px;
+    }
+  }
+
+  .player_you-arrow {
+    display: none;
+    position: absolute;
+    top: -30px;
+    left: 5px;
+    width: 7px;
+    height: 5px;
+    background: url(images/arrow.png) no-repeat no-repeat;
+  }
+
+  .player_name-container {
+    position: absolute;
+    top: -25px;
+    left: 40%;
+    transform: translateX(-50%);
+    font-size: 5px;
+    padding: 1px 2px 1px;
+    border-radius: 3px;
+    background: #333;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .player_sprite {
+    overflow: hidden;
+    top: -14px;
+    background: url(images/players.png);
+  }
+
+  .player[data-direction="right"] .player_sprite {
+    background-position-x: 23px;
+  }
+
+  .player[data-color="blue"] .player_sprite {
+    background-position-y: -28px;
+  }
+
+  .player[data-color="green"] .player_sprite {
+    background-position-y: -56px;
+  }
+
+  .player[data-color="purple"] .player_sprite {
+    background-position-y: -84px;
+  }
+
+  .player[data-color="pink"] .player_sprite {
+    background-position-y: -112px;
+  }
+
+  .player[data-color="turquoise"] .player_sprite {
+    background-position-y: -140px;
+  }
+
+  .player_shadow {
+    background: url(images/shadow.png) no-repeat no-repeat;
+  }
+
+  /* Messages */
+input {
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #3366cc;
+  border-radius: 5px;
+}
+
+.chat-container {
+  position: fixed;
+  margin: 20px;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 300px;
+  z-index: 2;
+  right: 0;
+}
+
+.chat-container {
+  bottom: 0;
+}
+
+.chat-box {
+  background-color: rgba(119, 138, 198, 0.75);
+  overflow-y: auto;
+  height: 300px;
+  padding: 0.1em;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+}
+
+.message {
+  background-color: #546aea;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.5em;
+  margin: 0.05em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+#chat-input {
+  font-size: 15px;
+  width: 100%;
+}
+
+.player_message-container {
+  position: absolute;
+  bottom: 60px;
+  left: 40%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.player_message {
+  font-size: 5px;
+  padding: 1px 2px 1px;
+  border-radius: 3px;
+  margin: 0.05em;
+  background: #546aea;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.player_message.fade-out {
+  opacity: 0;
+}
+
+  /* props */
+  .christmas-tree-button {
+    position: fixed;
+    top: 200px;
+    left: 200px;
+    width: 50px;
+    height: 80px;
+    border: none;
+    scale: 2;
+    background: url(images/waypoint.png) no-repeat no-repeat;
+  }
+
+  .christmas-tree-button:hover {
+    filter: drop-shadow(0 0 0.75rem yellow);
+  }
