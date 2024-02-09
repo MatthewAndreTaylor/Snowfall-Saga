@@ -153,3 +153,10 @@ messageInput.addEventListener("keydown", (e) => {
       socket.send(JSON.stringify(message));
   }
 });
+
+// When a user clicks within the game container, it moves their player
+gameContainer.addEventListener("click", (event) => {
+  const clickX = (event.clientX - 16) / 3;
+  const clickY = (event.clientY - 16) / 3;
+  handleMove(clickX, clickY);
+});
