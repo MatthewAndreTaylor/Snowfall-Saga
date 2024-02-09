@@ -63,19 +63,19 @@ body {
         background-position-x: 22px;
         right: 5px;
     }
-    [data-color="red"] & {
+    [data-color="blue"] & {
         background-position-y: -28px;
     }
-    [data-color="orange"] & {
+    [data-color="green"] & {
         background-position-y: -56px;
     }
-    [data-color="yellow"] & {
+    [data-color="purple"] & {
         background-position-y: -84px;
     }
-    [data-color="green"] & {
+    [data-color="pink"] & {
         background-position-y: -112px;
     }
-    [data-color="purple"] & {
+    [data-color="turquoise"] & {
         background-position-y: -140px;
     }
 }
@@ -108,7 +108,7 @@ body {
 .player_sprite {
     overflow: hidden;
     top: -14px;
-    background: url(images/players.png);
+    background: url(images/characters.png);
 }
 
 .player[data-direction="right"] .player_sprite {

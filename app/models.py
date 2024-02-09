@@ -1,15 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm.decl_api import DeclarativeMeta
 from flask_login import UserMixin
 
 db = SQLAlchemy()
 
 
-class Base(metaclass=DeclarativeMeta):
-    __abstract__ = True
-
-
-class User(UserMixin, Base):
+class User(UserMixin, db.Model):
     """Class representing a user in the system.
 
     Attributes:
