@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         snowflake.appendChild(content);
         snowflake.className = "snowflake";
         snowflake.style.fontSize = `calc(6px + ${Math.random() * 7}px)`;
-        snowflake.style.left = `${Math.random() * 2000}px`;
+        snowflake.style.left = `${Math.random() * 90}vw`;
         snowflake.style.animation = `
             snowflake-fall ${6 + 6 * Math.random()}s linear ${
             1 + 4 * Math.random()

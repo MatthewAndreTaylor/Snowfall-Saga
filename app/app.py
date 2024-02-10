@@ -1,7 +1,5 @@
 from flask import Flask
 from flask_login import LoginManager
-from auth import login_view
-from lobby import lobby_view
 from models import db, User
 
 app = Flask(__name__)
@@ -25,7 +23,12 @@ def load_user(user_id: int):
     return User.query.filter_by(id=int(user_id)).first()
 
 
+from auth import login_view
+
 app.register_blueprint(login_view)
+
+from lobby import lobby_view
+
 app.register_blueprint(lobby_view)
 
 with app.app_context():

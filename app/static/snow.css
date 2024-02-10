@@ -1,5 +1,9 @@
+body {
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
 .snowflake {
-    display: block;
     color: #236194;
     position: absolute;
     top: -1em;
