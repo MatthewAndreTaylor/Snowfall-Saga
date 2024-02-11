@@ -8,9 +8,7 @@ def create_trivia_app():
         template_folder="templates",
         static_folder="static",
     )
-    app.config['SECRET KEY'] = 'secret'
+    app.config["SECRET KEY"] = "secret"
     socketio = SocketIO(app)
 
     return app, socketio
-
-

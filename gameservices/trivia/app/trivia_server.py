@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 from .trivia_game_server import trivia_game
 from . import create_trivia_app
 
-app,socketio = create_trivia_app()
+app, socketio = create_trivia_app()
 
 users = {}
 user_queue = []
@@ -11,22 +11,28 @@ game_info = {"num_questions": 10, "timer": 10, "game_id": 0}
 
 current_user = {"username": "JOE"}
 
+
 @app.route("/trivia", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         print("Got HERE")
         current_user["username"] = request.json["username"]
 
-    print('got a connection')
-    return render_template("trivia_waiting_room.html", username=current_user["username"])
+    print("got a connection")
+    return render_template(
+        "trivia_waiting_room.html", username=current_user["username"]
+    )
+
 
 @socketio.on("connect", namespace="/trivia")
 def handle_connect():
     print("Client connected to /trivia:", request.sid)
 
+
 @app.route("/trivia/game")
 def render_game():
     return render_template("trivia_game.html", game_id=game_info["game_id"])
+
 
 @socketio.on("start_game", namespace="/trivia")
 def start_game():
@@ -40,6 +46,7 @@ def start_game():
         {"url": "trivia/game", "game_id": game_info["game_id"]},
         namespace="/trivia",
     )
+
 
 @socketio.on("username", namespace="/trivia")
 def get_username(username):
@@ -58,6 +65,7 @@ def get_username(username):
     if len(users) == 1:
         update_party_leader()
 
+
 @socketio.on("disconnect", namespace="/trivia")
 def handle_disconnect():
     if session.get("username") in users:
@@ -67,22 +75,27 @@ def handle_disconnect():
         update_users()
         update_party_leader()
 
+
 @socketio.on("num_questions", namespace="/trivia")
 def update_num_questions(new_num):
     game_info["num_questions"] = new_num
     socketio.emit("num_questions", game_info["num_questions"], namespace="/trivia")
+
 
 @socketio.on("timer", namespace="/trivia")
 def update_timer(new_timer):
     game_info["timer"] = int(new_timer)
     socketio.emit("timer", game_info["timer"], namespace="/trivia")
 
+
 def update_users():
     socketio.emit("user_list", list(users.keys()), namespace="/trivia")
+
 
 def update_party_leader():
     if len(user_queue) > 0:
         socketio.emit("party_leader", room=user_queue[0], namespace="/trivia")
+
 
 def run():
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True, port=9999)
