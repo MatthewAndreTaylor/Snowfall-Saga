@@ -1,14 +1,10 @@
 from flask_socketio import SocketIO, join_room
 from flask import request, session
 from .questions import TriviaDB
-
 import random
 
 
-db = TriviaDB("app/static/trivia_questions.csv")
-
-
-def trivia_game(socketio: SocketIO, users: dict, game_info: dict):
+def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
     points = {}
     namespace = "/trivia/game/" + str(game_info["game_id"])
 

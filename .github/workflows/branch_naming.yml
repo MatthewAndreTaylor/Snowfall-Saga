@@ -1,4 +1,4 @@
-name: 'Assert Branch Naming Convention'
+name: "Assert Branch Naming Convention"
 on: pull_request
 
 jobs:

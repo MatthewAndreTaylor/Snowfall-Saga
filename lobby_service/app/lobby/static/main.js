@@ -52,19 +52,16 @@ socket.addEventListener("message", (event) => {
           const playerElement = document.createElement("div");
           playerElement.classList.add("player", "grid-cell");
           playerElement.innerHTML = `
-                    <div class="player_shadow grid-cell"></div>
                     <div class="player_sprite grid-cell"></div>
                     <div class="player_name-container">
                         <span class="player_name">${playerState.name}</span>
                     </div>
                     <div class="player_message-container"></div>
-                    <div class="player_you-arrow"></div>`;
+                    <div class="player_you-arrow"></div>
+                    <div class="player_shadow grid-cell"></div>`;
           playerElements[key] = playerElement;
           playerElement.setAttribute("data-color", playerState.color);
-          playerElement.setAttribute(
-            "data-direction",
-            playerState.direction,
-          );
+          playerElement.setAttribute("data-direction", playerState.direction);
           const left = playerState.x + "px";
           const top = playerState.y + "px";
           playerElement.style.transform = `translate3d(${left}, ${top}, 0)`;
@@ -80,7 +77,7 @@ socket.addEventListener("message", (event) => {
       gameContainer.removeChild(playerElements[key]);
       delete playerElements[key];
       break;
-    case 'newMessage':
+    case "newMessage":
       const node = document.createElement("p");
       node.appendChild(document.createTextNode(`${data.name}: ${data.text}`));
       node.classList.add("message");
@@ -93,15 +90,21 @@ socket.addEventListener("message", (event) => {
       const playerWhoSent = playerElements[data.id];
 
       if (playerWhoSent) {
-        const messageContainer = playerWhoSent.querySelector(".player_message-container");
+        const messageContainer = playerWhoSent.querySelector(
+          ".player_message-container",
+        );
 
         // Check if there are already 3 more messages in the container
         const messages = messageContainer.querySelectorAll(".player_message");
         if (messages.length >= 3) {
           messages[0].classList.add("fade-out");
-          messages[0].addEventListener("transitionend", () => {
-            messageContainer.removeChild(messages[0]);
-          }, { once: true });
+          messages[0].addEventListener(
+            "transitionend",
+            () => {
+              messageContainer.removeChild(messages[0]);
+            },
+            { once: true },
+          );
         }
 
         const bubbleNode = document.createElement("span");
@@ -110,9 +113,13 @@ socket.addEventListener("message", (event) => {
         messageContainer.appendChild(bubbleNode);
         setTimeout(() => {
           bubbleNode.classList.add("fade-out");
-          bubbleNode.addEventListener("transitionend", () => {
-            messageContainer.removeChild(bubbleNode);
-          }, { once: true });
+          bubbleNode.addEventListener(
+            "transitionend",
+            () => {
+              messageContainer.removeChild(bubbleNode);
+            },
+            { once: true },
+          );
         }, 5000);
       }
       break;
@@ -126,8 +133,8 @@ socket.addEventListener("open", (event) => {
     value: {
       direction: "right",
       color: randomChoice(playerColors),
-      x: 100* Math.random() + 100,
-      y: 100* Math.random() + 100,
+      x: 100 * Math.random() + 100,
+      y: 100 * Math.random() + 100,
     },
   };
   socket.send(JSON.stringify(message));
@@ -144,13 +151,13 @@ socket.addEventListener("close", (event) => {
 
 // Send a user's message by pressing 'Enter'
 messageInput.addEventListener("keydown", (e) => {
-  if (e.key === 'Enter' && e.target.value.length > 0) {
-      const message = {
-          type: 'newMessage',
-          text: e.target.value,
-      };
-      e.target.value = '';
-      socket.send(JSON.stringify(message));
+  if (e.key === "Enter" && e.target.value.length > 0) {
+    const message = {
+      type: "newMessage",
+      text: e.target.value,
+    };
+    e.target.value = "";
+    socket.send(JSON.stringify(message));
   }
 });
 

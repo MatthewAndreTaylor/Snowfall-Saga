@@ -1,5 +1,6 @@
 import pytest
 from lobby_service.app import create_app
+from gameservices.trivia.app import app
 
 
 @pytest.fixture
@@ -49,4 +50,15 @@ def test_login(client):
         data={"username": "testuser", "password": "password"},
         follow_redirects=True,
     )
+    assert response.status_code == 200
+
+
+@pytest.fixture
+def trivia_client():
+    with app.test_client() as trivia_client:
+        yield trivia_client
+
+
+def test_trivia_page(trivia_client):
+    response = trivia_client.get("/trivia")
     assert response.status_code == 200
