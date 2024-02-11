@@ -16,7 +16,6 @@ class TriviaDB:
         """
         self.db_path = db_path
         self.df = pd.read_csv(db_path, on_bad_lines="skip")
-        print(self.df)
 
     def get_categories(self):
         # Retrieve all the categories from the csv

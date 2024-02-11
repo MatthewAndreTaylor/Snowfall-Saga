@@ -1,4 +1,4 @@
-import app.trivia_server
+from app import app, socketio
 
 if __name__ == "__main__":
-    app.trivia_server.run()
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True, port=9999)

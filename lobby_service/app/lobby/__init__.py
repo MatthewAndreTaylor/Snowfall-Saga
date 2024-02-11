@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect
 from flask_login import current_user, login_required
 from simple_websocket import ConnectionClosed
 from flask_sock import Sock
+import requests
 from collections import deque
 import json
 
@@ -29,6 +30,13 @@ message_cache = deque(maxlen=6)
 @login_required
 def lobby():
     return render_template("lobby/index.html", player_id=current_user.id)
+
+
+@lobby_view.route("/trivia", methods=["GET"])
+@login_required
+def trivia():
+    requests.post("http://127.0.0.1:9999/trivia", json=current_user.to_dict())
+    return redirect("http://127.0.0.1:9999/trivia")
 
 
 @sock.route("/echo")
