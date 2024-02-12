@@ -50,7 +50,7 @@ body {
 }
 
 .player:not(.you):hover {
-  filter: drop-shadow(0 0 0.07rem blue);
+  filter: drop-shadow(0 0 0.1rem orchid);
 }
 
 .player.you .player_you-arrow {
@@ -101,7 +101,6 @@ body {
   background: #333;
   color: white;
   font-weight: bold;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -206,7 +205,6 @@ input {
   background: #546aea;
   color: white;
   font-weight: bold;
-  text-transform: uppercase;
   white-space: nowrap;
   opacity: 1;
   transition: opacity 0.2s ease-in-out;

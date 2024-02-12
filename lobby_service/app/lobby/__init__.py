@@ -22,9 +22,6 @@ players = {}
 # Set of all client connections
 clients = set()
 
-# Previous messages before the player spawned are saved
-message_cache = deque(maxlen=6)
-
 
 @lobby_view.route("/")
 @login_required
@@ -48,10 +45,6 @@ def echo(connection):
     players[current_user.id] = {"name": current_user.username, "id": current_user.id}
     print(f"{current_user.username} joined with connection {connection}")
 
-    # Send the last few messages a player missed before they spawned
-    for message in message_cache:
-        connection.send(json.dumps(message))
-
     while True:
         try:
             event = connection.receive()
@@ -66,18 +59,6 @@ def echo(connection):
                 if player_id in players:
                     del players[player_id]
                 send_to_all_clients({"type": "playerRemoved", "id": player_id})
-
-            elif data["type"] == "newMessage":
-                text = data["text"]
-
-                new_message = {
-                    "type": "newMessage",
-                    "text": text,
-                    "id": current_user.id,
-                    "name": current_user.username,
-                }
-                message_cache.append(new_message)
-                send_to_all_clients(new_message)
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)

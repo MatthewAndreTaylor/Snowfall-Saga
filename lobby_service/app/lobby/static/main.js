@@ -1,5 +1,6 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
+const messageSocket = new WebSocket(`ws://${location.host}/message`);
 
 function randomChoice(arr) {
   return arr[Math.floor(arr.length * Math.random())];
@@ -77,52 +78,6 @@ socket.addEventListener("message", (event) => {
       gameContainer.removeChild(playerElements[key]);
       delete playerElements[key];
       break;
-    case "newMessage":
-      const node = document.createElement("p");
-      node.appendChild(document.createTextNode(`${data.name}: ${data.text}`));
-      node.classList.add("message");
-      chatBox.appendChild(node);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      setTimeout(() => {
-        chatBox.removeChild(node);
-      }, 10000);
-
-      const playerWhoSent = playerElements[data.id];
-
-      if (playerWhoSent) {
-        const messageContainer = playerWhoSent.querySelector(
-          ".player_message-container",
-        );
-
-        // Check if there are already 3 more messages in the container
-        const messages = messageContainer.querySelectorAll(".player_message");
-        if (messages.length >= 3) {
-          messages[0].classList.add("fade-out");
-          messages[0].addEventListener(
-            "transitionend",
-            () => {
-              messageContainer.removeChild(messages[0]);
-            },
-            { once: true },
-          );
-        }
-
-        const bubbleNode = document.createElement("span");
-        bubbleNode.appendChild(document.createTextNode(data.text));
-        bubbleNode.classList.add("player_message");
-        messageContainer.appendChild(bubbleNode);
-        setTimeout(() => {
-          bubbleNode.classList.add("fade-out");
-          bubbleNode.addEventListener(
-            "transitionend",
-            () => {
-              messageContainer.removeChild(bubbleNode);
-            },
-            { once: true },
-          );
-        }, 5000);
-      }
-      break;
   }
 });
 
@@ -149,21 +104,103 @@ socket.addEventListener("close", (event) => {
   socket.send(JSON.stringify(message));
 });
 
+messageSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  //console.log(data);
+
+  const node = document.createElement("p");
+  if (data.type != "newMessage") {
+    node.style.backgroundColor = "orchid";
+  }
+
+  node.appendChild(document.createTextNode(`${data.name}: ${data.text}`));
+  node.classList.add("message");
+  chatBox.appendChild(node);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  setTimeout(() => {
+    chatBox.removeChild(node);
+  }, 10000);
+
+  const playerWhoSent = playerElements[data.id];
+
+  if (playerWhoSent) {
+    const messageContainer = playerWhoSent.querySelector(
+      ".player_message-container",
+    );
+
+    // Check if there are already 3 more messages in the container
+    const messages = messageContainer.querySelectorAll(".player_message");
+    if (messages.length >= 3) {
+      messages[0].classList.add("fade-out");
+      messages[0].addEventListener(
+        "transitionend",
+        () => {
+          messageContainer.removeChild(messages[0]);
+        },
+        { once: true },
+      );
+    }
+
+    const bubbleNode = document.createElement("span");
+    if (data.type != "newMessage") {
+      bubbleNode.style.backgroundColor = "orchid";
+    }
+
+    bubbleNode.appendChild(document.createTextNode(data.text));
+    bubbleNode.classList.add("player_message");
+    messageContainer.appendChild(bubbleNode);
+    setTimeout(() => {
+      bubbleNode.classList.add("fade-out");
+      bubbleNode.addEventListener(
+        "transitionend",
+        () => {
+          messageContainer.removeChild(bubbleNode);
+        },
+        { once: true },
+      );
+    }, 5000);
+  }
+});
+
 // Send a user's message by pressing 'Enter'
 messageInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && e.target.value.length > 0) {
+    const words = e.target.value.split(" ");
+    const match = words[0].match(/^@(\w+)/);
     const message = {
       type: "newMessage",
       text: e.target.value,
     };
+
+    if (match) {
+      message.type = "directMessage";
+      message.to = match[1];
+    }
+
+    console.log(message);
     e.target.value = "";
-    socket.send(JSON.stringify(message));
+    messageSocket.send(JSON.stringify(message));
   }
 });
 
 // When a user clicks within the game container, it moves their player
 gameContainer.addEventListener("click", (event) => {
-  const clickX = (event.clientX - 16) / 3;
-  const clickY = (event.clientY - 16) / 3;
-  handleMove(clickX, clickY);
+  const clickedElement = event.target.closest(".player");
+  if (clickedElement) {
+    const playerName = clickedElement.querySelector(".player_name").innerText;
+    const match = messageInput.value.match(/^@(\w+)/);
+    if (!match) {
+      messageInput.value = `@${playerName} ${messageInput.value}`;
+    } else {
+      // Replace the current playerName in the message input with the new one
+      messageInput.value = messageInput.value.replace(
+        /^@(\w+)/,
+        `@${playerName}`,
+      );
+    }
+  } else {
+    const clickX = (event.clientX - 16) / 3;
+    const clickY = (event.clientY - 16) / 3;
+    handleMove(clickX, clickY);
+  }
 });
