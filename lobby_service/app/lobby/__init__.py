@@ -5,6 +5,8 @@ from flask_sock import Sock
 import requests
 from collections import deque
 import json
+from .. import db
+from ..models import User
 
 lobby_view = Blueprint(
     "lobby_view",
@@ -45,7 +47,11 @@ def echo(connection):
         return
 
     clients.add(connection)
-    players[current_user.id] = {"name": current_user.username, "id": current_user.id}
+    players[current_user.id] = {
+        "name": current_user.username,
+        "id": current_user.id,
+        "sprite": current_user.sprite,
+    }
     print(f"{current_user.username} joined with connection {connection}")
 
     # Send the last few messages a player missed before they spawned
@@ -58,6 +64,15 @@ def echo(connection):
             data = json.loads(event)
 
             if data["type"] == "playerUpdate":
+                # Update database with user's new sprite ONLY IF sprite changes
+                if (
+                    "sprite" in data["value"]
+                    and data["value"]["sprite"] != current_user.sprite
+                ):
+                    user = User.query.filter_by(username=current_user.username).first()
+                    user.sprite = data["value"]["sprite"]
+                    db.session.commit()
+
                 players[current_user.id].update(data["value"])
                 send_to_all_clients({"type": "playersUpdate", "value": players})
 
@@ -78,6 +93,13 @@ def echo(connection):
                 }
                 message_cache.append(new_message)
                 send_to_all_clients(new_message)
+
+            elif data["type"] == "getSprites":
+                message = {
+                    "type": "getSprites",
+                    "inventory": current_user.sprite_inventory,
+                }
+                connection.send(json.dumps(message))
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
