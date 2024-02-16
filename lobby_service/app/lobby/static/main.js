@@ -108,13 +108,26 @@ messageSocket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
   //console.log(data);
 
-  const node = document.createElement("p");
+  const node = document.createElement("div");
   if (data.type != "newMessage") {
     node.style.backgroundColor = "orchid";
   }
 
-  node.appendChild(document.createTextNode(`${data.name}: ${data.text}`));
+  const messageTextNode = document.createElement("p");
+  messageTextNode.appendChild(
+    document.createTextNode(`${data.name}: ${data.text}`),
+  );
+  messageTextNode.classList.add("message-text");
+  node.appendChild(messageTextNode);
+
+  const timeNode = document.createElement("small");
+  timeNode.appendChild(
+    document.createTextNode(`${new Date(data.time).toLocaleString()}`),
+  );
+  timeNode.classList.add("message-time");
+  node.appendChild(timeNode);
   node.classList.add("message");
+
   chatBox.appendChild(node);
   chatBox.scrollTop = chatBox.scrollHeight;
   setTimeout(() => {
@@ -131,11 +144,13 @@ messageSocket.addEventListener("message", (event) => {
     // Check if there are already 3 more messages in the container
     const messages = messageContainer.querySelectorAll(".player_message");
     if (messages.length >= 3) {
-      messages[0].classList.add("fade-out");
+      messages[0].classList.add("fade-out-fast");
       messages[0].addEventListener(
         "transitionend",
         () => {
-          messageContainer.removeChild(messages[0]);
+          if (messages[0] && messages[0].parentNode === messageContainer) {
+            messageContainer.removeChild(messages[0]);
+          }
         },
         { once: true },
       );
@@ -154,7 +169,9 @@ messageSocket.addEventListener("message", (event) => {
       bubbleNode.addEventListener(
         "transitionend",
         () => {
-          messageContainer.removeChild(bubbleNode);
+          if (bubbleNode && bubbleNode.parentNode === messageContainer) {
+            messageContainer.removeChild(bubbleNode);
+          }
         },
         { once: true },
       );
@@ -177,7 +194,6 @@ messageInput.addEventListener("keydown", (e) => {
       message.to = match[1];
     }
 
-    console.log(message);
     e.target.value = "";
     messageSocket.send(JSON.stringify(message));
   }

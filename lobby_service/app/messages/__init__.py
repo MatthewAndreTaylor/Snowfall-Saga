@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint
 from flask_login import current_user
 from simple_websocket import ConnectionClosed
@@ -5,6 +6,7 @@ from flask_sock import Sock
 from collections import deque, defaultdict
 from functools import partial
 import json
+from ..models import User
 
 messenger = Blueprint(
     "messenger",
@@ -31,10 +33,14 @@ def message(connection):
     clients[connection] = current_user.username
     users[current_user.username] = connection
 
+    # Sort the messages by time
+    missed_mesages = sorted(
+        message_caches["all"] + message_caches[current_user.username],
+        key=lambda message: message["time"],
+    )
+
     # Send the last few messages a player missed before they spawned
-    for message in message_caches["all"]:
-        connection.send(json.dumps(message))
-    for message in message_caches[current_user.username]:
+    for message in missed_mesages:
         connection.send(json.dumps(message))
 
     while True:
@@ -42,33 +48,28 @@ def message(connection):
             event = connection.receive()
             data = json.loads(event)
 
-            if data["type"] == "newMessage":
-                text = data["text"]
+            new_message = {
+                "type": data["type"],
+                "text": data["text"],
+                "id": current_user.id,
+                "name": current_user.username,
+                "time": datetime.now().isoformat(),
+            }
 
-                new_message = {
-                    "type": "newMessage",
-                    "text": text,
-                    "id": current_user.id,
-                    "name": current_user.username,
-                }
+            if data["type"] == "newMessage":
                 message_caches["all"].append(new_message)
                 send_to_all_clients(new_message)
+
             elif data["type"] == "directMessage":
                 to = data["to"]
-                text = data["text"]
-
-                new_message = {
-                    "type": "directMessage",
-                    "text": text,
-                    "id": current_user.id,
-                    "name": current_user.username,
-                }
                 if connection != users.get(to):
+                    # Show on both your screen and the other person
                     connection.send(json.dumps(new_message))
 
-                if to in users:
+                if to in users or User.query.filter_by(username=to).first():
                     message_caches[to].append(new_message)
-                    # Show on both your screen and the other person
+
+                if to in users:
                     users[to].send(json.dumps(new_message))
 
         except (KeyError, ConnectionError, ConnectionClosed):
