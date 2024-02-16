@@ -1,12 +1,6 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
 
-function randomChoice(arr) {
-  return arr[Math.floor(arr.length * Math.random())];
-}
-
-const playerColors = ["blue", "red", "orange", "yellow", "green", "purple"];
-
 let playerRef;
 let players = {};
 let playerElements = {};
@@ -157,7 +151,6 @@ socket.addEventListener("open", (event) => {
     type: "playerUpdate",
     value: {
       direction: "right",
-      color: randomChoice(playerColors),
       x: 100 * Math.random() + 100,
       y: 100 * Math.random() + 100,
     },
