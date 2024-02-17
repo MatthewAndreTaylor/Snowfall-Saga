@@ -28,20 +28,25 @@ users = {}
 @sock.route("/message")
 @login_required
 def message(connection):
+    send_message(connection, curr_user=current_user)
+
+
+def send_message(connection, curr_user):
     if connection in clients:
         return
 
-    # In the case of a test, the current user is anonymous
-    if current_user.is_anonymous:
-        current_user.username = "TestUser"
-        current_user.id = 1
+    # In the case of a test, the current user does not exist
+    if curr_user is None:
+        curr_user = User()
+        curr_user.username = "TestUser"
+        curr_user.id = 1
 
-    clients[connection] = current_user.username
-    users[current_user.username] = connection
+    clients[connection] = curr_user.username
+    users[curr_user.username] = connection
 
     # Sort the messages by time
     missed_mesages = sorted(
-        message_caches["all"] + message_caches[current_user.username],
+        message_caches["all"] + message_caches[curr_user.username],
         key=lambda message: message["time"],
     )
 
@@ -58,8 +63,8 @@ def message(connection):
             new_message = {
                 "type": data["type"],
                 "text": data["text"],
-                "id": current_user.id,
-                "name": current_user.username,
+                "id": curr_user.id,
+                "name": curr_user.username,
                 "time": datetime.now().isoformat(),
             }
 

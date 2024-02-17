@@ -1,13 +1,15 @@
 from lobby_service.app import create_app
 from gameservices.trivia.app import app
-from simple_websocket import Client, ConnectionClosed
-import json
-import multiprocessing
+from lobby_service.app.messages import send_message
 import pytest
+import json
 
 
 @pytest.fixture
 def client():
+    """
+    Fixture that creates a test client for the lobby service app
+    """
     test_app = create_app()
     with test_app.test_client() as client:
         yield client
@@ -56,40 +58,50 @@ def test_login(client):
     assert response.status_code == 200
 
 
-def run_app():
-    app_runner = create_app()
-    app_runner.config["LOGIN_DISABLED"] = True
-    app_runner.login_manager.init_app(app_runner)
-    app_runner.run(port=5000)
+class MockClient:
+    """
+    Mock client class for testing message sending and receiving
+    """
+
+    def __init__(self):
+        self.counter = 0
+
+    def send(self, message):
+        message = json.loads(message)
+        assert message["type"] == "newMessage"
+        assert message["text"] == "Hello World"
+        assert message["id"] == 1
+        assert message["name"] == "TestUser"
+        return message
+
+    def receive(self):
+        if self.counter == 0:
+            self.counter += 1
+            return json.dumps(
+                {
+                    "type": "newMessage",
+                    "text": "Hello World",
+                    "id": 1,
+                    "name": "TestUser",
+                }
+            )
+        else:
+            raise ConnectionError
+
+    def close(self):
+        return
 
 
 def test_message_websocket():
-    proc = multiprocessing.Process(target=run_app, daemon=True)
-    proc.start()
-
-    url = "ws://localhost:5000/message"
-    ws = Client(url)
-    message = {
-        "type": "newMessage",
-        "text": "Hello World",
-        "id": 1,
-        "name": "TestUser",
-    }
-    try:
-        ws.send(json.dumps(message))
-        event = ws.receive()
-        data = json.loads(event)
-        for k, v in message.items():
-            assert data[k] == v
-    except ConnectionClosed:
-        ws.close()
-
-    proc.terminate()
-    proc.join()
+    message_client = MockClient()
+    send_message(message_client, curr_user=None)
 
 
 @pytest.fixture
 def trivia_client():
+    """
+    Fixture that creates a test client for the trivia app
+    """
     with app.test_client() as trivia_client:
         yield trivia_client
 
