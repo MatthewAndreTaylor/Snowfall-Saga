@@ -80,6 +80,23 @@ socket.addEventListener("message", (event) => {
       gameContainer.removeChild(playerElements[key]);
       delete playerElements[key];
       break;
+    case "getSprites":
+      const binary = data["inventory"].toString(2);
+      const binaryArr = binary.split("").reverse();
+
+      const sprites = document.querySelector("#sprite-container");
+
+      binaryArr.forEach((bool, index) => {
+        if (bool === "1") {
+          sprites.innerHTML += `
+          <div class="grid-item">
+            <div class="sprite sprite-cell" data-value="${index}" style="background-position-y: ${
+              index * -28
+            }px;"></div>
+          </div>`;
+        }
+      });
+      break;
   }
 });
 
@@ -89,7 +106,6 @@ socket.addEventListener("open", (event) => {
     type: "playerUpdate",
     value: {
       direction: "right",
-      color: randomChoice(playerColors),
       x: 100 * Math.random() + 100,
       y: 100 * Math.random() + 100,
     },
@@ -178,39 +194,6 @@ messageSocket.addEventListener("message", (event) => {
         { once: true },
       );
     }, 5000);
-        const bubbleNode = document.createElement("span");
-        bubbleNode.appendChild(document.createTextNode(data.text));
-        bubbleNode.classList.add("player_message");
-        messageContainer.appendChild(bubbleNode);
-        setTimeout(() => {
-          bubbleNode.classList.add("fade-out");
-          bubbleNode.addEventListener(
-            "transitionend",
-            () => {
-              messageContainer.removeChild(bubbleNode);
-            },
-            { once: true },
-          );
-        }, 5000);
-      }
-      break;
-    case "getSprites":
-      const binary = data["inventory"].toString(2);
-      const binaryArr = binary.split("").reverse();
-
-      const sprites = document.querySelector("#sprite-container");
-
-      binaryArr.forEach((bool, index) => {
-        if (bool === "1") {
-          sprites.innerHTML += `
-          <div class="grid-item">
-            <div class="sprite sprite-cell" data-value="${index}" style="background-position-y: ${
-              index * -28
-            }px;"></div>
-          </div>`;
-        }
-      });
-      break;
   }
 });
 
