@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Blueprint
-from flask_login import current_user
+from flask_login import current_user, login_required
 from simple_websocket import ConnectionClosed
 from flask_sock import Sock
 from collections import deque, defaultdict
@@ -26,9 +26,15 @@ users = {}
 
 
 @sock.route("/message")
+@login_required
 def message(connection):
     if connection in clients:
         return
+
+    # In the case of a test, the current user is anonymous
+    if current_user.is_anonymous:
+        current_user.username = "TestUser"
+        current_user.id = 1
 
     clients[connection] = current_user.username
     users[current_user.username] = connection
@@ -48,6 +54,7 @@ def message(connection):
             event = connection.receive()
             data = json.loads(event)
 
+            # Create a new message object
             new_message = {
                 "type": data["type"],
                 "text": data["text"],

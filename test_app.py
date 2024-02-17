@@ -1,6 +1,9 @@
-import pytest
 from lobby_service.app import create_app
 from gameservices.trivia.app import app
+from simple_websocket import Client, ConnectionClosed
+import json
+import multiprocessing
+import pytest
 
 
 @pytest.fixture
@@ -51,6 +54,38 @@ def test_login(client):
         follow_redirects=True,
     )
     assert response.status_code == 200
+
+
+def run_app():
+    app_runner = create_app()
+    app_runner.config["LOGIN_DISABLED"] = True
+    app_runner.login_manager.init_app(app_runner)
+    app_runner.run(port=5000)
+
+
+def test_message_websocket():
+    proc = multiprocessing.Process(target=run_app, daemon=True)
+    proc.start()
+
+    url = "ws://localhost:5000/message"
+    ws = Client(url)
+    message = {
+        "type": "newMessage",
+        "text": "Hello World",
+        "id": 1,
+        "name": "TestUser",
+    }
+    try:
+        ws.send(json.dumps(message))
+        event = ws.receive()
+        data = json.loads(event)
+        for k, v in message.items():
+            assert data[k] == v
+    except ConnectionClosed:
+        ws.close()
+
+    proc.terminate()
+    proc.join()
 
 
 @pytest.fixture

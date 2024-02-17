@@ -14,6 +14,6 @@ Changes:
 Checklist:
 
 - [ ] my code follows the style guidelines
-- [ ] my changes did not produce and new errors or warnings
+- [ ] my changes did not produce any new errors or warnings
 - [ ] updated/added documentation and comments to reflect my changes
 - [ ] I have added/updated tests for my changes
