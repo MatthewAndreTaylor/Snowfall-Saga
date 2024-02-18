@@ -50,7 +50,7 @@ body {
 }
 
 .player:not(.you):hover {
-  filter: drop-shadow(0 0 0.07rem blue);
+  filter: drop-shadow(0 0 0.1rem orchid);
 }
 
 .player.you .player_you-arrow {
@@ -86,7 +86,6 @@ body {
   background: #333;
   color: white;
   font-weight: bold;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -148,6 +147,15 @@ input {
   overflow-wrap: break-word;
 }
 
+.message-text {
+  margin: 0;
+}
+
+.message-time {
+  float: inline-end;
+  opacity: 0.5;
+}
+
 #chat-input {
   font-size: 15px;
   width: 100%;
@@ -171,14 +179,18 @@ input {
   background: #546aea;
   color: white;
   font-weight: bold;
-  text-transform: uppercase;
   white-space: nowrap;
   opacity: 1;
-  transition: opacity 0.2s ease-in-out;
 }
 
 .player_message.fade-out {
   opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.player_message.fade-out-fast {
+  opacity: 0;
+  transition: opacity 0.01s ease-in-out;
 }
 
 /* inventory */
