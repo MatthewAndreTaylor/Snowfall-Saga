@@ -273,12 +273,9 @@ input {
 
 .leaderboard-button {
   position: fixed;
-  top: 200px;
-  left: 200px;
-  width: 50px;
-  height: 80px;
+  top: 8px;
+  right: 16px;
   border: none;
-  scale: 2;
   background: url(images/leaderboard_icon.png) no-repeat no-repeat;
 }
 
