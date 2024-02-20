@@ -267,6 +267,28 @@ input {
   scale: 3;
 }
 
+.points {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  background-color: rgba(119, 138, 198, 0.75);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.coin {
+  width: 25px;
+  height: 25px;
+  background-image: url(images/coin.png);
+  background-size: cover;
+  background-position: center;
+}
+
+.points-count {
+  font-size: 24px;
+  font-weight: bold;
+}
+
 /* props */
 .christmas-tree-button {
   position: fixed;

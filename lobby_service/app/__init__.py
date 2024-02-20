@@ -32,6 +32,10 @@ def create_app():
 
         app.register_blueprint(messenger)
 
+        from .points import points_handler
+
+        app.register_blueprint(points_handler)
+
     with app.app_context():
         db.create_all()
 

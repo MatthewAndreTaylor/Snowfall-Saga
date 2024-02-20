@@ -15,6 +15,8 @@ const inventoryContainer = document.querySelector(".inventory-container");
 const inventoryButton = document.querySelector("#inv-btn");
 const spriteGrid = document.querySelector("#sprite-grid");
 
+const pointsCount = document.querySelector("#points-count");
+
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {
     players[playerId].direction = "right";
@@ -74,6 +76,8 @@ socket.addEventListener("message", (event) => {
           gameContainer.appendChild(playerElement);
         }
       });
+      // temporary - displays points
+      pointsCount.innerText = `${players[playerId].points}`;
       break;
     case "playerRemoved":
       const key = data.id;
