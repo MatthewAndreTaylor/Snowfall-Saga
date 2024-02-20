@@ -11,10 +11,22 @@ let playerRef;
 let players = {};
 let playerElements = {};
 const gameContainer = document.querySelector(".game-container");
+const addedUsers = new Set();
 
 const userBox = document.querySelector("#user-box");
 const chatBox = document.querySelector("#chat-box");
 const messageInput = document.querySelector("#chat-input");
+
+function toggleTab(tab) {
+  document.querySelectorAll('.content').forEach(function (content) {
+    content.classList.remove('active');
+  });
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.classList.remove('active');
+  });
+  document.getElementById(tab + '-box').classList.add('active');
+  document.getElementById(tab + '-tab').classList.add('active');
+}
 
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {
@@ -31,6 +43,33 @@ function handleMove(newX, newY) {
   socket.send(JSON.stringify(message));
 }
 
+function addUserToBox(username) {
+  if (addedUsers.has(username)) {
+    return;
+  }
+  const user = document.createElement("div");
+
+  user.classList.add("user-box-item");
+  if (addedUsers.size % 2 == 0) {
+    user.classList.add("even");
+  } else {
+    user.classList.add("odd");
+  }
+
+  user.textContent = username.toUpperCase();
+  user.setAttribute("username", username);
+  userBox.appendChild(user);
+  addedUsers.add(username);
+}
+
+function removeUserFromBox(username) {
+  if (addedUsers.has(username)) {
+    const user = userBox.querySelector(`[username="${username}"]`);
+    userBox.removeChild(user);
+    addedUsers.delete(username);
+  }
+}
+
 socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
   //console.log(data);
@@ -40,6 +79,9 @@ socket.addEventListener("message", (event) => {
       players = data.value || {};
       Object.keys(players).forEach((key) => {
         const playerState = players[key];
+        
+        addUserToBox(playerState.name);
+
         if (key in playerElements) {
           let el = playerElements[key];
           el.querySelector(".player_name").innerText = playerState.name;
@@ -73,9 +115,12 @@ socket.addEventListener("message", (event) => {
       });
       break;
     case "playerRemoved":
-      const key = data.id;
-      gameContainer.removeChild(playerElements[key]);
-      delete playerElements[key];
+      const pkey = data.id;
+      gameContainer.removeChild(playerElements[pkey]);
+
+      removeUserFromBox(players[pkey].name);
+
+      delete playerElements[pkey];
       break;
     case "newMessage":
       const node = document.createElement("p");

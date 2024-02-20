@@ -25,10 +25,18 @@
         <input id="chat-input" type="text" maxlength="40" />
       </div>
     </div>
+    <div class="user-container">
+      <div class="tab-container">
+        <div id="user-tab" class="tab active" onclick="toggleTab('user')">Users</div>
+        <div id="friend-tab" class="tab" onclick="toggleTab('friend')">Friends</div>
+      </div>
+      <div id="user-box" class="content active"></div>
+      <div id="friend-box" class="content"></div>
+    </div>
     <script>
       const playerId = "{{ player_id }}";
     </script>
     <script src="{{ url_for('lobby_view.static', filename='main.js') }}"></script>
-    <script src="/static/snow.js"></script>
+    <!-- <script src="/static/snow.js"></script> -->
   </body>
 </html>
