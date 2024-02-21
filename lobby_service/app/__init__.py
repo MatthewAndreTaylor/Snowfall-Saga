@@ -28,6 +28,10 @@ def create_app():
 
         app.register_blueprint(lobby_view)
 
+        from .messages import messenger
+
+        app.register_blueprint(messenger)
+
     with app.app_context():
         db.create_all()
 
