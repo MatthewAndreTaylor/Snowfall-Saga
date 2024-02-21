@@ -17,6 +17,19 @@ const userBox = document.querySelector("#user-box");
 const chatBox = document.querySelector("#chat-box");
 const messageInput = document.querySelector("#chat-input");
 
+const modal = document.getElementById("user-modal");
+const closeButton = document.querySelector(".close");
+
+closeButton.onclick = function () {
+  modal.style.display = "none";
+};
+
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
+
 function toggleTab(tab) {
   document.querySelectorAll(".content").forEach(function (content) {
     content.classList.remove("active");
@@ -60,6 +73,11 @@ function addUserToBox(username) {
   user.setAttribute("username", username);
   userBox.appendChild(user);
   addedUsers.add(username);
+
+  user.addEventListener("click", function () {
+    document.querySelector(".modal-username").textContent = "User: " + username;
+    modal.style.display = "block";
+  });
 }
 
 function removeUserFromBox(username) {
