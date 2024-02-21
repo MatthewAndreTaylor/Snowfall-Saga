@@ -14,6 +14,8 @@ class User(UserMixin, db.Model):
         id (int): The unique identifier for the user.
         username (str): The username of the user, should be unique.
         password (str): The hashed password of the user.
+        sprite (int): The sprite index of the current user.
+        sprite_inventory (int): A bit representation of the owned sprites of the user.
 
     Methods:
         hash_password(): Returns a password hashed using SHA512
@@ -24,6 +26,12 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    sprite = db.Column(
+        db.Integer, default=0, nullable=False
+    )  # Default sprite at index 0
+    sprite_inventory = db.Column(
+        db.Integer, default=7, nullable=False
+    )  # Initial access to sprites at indexes 0 to 2
 
     @staticmethod
     def hash_password(password):
