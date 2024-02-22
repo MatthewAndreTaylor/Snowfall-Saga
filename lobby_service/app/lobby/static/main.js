@@ -1,6 +1,12 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
 
+const collisionSound = new Audio('/audio/snowballHit.mp3');
+
+function playCollisionSound() {
+  collisionSound.play();
+}
+
 function randomChoice(arr) {
   return arr[Math.floor(arr.length * Math.random())];
 }
@@ -31,11 +37,46 @@ function handleMove(newX, newY) {
   socket.send(JSON.stringify(message));
 }
 
+
 socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  //console.log(data);
-
+  
   switch (data.type) {
+
+    case "throwSnowball":
+      const snowballStartX = (players[data.value.id].x) * 3;
+      const snowballStartY = (players[data.value.id].y - 8) * 3;
+      const targetX = data.value.destinationX;
+      const targetY = data.value.destinationY;
+      
+      const deltaX = targetX - snowballStartX;
+      const deltaY = targetY - snowballStartY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const speed = 9; // Adjust speed as needed
+      const velocityX = (deltaX / distance) * speed;
+      const velocityY = (deltaY / distance) * speed;
+
+      const snowball = document.createElement("div");
+      snowball.classList.add("snowball");
+      snowball.style.left = snowballStartX + "px";
+      snowball.style.top = snowballStartY + "px";
+      document.body.appendChild(snowball);
+
+      const animationInterval = setInterval(() => {
+        const snowballX = parseInt(snowball.style.left);
+        const snowballY = parseInt(snowball.style.top);
+        if (Math.abs(snowballX - snowballStartX) >= Math.abs(deltaX) ||
+            Math.abs(snowballY - snowballStartY) >= Math.abs(deltaY)) {
+          clearInterval(animationInterval);
+          snowball.remove();
+          playCollisionSound();
+          snowball.classList.add('collision');
+        }
+        snowball.style.left = parseInt(snowball.style.left) + velocityX + "px";
+        snowball.style.top = parseInt(snowball.style.top) + velocityY + "px";
+      }, 10);
+      break;
+    
     case "playersUpdate":
       players = data.value || {};
       Object.keys(players).forEach((key) => {
@@ -94,7 +135,6 @@ socket.addEventListener("message", (event) => {
           ".player_message-container",
         );
 
-        // Check if there are already 3 more messages in the container
         const messages = messageContainer.querySelectorAll(".player_message");
         if (messages.length >= 3) {
           messages[0].classList.add("fade-out");
@@ -123,6 +163,7 @@ socket.addEventListener("message", (event) => {
         }, 5000);
       }
       break;
+    
   }
 });
 
@@ -149,7 +190,6 @@ socket.addEventListener("close", (event) => {
   socket.send(JSON.stringify(message));
 });
 
-// Send a user's message by pressing 'Enter'
 messageInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && e.target.value.length > 0) {
     const message = {
@@ -161,9 +201,22 @@ messageInput.addEventListener("keydown", (e) => {
   }
 });
 
-// When a user clicks within the game container, it moves their player
 gameContainer.addEventListener("click", (event) => {
   const clickX = (event.clientX - 16) / 3;
   const clickY = (event.clientY - 16) / 3;
   handleMove(clickX, clickY);
+});
+
+gameContainer.addEventListener("contextmenu", (event) => {
+  event.preventDefault(); 
+
+  const message = {
+    type: "throwSnowball",
+    value: {
+      id: playerId,
+      destinationX: event.clientX,
+      destinationY: event.clientY
+    },
+  };
+  socket.send(JSON.stringify(message));
 });

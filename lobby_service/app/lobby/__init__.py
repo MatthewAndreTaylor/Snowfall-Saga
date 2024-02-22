@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, redirect, send_from_directory
 from flask_login import current_user, login_required
 from simple_websocket import ConnectionClosed
 from flask_sock import Sock
 import requests
 from collections import deque
 import json
+import os
 
 lobby_view = Blueprint(
     "lobby_view",
@@ -25,6 +26,9 @@ clients = set()
 # Previous messages before the player spawned are saved
 message_cache = deque(maxlen=6)
 
+@lobby_view.route("/audio/<filename>")
+def audio(filename):
+    return send_from_directory(os.path.join(lobby_view.root_path, 'static', 'audio'), filename)
 
 @lobby_view.route("/")
 @login_required
@@ -78,6 +82,21 @@ def echo(connection):
                 }
                 message_cache.append(new_message)
                 send_to_all_clients(new_message)
+            
+            elif data["type"] == "throwSnowball":
+                player_id = current_user.id
+                destination_x = data["value"]["destinationX"]
+                destination_y = data["value"]["destinationY"]
+
+                throw_message = {
+                    "type": "throwSnowball",
+                    "value": {
+                        "id": player_id,
+                        "destinationX": destination_x,
+                        "destinationY": destination_y,
+                    },
+                }
+                send_to_all_clients(throw_message)
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
