@@ -1,7 +1,7 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
 
-const collisionSound = new Audio('/audio/snowballHit.mp3');
+const collisionSound = new Audio("/audio/snowballHit.mp3");
 
 function playCollisionSound() {
   collisionSound.play();
@@ -37,18 +37,16 @@ function handleMove(newX, newY) {
   socket.send(JSON.stringify(message));
 }
 
-
 socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  
-  switch (data.type) {
 
+  switch (data.type) {
     case "throwSnowball":
-      const snowballStartX = (players[data.value.id].x) * 3;
+      const snowballStartX = players[data.value.id].x * 3;
       const snowballStartY = (players[data.value.id].y - 8) * 3;
       const targetX = data.value.destinationX;
       const targetY = data.value.destinationY;
-      
+
       const deltaX = targetX - snowballStartX;
       const deltaY = targetY - snowballStartY;
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -65,18 +63,20 @@ socket.addEventListener("message", (event) => {
       const animationInterval = setInterval(() => {
         const snowballX = parseInt(snowball.style.left);
         const snowballY = parseInt(snowball.style.top);
-        if (Math.abs(snowballX - snowballStartX) >= Math.abs(deltaX) ||
-            Math.abs(snowballY - snowballStartY) >= Math.abs(deltaY)) {
+        if (
+          Math.abs(snowballX - snowballStartX) >= Math.abs(deltaX) ||
+          Math.abs(snowballY - snowballStartY) >= Math.abs(deltaY)
+        ) {
           clearInterval(animationInterval);
           snowball.remove();
           playCollisionSound();
-          snowball.classList.add('collision');
+          snowball.classList.add("collision");
         }
         snowball.style.left = parseInt(snowball.style.left) + velocityX + "px";
         snowball.style.top = parseInt(snowball.style.top) + velocityY + "px";
       }, 10);
       break;
-    
+
     case "playersUpdate":
       players = data.value || {};
       Object.keys(players).forEach((key) => {
@@ -163,7 +163,6 @@ socket.addEventListener("message", (event) => {
         }, 5000);
       }
       break;
-    
   }
 });
 
@@ -207,15 +206,16 @@ gameContainer.addEventListener("click", (event) => {
   handleMove(clickX, clickY);
 });
 
+// Handle user choice - Snowball
 gameContainer.addEventListener("contextmenu", (event) => {
-  event.preventDefault(); 
+  event.preventDefault();
 
   const message = {
     type: "throwSnowball",
     value: {
       id: playerId,
       destinationX: event.clientX,
-      destinationY: event.clientY
+      destinationY: event.clientY,
     },
   };
   socket.send(JSON.stringify(message));

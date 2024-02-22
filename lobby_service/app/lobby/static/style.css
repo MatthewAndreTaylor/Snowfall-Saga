@@ -232,10 +232,9 @@ input {
   filter: drop-shadow(0 0 0.75rem yellow);
 }
 
-
 /* snowball */
 .snowball {
-  width: 32px; 
+  width: 32px;
   height: 32px;
   background: url(images/snowball.png) no-repeat;
   background-size: contain;
@@ -243,9 +242,15 @@ input {
 }
 
 @keyframes collisionEffect {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.5); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .snowball.collision {
