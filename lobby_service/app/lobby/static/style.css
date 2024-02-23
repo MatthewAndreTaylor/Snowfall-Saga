@@ -103,6 +103,34 @@ body {
   background: url(images/shadow.png) no-repeat no-repeat;
 }
 
+#friend-requests {
+  position: fixed;
+  top: 23%;
+  padding: 0.5em;
+  right: 0;
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  border: 2px solid black;
+  background: rgba(119, 138, 198, 0.75);
+}
+
+.accept-button,
+.reject-button {
+  color: white;
+  border: 1px solid black;
+  padding: 5px 10px;
+  margin-left: 10px;
+}
+
+.accept-button {
+  background-color: green;
+}
+
+.reject-button {
+  background-color: red;
+}
+
 .user-container {
   position: fixed;
   flex-direction: column;

@@ -44,11 +44,20 @@
       <div id="user-box" class="content active"></div>
       <div id="friend-box" class="content"></div>
     </div>
+    <div id="friend-requests">Friend Requests</div>
     <div id="user-modal" class="modal">
       <div class="modal-content">
-        <span class="close">&times;</span>
+        <span id="c1" class="close">&times;</span>
         <h2 class="modal-username"></h2>
         <button id="add-friend">Send Friend Request</button>
+        <div class="request-info"></div>
+      </div>
+    </div>
+    <div id="friend-request-modal" class="modal">
+      <div class="modal-content">
+        <span id="c2" class="close">&times;</span>
+        <h2>Friend Requests</h2>
+        <div id="friend-request-list"></div>
       </div>
     </div>
     <script>

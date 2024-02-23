@@ -1,8 +1,12 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
 const messageSocket = new WebSocket(`ws://${location.host}/message`);
-const friendRequestSocket = new WebSocket(
+
+const sendFriendRequestSocket = new WebSocket(
   `ws://${location.host}/send_friend_request`,
+);
+const getFriendRequestsSocket = new WebSocket(
+  `ws://${location.host}/get_friend_requests`,
 );
 
 let playerRef;
@@ -20,9 +24,67 @@ const inventoryButton = document.querySelector("#inv-btn");
 const spriteGrid = document.querySelector("#sprite-grid");
 
 const modal = document.getElementById("user-modal");
-const closeButton = document.querySelector(".close");
+const modalContent = modal.querySelector(".modal-content");
+const response = modalContent.querySelector(".request-info");
 
+const closeButton1 = document.querySelector("#c1");
+const closeButton2 = document.querySelector("#c2");
+
+const friendRequestModal = document.getElementById("friend-request-modal");
 const friendRequestButton = document.querySelector("#add-friend");
+const friendRequests = document.querySelector("#friend-requests");
+
+friendRequests.addEventListener("click", () => {
+  const message = {
+    type: "getFriendRequests",
+  };
+  getFriendRequestsSocket.send(JSON.stringify(message));
+  friendRequestModal.style.display = "block";
+});
+
+getFriendRequestsSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === "friend_requests") {
+    const modalContent = friendRequestModal.querySelector(".modal-content");
+    const list = modalContent.querySelector("#friend-request-list");
+    list.innerHTML = "";
+
+    const friendRequests = data.requests;
+
+    if (friendRequests.length === 0) {
+      const noRequests = document.createElement("div");
+      noRequests.textContent = "No pending friend requests";
+      list.appendChild(noRequests);
+    }
+
+    friendRequests.forEach((request) => {
+      const requestDiv = document.createElement("div");
+      requestDiv.classList.add("friend-request");
+
+      const fromUserSpan = document.createElement("span");
+      fromUserSpan.textContent = "From: " + request.from_user;
+
+      const acceptButton = document.createElement("button");
+      acceptButton.textContent = "Accept";
+      acceptButton.classList.add("accept-button");
+      acceptButton.addEventListener("click", () => {
+        console.log("Accepting friend request");
+      });
+
+      const rejectButton = document.createElement("button");
+      rejectButton.textContent = "Reject";
+      rejectButton.classList.add("reject-button");
+      rejectButton.addEventListener("click", () => {
+        console.log("Rejecting friend request");
+      });
+
+      requestDiv.appendChild(fromUserSpan);
+      requestDiv.appendChild(acceptButton);
+      requestDiv.appendChild(rejectButton);
+      list.appendChild(requestDiv);
+    });
+  }
+});
 
 friendRequestButton.addEventListener("click", () => {
   const username = document
@@ -32,21 +94,41 @@ friendRequestButton.addEventListener("click", () => {
     type: "friendRequest",
     username: username,
   };
-  friendRequestSocket.send(JSON.stringify(message));
-  modal.style.display = "none";
+  sendFriendRequestSocket.send(JSON.stringify(message));
 });
 
-friendRequestSocket.addEventListener("message", (event) => {
-  console.log(event.data);
+sendFriendRequestSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  response.innerHTML = "";
+  const lineBreak = document.createElement("br");
+  const requestSent = document.createElement("div");
+
+  if (data.error) {
+    requestSent.textContent = data.error;
+    requestSent.style.color = "red";
+    friendRequestButton.disabled = true;
+  } else {
+    requestSent.textContent = data.success;
+    requestSent.style.color = "green";
+  }
+
+  response.appendChild(lineBreak);
+  response.appendChild(requestSent);
 });
 
-closeButton.onclick = function () {
+closeButton1.onclick = function () {
   modal.style.display = "none";
+};
+
+closeButton2.onclick = function () {
+  friendRequestModal.style.display = "none";
 };
 
 window.onclick = function (event) {
   if (event.target == modal) {
     modal.style.display = "none";
+  } else if (event.target == friendRequestModal) {
+    friendRequestModal.style.display = "none";
   }
 };
 
@@ -77,7 +159,7 @@ function handleMove(newX, newY) {
 }
 
 function addUserToBox(username) {
-  if (addedUsers.has(username)) {
+  if (addedUsers.has(username) || username === players[playerId].name) {
     return;
   }
   const user = document.createElement("div");
@@ -95,6 +177,8 @@ function addUserToBox(username) {
   addedUsers.add(username);
 
   user.addEventListener("click", function () {
+    response.innerHTML = "";
+    friendRequestButton.disabled = false;
     document.querySelector(".modal-username").textContent = "User: " + username;
     modal.style.display = "block";
   });
@@ -110,7 +194,6 @@ function removeUserFromBox(username) {
 
 socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  //console.log(data);
 
   switch (data.type) {
     case "playersUpdate":
