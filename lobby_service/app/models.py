@@ -16,6 +16,7 @@ class User(UserMixin, db.Model):
         password (str): The hashed password of the user.
         sprite (int): The sprite index of the current user.
         sprite_inventory (int): A bit representation of the owned sprites of the user.
+        points (int): The amount of points a user currently has.
 
     Methods:
         hash_password(): Returns a password hashed using SHA512
@@ -32,6 +33,9 @@ class User(UserMixin, db.Model):
     sprite_inventory = db.Column(
         db.Integer, default=7, nullable=False
     )  # Initial access to sprites at indexes 0 to 2
+    points = db.Column(
+        db.Integer, default=0, nullable=False
+    )  # Amount of points a player has
 
     @staticmethod
     def hash_password(password):

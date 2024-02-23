@@ -48,6 +48,7 @@ def echo(connection):
         "name": current_user.username,
         "id": current_user.id,
         "sprite": current_user.sprite,
+        "points": current_user.points,
     }
     print(f"{current_user.username} joined with connection {connection}")
 

@@ -1,0 +1,127 @@
+body {
+  background-color: #ffffff;
+  font-family: "Source Sans Pro", sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+h1 {
+  color: #3399ff;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+a {
+  color: #3366cc;
+  margin-bottom: 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  padding: 2px;
+}
+
+a:hover {
+  background: #3366cc;
+  color: white;
+}
+
+.sprite-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  image-rendering: pixelated;
+  flex-direction: column;
+  background-color: rgba(119, 138, 198, 0.75);
+  padding: 5px;
+  border-radius: 10px;
+  width: 350px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+/* points */
+.points-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  background-color: rgba(119, 138, 198, 0.75);
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.coin {
+  width: 25px;
+  height: 25px;
+  background-image: url(/static/images/coin.png);
+  background-size: cover;
+  background-position: center;
+}
+
+.points {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* sprites */
+.sprite {
+  position: relative;
+  background: url(/static/images/characters.png);
+  overflow: hidden;
+  width: 22px;
+  height: 28px;
+  scale: 3;
+  transform-origin: left;
+}
+
+/* info box */
+.item-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 300px;
+  height: 100px;
+  gap: 5em;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+button {
+  width: 150px;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+  color: #ffffff;
+}
+
+.purchase {
+  background-color: #3399ff;
+  border: 1px solid #3366cc;
+  cursor: pointer;
+}
+
+.purchase:hover {
+  background-color: #3366cc;
+}
+
+.owned {
+  background-color: #3b9023;
+  border: 1px solid #225713;
+}
+
+.no-purchase {
+  background-color: #c0322a;
+  border: 1px solid #70130f;
+}

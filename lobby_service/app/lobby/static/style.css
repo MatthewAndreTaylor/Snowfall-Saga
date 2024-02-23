@@ -19,7 +19,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: url(images/map.png);
+  background: url(/static/images/map.png);
   image-rendering: pixelated;
 }
 
@@ -58,7 +58,7 @@ body {
 }
 
 .player.you:hover .player_sprite {
-  background: url(images/throw.gif);
+  background: url(/static/images/throw.gif);
   [data-direction="right"] & {
     background-position-x: 22px;
     right: 5px;
@@ -72,7 +72,7 @@ body {
   left: 5px;
   width: 7px;
   height: 5px;
-  background: url(images/arrow.png) no-repeat no-repeat;
+  background: url(/static/images/arrow.png) no-repeat no-repeat;
 }
 
 .player_name-container {
@@ -92,7 +92,7 @@ body {
 .player_sprite {
   overflow: hidden;
   top: -14px;
-  background: url(images/characters.png);
+  background: url(/static/images/characters.png);
 }
 
 .player[data-direction="right"] .player_sprite {
@@ -100,7 +100,7 @@ body {
 }
 
 .player_shadow {
-  background: url(images/shadow.png) no-repeat no-repeat;
+  background: url(/static/images/shadow.png) no-repeat no-repeat;
 }
 
 /* messages */
@@ -251,7 +251,7 @@ input {
 
 .sprite {
   position: relative;
-  background: url(images/characters.png);
+  background: url(/static/images/characters.png);
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -267,6 +267,28 @@ input {
   scale: 3;
 }
 
+.points {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  background-color: rgba(119, 138, 198, 0.75);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.coin {
+  width: 25px;
+  height: 25px;
+  background-image: url(/static/images/coin.png);
+  background-size: cover;
+  background-position: center;
+}
+
+.points-count {
+  font-size: 24px;
+  font-weight: bold;
+}
+
 /* props */
 .christmas-tree-button {
   position: fixed;
@@ -276,9 +298,24 @@ input {
   height: 80px;
   border: none;
   scale: 2;
-  background: url(images/waypoint.png) no-repeat no-repeat;
+  background: url(/static/images/waypoint.png) no-repeat no-repeat;
 }
 
 .christmas-tree-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.store-button {
+  position: fixed;
+  top: 300px;
+  left: 600px;
+  width: 50px;
+  height: 80px;
+  border: none;
+  scale: 4;
+  background: url(/static/images/store.png) no-repeat no-repeat;
+}
+
+.store-button:hover {
   filter: drop-shadow(0 0 0.75rem yellow);
 }

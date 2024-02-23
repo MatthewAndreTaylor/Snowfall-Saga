@@ -1,6 +1,7 @@
 from lobby_service.app import create_app
 from gameservices.trivia.app import app
 from lobby_service.app.messages import send_message
+from lobby_service.app.store import process_purchase
 import pytest
 import json
 
@@ -95,6 +96,42 @@ class MockClient:
 def test_message_websocket():
     message_client = MockClient()
     send_message(message_client, curr_user=None)
+
+
+class MockPurchase:
+    """
+    Mock purchase class for purchasing sprites.
+    """
+
+    def __init__(self):
+        self.counter = 0
+
+    def send(self, message):
+        message = json.loads(message)
+
+        if self.counter <= 2:
+            assert message["type"] == "purchaseSuccess"
+            assert message["sprite"] == self.counter + 2
+            assert message["points"] == 250 - 100 * self.counter
+        else:
+            assert message["type"] == "purchaseFailure"
+            assert message["sprite"] == self.counter + 2
+        return message
+
+    def receive(self):
+        if self.counter <= 2:
+            self.counter += 1
+            return json.dumps({"type": "purchase", "sprite": self.counter + 2})
+        else:
+            raise ConnectionError
+
+    def close(self):
+        return
+
+
+def test_store_websocket(client):
+    store_client = MockPurchase()
+    process_purchase(store_client, curr_user=None)
 
 
 @pytest.fixture
