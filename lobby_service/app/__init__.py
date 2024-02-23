@@ -21,18 +21,23 @@ def create_app():
 
     with app.app_context():
         from .auth import login_view
+
         app.register_blueprint(login_view)
 
         from .lobby import lobby_view
+
         app.register_blueprint(lobby_view)
 
         from .messages import messenger
+
         app.register_blueprint(messenger)
 
         from .points import points_handler
+
         app.register_blueprint(points_handler)
 
         from .leaderboard import leaderboard_handler
+
         app.register_blueprint(leaderboard_handler)
 
     with app.app_context():

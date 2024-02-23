@@ -324,7 +324,7 @@ input {
   z-index: 3;
   background-color: #000;
   color: #fff;
-  opacity: .5;
+  opacity: 0.5;
 }
 
 .christmas-tree-button:hover {

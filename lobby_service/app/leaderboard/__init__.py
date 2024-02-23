@@ -15,7 +15,9 @@ def make_leaderboard():
     # get all the userrs from the database which is inside User table
     # Sort by the points and display the users: username -> points in dict.
     users = User.query.order_by(User.points.desc()).all()
-    leaderboard = {user.username: user.points for user in users} # Exxample: {"matt": 100, "john": 50}4
+    leaderboard = {
+        user.username: user.points for user in users
+    }  # Exxample: {"matt": 100, "john": 50}4
 
     prepaered_leaderboard = ["Rank | Username | Points"]
     for i, (username, points) in enumerate(leaderboard.items(), 1):
