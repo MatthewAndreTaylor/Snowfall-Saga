@@ -251,7 +251,7 @@ input {
 
 .sprite {
   position: relative;
-  background: url(images/characters.png);
+  background: url(/static/images/characters.png);
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -279,7 +279,7 @@ input {
 .coin {
   width: 25px;
   height: 25px;
-  background-image: url(images/coin.png);
+  background-image: url(/static/images/coin.png);
   background-size: cover;
   background-position: center;
 }
@@ -302,5 +302,20 @@ input {
 }
 
 .christmas-tree-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.store-button {
+  position: fixed;
+  top: 300px;
+  left: 600px;
+  width: 50px;
+  height: 80px;
+  border: none;
+  scale: 4;
+  background: url(images/store.png) no-repeat no-repeat;
+}
+
+.store-button:hover {
   filter: drop-shadow(0 0 0.75rem yellow);
 }

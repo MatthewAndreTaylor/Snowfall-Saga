@@ -21,5 +21,4 @@ def update_points():
 def update_database(username, points):
     user = User.query.filter_by(username=username).first()
     user.points += points
-    print(user.points)
     db.session.commit()
