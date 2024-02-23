@@ -40,6 +40,10 @@ def create_app():
 
         app.register_blueprint(leaderboard_handler)
 
+        from .store import store_view
+
+        app.register_blueprint(store_view)
+
     with app.app_context():
         db.create_all()
 

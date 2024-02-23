@@ -76,7 +76,6 @@ socket.addEventListener("message", (event) => {
           gameContainer.appendChild(playerElement);
         }
       });
-      // temporary - displays points
       pointsCount.innerText = `${players[playerId].points}`;
       break;
     case "playerRemoved":
