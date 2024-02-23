@@ -1,25 +1,27 @@
 .colored-text::incorrect {
-    content: attr(data-incorrect);
-    color: red;
+  content: attr(data-incorrect);
+  color: red;
 }
 
 .colored-text::correct {
-    content: attr(data-correct);
-    color: green;
+  content: attr(data-correct);
+  color: green;
 }
 
 body {
-    background-color: #007ba7;
+  background-color: #007ba7;
 }
 
-h1, h2, p {
-    font-size: 50px;
-    white-space: nowrap;
-    overflow-x: hidden;
+h1,
+h2,
+p {
+  font-size: 50px;
+  white-space: nowrap;
+  overflow-x: hidden;
 }
 
 #text {
-    width: 100%;
+  width: 100%;
 }
 
 #countdown {
@@ -61,7 +63,7 @@ ul li {
   top: 0;
   right: 0;
   transform: translate(-50%, -50%);
-  z-index: 2
+  z-index: 2;
 }
 
 .finish-line {
@@ -78,8 +80,12 @@ ul li {
   );
   background-repeat: repeat;
   background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-  z-index: 1
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
+  z-index: 1;
 }
 
 .snowfall {

@@ -1,6 +1,7 @@
 import pytest
 from lobby_service.app import create_app
 from gameservices.trivia.app import app
+from gameservices.type_race.app import create_type_race_app
 
 
 @pytest.fixture
@@ -61,4 +62,16 @@ def trivia_client():
 
 def test_trivia_page(trivia_client):
     response = trivia_client.get("/trivia")
+    assert response.status_code == 200
+
+
+@pytest.fixture
+def type_client():
+    type_app = create_type_race_app()
+    with type_app.test_client() as type_client:
+        yield type_client
+
+
+def test_type_connect(type_client):
+    response = type_client.get("/type_race")
     assert response.status_code == 200

@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Type Race - Player List</title>
     <link
       rel="stylesheet"
@@ -10,18 +10,17 @@
       href="{{ url_for('static', filename='style.css') }}"
     />
     <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Type Race - Player List</h1>
     <div class="player-container">
-      <ul id="player-list">
-      </ul>
+      <ul id="player-list"></ul>
     </div>
     <button id="startButton">Start Game</button>
     <script>
-        const username = `{{ username }}` || "Guest";
-        const gameId = `{{ gameId }}` || "0";
+      const username = `{{ username }}` || "Guest";
+      const gameId = `{{ gameId }}` || "0";
     </script>
     <script src="{{ url_for('static', filename='type_race_waiting_room.js') }}"></script>
-</body>
+  </body>
 </html>

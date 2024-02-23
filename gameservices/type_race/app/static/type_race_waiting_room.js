@@ -2,24 +2,23 @@ const socket = new WebSocket(
   `ws://${document.domain}:${location.port}/type_race`,
 );
 
-socket.addEventListener('open', (event) => {
-    socket.send(JSON.stringify({ type: 'username', username: username }));
+socket.addEventListener("open", (event) => {
+  socket.send(JSON.stringify({ type: "username", username: username }));
 });
 
-
-socket.addEventListener('message', (message) => {
+socket.addEventListener("message", (message) => {
   const data = JSON.parse(message.data);
 
   switch (data.type) {
-    case 'playerList':
-        displayUsersList(data['data']);
-    break;
+    case "playerList":
+      displayUsersList(data["data"]);
+      break;
 
-    case 'switchPage':
-        sessionStorage.setItem("username", username);
-        sessionStorage.setItem('gameId', gameId);
-        window.location.href = data.url + '/' + gameId;
-    break;
+    case "switchPage":
+      sessionStorage.setItem("username", username);
+      sessionStorage.setItem("gameId", gameId);
+      window.location.href = data.url + "/" + gameId;
+      break;
   }
 });
 
@@ -50,5 +49,5 @@ function displayUsersList(userList) {
 }
 
 document.getElementById("startButton").addEventListener("click", () => {
-  socket.send(JSON.stringify({ type: 'startGame' }));
+  socket.send(JSON.stringify({ type: "startGame" }));
 });
