@@ -19,7 +19,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: url(images/map.png);
+  background: url(/static/images/map.png);
   image-rendering: pixelated;
 }
 
@@ -58,7 +58,7 @@ body {
 }
 
 .player.you:hover .player_sprite {
-  background: url(images/throw.gif);
+  background: url(/static/images/throw.gif);
   [data-direction="right"] & {
     background-position-x: 22px;
     right: 5px;
@@ -72,7 +72,7 @@ body {
   left: 5px;
   width: 7px;
   height: 5px;
-  background: url(images/arrow.png) no-repeat no-repeat;
+  background: url(/static/images/arrow.png) no-repeat no-repeat;
 }
 
 .player_name-container {
@@ -92,7 +92,7 @@ body {
 .player_sprite {
   overflow: hidden;
   top: -14px;
-  background: url(images/characters.png);
+  background: url(/static/images/characters.png);
 }
 
 .player[data-direction="right"] .player_sprite {
@@ -100,7 +100,7 @@ body {
 }
 
 .player_shadow {
-  background: url(images/shadow.png) no-repeat no-repeat;
+  background: url(/static/images/shadow.png) no-repeat no-repeat;
 }
 
 /* messages */
@@ -298,7 +298,7 @@ input {
   height: 80px;
   border: none;
   scale: 2;
-  background: url(images/waypoint.png) no-repeat no-repeat;
+  background: url(/static/images/waypoint.png) no-repeat no-repeat;
 }
 
 .christmas-tree-button:hover {
@@ -313,7 +313,7 @@ input {
   height: 80px;
   border: none;
   scale: 4;
-  background: url(images/store.png) no-repeat no-repeat;
+  background: url(/static/images/store.png) no-repeat no-repeat;
 }
 
 .store-button:hover {
