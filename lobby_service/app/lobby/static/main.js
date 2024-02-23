@@ -60,6 +60,8 @@ socket.addEventListener("message", (event) => {
       snowball.style.top = snowballStartY + "px";
       document.body.appendChild(snowball);
 
+      snowball.classList.add("throw-animation");
+
       const animationInterval = setInterval(() => {
         const snowballX = parseInt(snowball.style.left);
         const snowballY = parseInt(snowball.style.top);
@@ -71,6 +73,11 @@ socket.addEventListener("message", (event) => {
           snowball.remove();
           playCollisionSound();
           snowball.classList.add("collision");
+          const explosion = document.createElement("div");
+          explosion.classList.add("explosion");
+          explosion.style.left = snowballX + "px";
+          explosion.style.top = snowballY + "px";
+          document.body.appendChild(explosion);
         }
         snowball.style.left = parseInt(snowball.style.left) + velocityX + "px";
         snowball.style.top = parseInt(snowball.style.top) + velocityY + "px";
