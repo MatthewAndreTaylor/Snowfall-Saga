@@ -36,6 +36,10 @@ friendRequestButton.addEventListener("click", () => {
   modal.style.display = "none";
 });
 
+friendRequestSocket.addEventListener("message", (event) => {
+  console.log(event.data);
+});
+
 closeButton.onclick = function () {
   modal.style.display = "none";
 };
