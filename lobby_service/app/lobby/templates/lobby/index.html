@@ -19,8 +19,9 @@
     <div class="game-container">
       <a class="christmas-tree-button" href="/trivia"></a>
     </div>
-    <div class="leaderboard-container">
-      <a class="leaderboard-button" href="/leaderboard"></a>
+    <div id="leaderboard" class="leaderboard-container">
+      <a class="leaderboard-button"></a>
+      <span id="leaderboard-popup" class="leaderboard-popup"></span>
     </div>
     <div id="chat" class="chat-container">
       <div id="chat-box" class="chat-box"></div>
@@ -29,6 +30,10 @@
       </div>
     </div>
     <div class="inventory-container">
+      <div class="points">
+        <div class="coin"></div>
+        <span id="points-count" class="points-count"></span>
+      </div>
       <div id="sprite-grid" class="sprite-grid"></div>
       <button type="button" id="inv-btn" class="inventory-btn">
         Inventory
