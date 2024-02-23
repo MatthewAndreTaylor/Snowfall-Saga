@@ -1,0 +1,50 @@
+body {
+  font-family: "Courier New", Courier, monospace;
+  background-color: #f3f3f3;
+  margin: 20px;
+
+  background: url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ea95cd6e-d680-419a-87af-dde5bcda2898/d9bi0dd-0815e4da-3428-409f-b05c-da4eb3b2ceef.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2VhOTVjZDZlLWQ2ODAtNDE5YS04N2FmLWRkZTViY2RhMjg5OFwvZDliaTBkZC0wODE1ZTRkYS0zNDI4LTQwOWYtYjA1Yy1kYTRlYjNiMmNlZWYucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.WdNJ58wgNMlC81m3Rqb0bNElC4Y1bjgfk2EL8p0FlYk);
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.9;
+}
+
+h1 {
+  text-align: center;
+  color: #4d4d4d;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2);
+}
+
+thead {
+  background-color: #cccccc;
+  border-bottom: 2px solid #999999;
+}
+
+th,
+td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 12px;
+}
+
+tr:hover {
+  background-color: #d3e0ea;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.highlighted-row {
+  background-color: #ffffcc;
+}
+
+a {
+  background-color: #ffffff;
+  border-radius: 10%;
+}

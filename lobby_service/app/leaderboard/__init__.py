@@ -1,5 +1,5 @@
-from flask import Blueprint, request
-from .. import db
+from flask import Blueprint, render_template
+from flask_login import current_user
 from ..models import User
 
 leaderboard_handler = Blueprint(
@@ -7,19 +7,19 @@ leaderboard_handler = Blueprint(
     __name__,
     template_folder="templates",
     static_folder="static",
+    static_url_path="/assets/leaderboard",
 )
 
 
 @leaderboard_handler.route("/leaderboard", methods=["GET"])
 def make_leaderboard():
-    # get all the userrs from the database which is inside User table
-    # Sort by the points and display the users: username -> points in dict.
+    # Get all the users from the database which is inside User table
+    # Sort by the points and display the users: rank, username, points
     users = User.query.order_by(User.points.desc()).all()
-    leaderboard = {
-        user.username: user.points for user in users
-    }  # Exxample: {"matt": 100, "john": 50}4
+    ranked_users = [(i + 1, user.username, user.points) for i, user in enumerate(users)]
 
-    prepaered_leaderboard = ["Rank | Username | Points"]
-    for i, (username, points) in enumerate(leaderboard.items(), 1):
-        prepaered_leaderboard.append(f"{i} | {username} | {points}")
-    return "<br>".join(prepaered_leaderboard)
+    return render_template(
+        "leaderboard/index.html",
+        ranked_users=ranked_users,
+        current_user_name=current_user.username,
+    )

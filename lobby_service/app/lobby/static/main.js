@@ -17,8 +17,6 @@ const spriteGrid = document.querySelector("#sprite-grid");
 
 const pointsCount = document.querySelector("#points-count");
 
-const leaderboardPopup = document.querySelector("#leaderboard-popup");
-
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {
     players[playerId].direction = "right";
@@ -296,21 +294,5 @@ gameContainer.addEventListener("click", (event) => {
     const clickX = (event.clientX - 16) / 3;
     const clickY = (event.clientY - 16) / 3;
     handleMove(clickX, clickY);
-  }
-});
-
-// Open and close the leaderboard, display the leaderboard by calling /leaderboard/__init__.py which has the function make_leaderboard
-leaderboardPopup.addEventListener("click", () => {
-  fetch("/leaderboard")
-    .then((response) => response.text())
-    .then((html) => {
-      leaderboardPopup.innerHTML = html;
-      leaderboardPopup.style.display = "block";
-    });
-});
-
-leaderboardPopup.addEventListener("click", (e) => {
-  if (e.target.id === "leaderboard-popup") {
-    leaderboardPopup.style.display = "none";
   }
 });
