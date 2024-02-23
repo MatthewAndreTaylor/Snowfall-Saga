@@ -1,6 +1,9 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
 const messageSocket = new WebSocket(`ws://${location.host}/message`);
+const friendRequestSocket = new WebSocket(
+  `ws://${location.host}/send_friend_request`,
+);
 
 let playerRef;
 let players = {};
@@ -15,6 +18,44 @@ const messageInput = document.querySelector("#chat-input");
 const inventoryContainer = document.querySelector(".inventory-container");
 const inventoryButton = document.querySelector("#inv-btn");
 const spriteGrid = document.querySelector("#sprite-grid");
+
+const modal = document.getElementById("user-modal");
+const closeButton = document.querySelector(".close");
+
+const friendRequestButton = document.querySelector("#add-friend");
+
+friendRequestButton.addEventListener("click", () => {
+  const username = document
+    .querySelector(".modal-username")
+    .textContent.split(": ")[1];
+  const message = {
+    type: "friendRequest",
+    username: username,
+  };
+  friendRequestSocket.send(JSON.stringify(message));
+  modal.style.display = "none";
+});
+
+closeButton.onclick = function () {
+  modal.style.display = "none";
+};
+
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+};
+
+function toggleTab(tab) {
+  document.querySelectorAll(".content").forEach(function (content) {
+    content.classList.remove("active");
+  });
+  document.querySelectorAll(".tab").forEach(function (tab) {
+    tab.classList.remove("active");
+  });
+  document.getElementById(tab + "-box").classList.add("active");
+  document.getElementById(tab + "-tab").classList.add("active");
+}
 
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {

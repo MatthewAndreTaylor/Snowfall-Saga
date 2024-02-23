@@ -15,6 +15,7 @@
     />
     <link rel="stylesheet" href="/static/snow.css" type="text/css" />
   </head>
+
   <body>
     <div class="game-container">
       <a class="christmas-tree-button" href="/trivia"></a>
@@ -30,6 +31,25 @@
       <button type="button" id="inv-btn" class="inventory-btn">
         Inventory
       </button>
+    </div>
+    <div class="user-container">
+      <div class="tab-container">
+        <div id="user-tab" class="tab active" onclick="toggleTab('user')">
+          Users
+        </div>
+        <div id="friend-tab" class="tab" onclick="toggleTab('friend')">
+          Friends
+        </div>
+      </div>
+      <div id="user-box" class="content active"></div>
+      <div id="friend-box" class="content"></div>
+    </div>
+    <div id="user-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 class="modal-username"></h2>
+        <button id="add-friend">Send Friend Request</button>
+      </div>
     </div>
     <script>
       const playerId = "{{ player_id }}";

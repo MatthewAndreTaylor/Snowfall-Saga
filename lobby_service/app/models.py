@@ -49,3 +49,29 @@ class User(UserMixin, db.Model):
             dict: A dictionary containing user information.
         """
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
+
+
+class Friendship(db.Model):
+    """Class representing a friendship between two users.
+
+    Attributes:
+        user_id (int): The id of the user who sent the friend request.
+        friend_id (int): The id of the user who received the friend request.
+        status (int): The status of the friendship request. 0 for pending, 1 for accepted, 2 for declined.
+
+    Methods:
+        to_dict(): Returns the friendship object as a dictionary.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    status = db.Column(db.Integer, default=0, nullable=False)
+
+    def to_dict(self):
+        """Converts the friendship object to a dictionary.
+
+        Returns:
+            dict: A dictionary containing friendship information.
+        """
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
