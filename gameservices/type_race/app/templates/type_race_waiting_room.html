@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Type Race - Player List</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
 </head>
 <body>
-$END$
+    <h1>Type Race - Player List</h1>
+    <div class="player-container">
+      <ul id="player-list">
+      </ul>
+    </div>
+    <button id="startButton">Start Game</button>
+    <script>
+        const username = `{{ username }}` || "Guest";
+        const gameId = `{{ gameId }}` || "0";
+    </script>
+    <script src="{{ url_for('static', filename='type_race_waiting_room.js') }}"></script>
 </body>
 </html>
