@@ -309,7 +309,7 @@ input {
   height: 80px;
   border: none;
   scale: 3;
-  background: url(images/leaderboard.png) no-repeat no-repeat;
+  background: url(/static/images/leaderboard.png) no-repeat no-repeat;
 }
 
 .leaderboard-popup {
