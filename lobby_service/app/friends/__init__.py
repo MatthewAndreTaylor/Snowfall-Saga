@@ -22,34 +22,29 @@ users = {}
 @sock.route("/get_friends")
 @login_required
 def get_friends(connection):
+    if connection in clients:
+        return
+
+    clients[connection] = current_user.username
+    users[current_user.username] = connection
+
     while True:
         try:
             event = connection.receive()
             data = json.loads(event)
             type = data["type"]
             if type == "getFriends":
-                friends = Friendship.query.filter_by(
-                    user_id=current_user.id, status=1
-                ).all()
-                friends2 = Friendship.query.filter_by(
-                    friend_id=current_user.id, status=1
-                ).all()
-
-                friend_list = []
-
-                for friend in friends:
-                    user = User.query.filter_by(id=friend.friend_id).first()
-                    friend_list.append({"username": user.username})
-                for friend in friends2:
-                    user = User.query.filter_by(id=friend.user_id).first()
-                    friend_list.append({"username": user.username})
-
-                message = {
-                    "type": "friends",
-                    "friends": friend_list,
-                }
+                message = getAllFriends(current_user.username)
                 connection.send(json.dumps(message))
+                if data["sent_from"] != "":
+                    from_user = data["sent_from"]
+                    if from_user in users:
+                        message = getAllFriends(from_user)
+                        users[from_user].send(json.dumps(message))
         except (KeyError, ConnectionError, ConnectionClosed):
+            user = clients[connection]
+            del clients[connection]
+            del users[user]
             break
 
 
@@ -250,3 +245,27 @@ def send_friend_request(connection, from_user):
             del users[user]
             print(f"Friendship Removed connection {connection}")
             break
+
+
+def getAllFriends(curr_user):
+    curr_user = User.query.filter_by(username=curr_user).first()
+    if curr_user is None:
+        return {"error": "User not found"}
+
+    friends = Friendship.query.filter_by(user_id=curr_user.id, status=1).all()
+    friends2 = Friendship.query.filter_by(friend_id=curr_user.id, status=1).all()
+
+    friend_list = []
+
+    for friend in friends:
+        user = User.query.filter_by(id=friend.friend_id).first()
+        friend_list.append({"username": user.username})
+    for friend in friends2:
+        user = User.query.filter_by(id=friend.user_id).first()
+        friend_list.append({"username": user.username})
+
+    message = {
+        "type": "friends",
+        "friends": friend_list,
+    }
+    return message

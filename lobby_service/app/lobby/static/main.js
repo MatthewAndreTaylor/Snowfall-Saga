@@ -114,7 +114,11 @@ function rejectFriendRequest(username) {
 
 acceptFriendRequestSocket.addEventListener("message", (event) => {
   updateFriendRequests(event);
-  getFriends();
+  const data = JSON.parse(event.data);
+  if (data.success) {
+    sent_from = data.username;
+    getFriends((sent_from = sent_from));
+  }
 });
 
 rejectFriendRequestSocket.addEventListener("message", (event) => {
@@ -192,12 +196,12 @@ function toggleTab(tab) {
   });
   document.getElementById(tab + "-box").classList.add("active");
   document.getElementById(tab + "-tab").classList.add("active");
-  getFriends();
 }
 
-function getFriends() {
+function getFriends(sent_from = "") {
   const message = {
     type: "getFriends",
+    sent_from: sent_from,
   };
   getFriendsSocket.send(JSON.stringify(message));
 }
