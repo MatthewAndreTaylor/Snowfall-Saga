@@ -301,7 +301,37 @@ input {
   background: url(/static/images/waypoint.png) no-repeat no-repeat;
 }
 
+.leaderboard-button {
+  position: fixed;
+  top: 110px;
+  left: 75px;
+  width: 50px;
+  height: 80px;
+  border: none;
+  scale: 3;
+  background: url(/static/images/leaderboard.png) no-repeat no-repeat;
+}
+
+.leaderboard-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  background-color: #000;
+  color: #fff;
+  opacity: 0.5;
+}
+
 .christmas-tree-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.leaderboard-button:hover {
   filter: drop-shadow(0 0 0.75rem yellow);
 }
 

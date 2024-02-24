@@ -36,6 +36,10 @@ def create_app():
 
         app.register_blueprint(points_handler)
 
+        from .leaderboard import leaderboard_handler
+
+        app.register_blueprint(leaderboard_handler)
+
         from .store import store_view
 
         app.register_blueprint(store_view)
