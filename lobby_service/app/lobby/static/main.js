@@ -31,6 +31,8 @@ const inventoryContainer = document.querySelector(".inventory-container");
 const inventoryButton = document.querySelector("#inv-btn");
 const spriteGrid = document.querySelector("#sprite-grid");
 
+const pointsCount = document.querySelector("#points-count");
+
 const modal = document.getElementById("user-modal");
 const modalContent = modal.querySelector(".modal-content");
 const response = modalContent.querySelector(".request-info");
@@ -322,14 +324,15 @@ socket.addEventListener("message", (event) => {
           gameContainer.appendChild(playerElement);
         }
       });
+      pointsCount.innerText = `${players[playerId].points}`;
       break;
     case "playerRemoved":
-      const pkey = data.id;
-      gameContainer.removeChild(playerElements[pkey]);
+      const key = data.id;
+      gameContainer.removeChild(playerElements[key]);
 
-      removeUserFromBox(players[pkey].name);
+      removeUserFromBox(players[key].name);
 
-      delete playerElements[pkey];
+      delete playerElements[key];
       break;
     case "getSprites":
       const binary = data["inventory"].toString(2);

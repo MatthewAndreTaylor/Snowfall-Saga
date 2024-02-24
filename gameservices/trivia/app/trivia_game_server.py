@@ -2,6 +2,7 @@ from flask_socketio import SocketIO, join_room
 from flask import request, session
 from .questions import TriviaDB
 import random
+import requests
 
 
 def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
@@ -75,3 +76,9 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
                     )
 
             question_number += 1
+
+        send_points(points)
+
+
+def send_points(points):
+    requests.post("http://127.0.0.1:5000/points", json=points)

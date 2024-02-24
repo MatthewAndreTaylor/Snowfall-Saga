@@ -38,6 +38,12 @@ def trivia():
     return redirect("http://127.0.0.1:9999/trivia")
 
 
+@lobby_view.route("/blizzard_bounce", methods=["GET"])
+@login_required
+def blizzard_bounce():
+    return redirect("http://127.0.0.1:9998")
+
+
 @sock.route("/echo")
 def echo(connection):
     if connection in clients or current_user.id in players:
@@ -48,6 +54,7 @@ def echo(connection):
         "name": current_user.username,
         "id": current_user.id,
         "sprite": current_user.sprite,
+        "points": current_user.points,
     }
     print(f"{current_user.username} joined with connection {connection}")
 
