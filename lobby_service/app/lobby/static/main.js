@@ -1,7 +1,7 @@
 // Setup a new socket connection
 const socket = new WebSocket(`ws://${location.host}/echo`);
 
-const collisionSound = new Audio("/audio/snowballHit.mp3");
+const collisionSound = new Audio("/static/audio/snowballHit.mp3");
 
 function playCollisionSound() {
   collisionSound.play();
