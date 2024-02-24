@@ -115,12 +115,21 @@ body {
   background: rgba(119, 138, 198, 0.75);
 }
 
+.friend-request {
+  margin: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .accept-button,
 .reject-button {
   color: white;
   border: 1px solid black;
-  padding: 5px 10px;
-  margin-left: 10px;
+  margin-left: 1em;
+  padding: 0.5em;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .accept-button {

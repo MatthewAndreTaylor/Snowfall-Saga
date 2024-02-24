@@ -55,6 +55,84 @@ def friend_request(connection):
     send_friend_request(connection, from_user=current_user)
 
 
+@sock.route("/accept_friend_request")
+@login_required
+def accept_friend_request(connection):
+    from_user = current_user
+    while True:
+        try:
+            event = connection.receive()
+            data = json.loads(event)
+            type = data["type"]
+            if type == "acceptFriendRequest":
+                sent_from = data["username"]
+                if sent_from is None:
+                    connection.send(
+                        json.dumps({"error": "Error accepting friend request"})
+                    )
+                    continue
+                user = User.query.filter_by(username=sent_from).first()
+                if user is None:
+                    message = {"error": "User not found"}
+                    connection.send(json.dumps(message))
+                    continue
+                friendship = Friendship.query.filter_by(
+                    user_id=user.id, friend_id=from_user.id, status=0
+                ).first()
+                if friendship is None:
+                    message = {"error": "Friend request not found"}
+                    connection.send(json.dumps(message))
+                    continue
+                friendship.status = 1
+                db.session.commit()
+                message = {
+                    "success": "Friend request accepted",
+                    "username": sent_from,
+                }
+                connection.send(json.dumps(message))
+        except (KeyError, ConnectionError, ConnectionClosed):
+            break
+
+
+@sock.route("/reject_friend_request")
+@login_required
+def reject_friend_request(connection):
+    from_user = current_user
+    while True:
+        try:
+            event = connection.receive()
+            data = json.loads(event)
+            type = data["type"]
+            if type == "rejectFriendRequest":
+                sent_from = data["username"]
+                if sent_from is None:
+                    connection.send(
+                        json.dumps({"error": "Error rejecting friend request"})
+                    )
+                    continue
+                user = User.query.filter_by(username=sent_from).first()
+                if user is None:
+                    message = {"error": "User not found"}
+                    connection.send(json.dumps(message))
+                    continue
+                friendship = Friendship.query.filter_by(
+                    user_id=user.id, friend_id=from_user.id, status=0
+                ).first()
+                if friendship is None:
+                    message = {"error": "Friend request not found"}
+                    connection.send(json.dumps(message))
+                    continue
+                friendship.status = 2
+                db.session.commit()
+                message = {
+                    "success": "Friend request rejected",
+                    "username": sent_from,
+                }
+                connection.send(json.dumps(message))
+        except (KeyError, ConnectionError, ConnectionClosed):
+            break
+
+
 def send_friend_request(connection, from_user):
     if connection in clients:
         return
@@ -66,8 +144,12 @@ def send_friend_request(connection, from_user):
         try:
             event = connection.receive()
             data = json.loads(event)
-            to_user = data["username"]
 
+            type = data["type"]
+            if type != "friendRequest":
+                continue
+
+            to_user = data["username"]
             if to_user is None:
                 connection.send(json.dumps({"error": "Error sending friend request"}))
                 continue
@@ -76,25 +158,48 @@ def send_friend_request(connection, from_user):
 
             if to_user is None:
                 message = {"error": "User not found"}
+                connection.send(json.dumps(message))
+                continue
             elif from_user == to_user:
                 message = {
                     "error": "You can't send a friend request to yourself",
                 }
-            elif (
-                Friendship.query.filter_by(
-                    user_id=from_user.id, friend_id=to_user.id
-                ).first()
-                is not None
-            ):
-                message = {"error": "You are already friends"}
-            elif (
-                Friendship.query.filter_by(
-                    user_id=to_user.id, friend_id=from_user.id
-                ).first()
-                is not None
-            ):
-                message = {"error": "You are already friends"}
-            else:
+                connection.send(json.dumps(message))
+                continue
+
+            friendship = Friendship.query.filter_by(
+                user_id=from_user.id, friend_id=to_user.id
+            ).first()
+            friendship2 = Friendship.query.filter_by(
+                user_id=to_user.id, friend_id=from_user.id
+            ).first()
+
+            message = None
+
+            if friendship is not None:
+                if friendship.status == 0:
+                    message = {
+                        "error": "Friend request already sent",
+                    }
+                elif friendship.status == 1:
+                    message = {
+                        "error": "You are already friends",
+                    }
+                elif friendship2 is None or friendship2.status == 2:
+                    friendship.status = 0
+                    db.session.commit()
+                    message = {"success": "Friend request sent"}
+            elif friendship2 is not None:
+                if friendship2.status == 0:
+                    message = {
+                        "error": "Friend request already sent to you",
+                    }
+                elif friendship2.status == 1:
+                    message = {
+                        "error": "You are already friends",
+                    }
+
+            if message is None:
                 friendship = Friendship(
                     user_id=from_user.id, friend_id=to_user.id, status=0
                 )

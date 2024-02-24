@@ -8,6 +8,12 @@ const sendFriendRequestSocket = new WebSocket(
 const getFriendRequestsSocket = new WebSocket(
   `ws://${location.host}/get_friend_requests`,
 );
+const acceptFriendRequestSocket = new WebSocket(
+  `ws://${location.host}/accept_friend_request`,
+);
+const rejectFriendRequestSocket = new WebSocket(
+  `ws://${location.host}/reject_friend_request`,
+);
 
 let playerRef;
 let players = {};
@@ -68,23 +74,65 @@ getFriendRequestsSocket.addEventListener("message", (event) => {
       acceptButton.textContent = "Accept";
       acceptButton.classList.add("accept-button");
       acceptButton.addEventListener("click", () => {
-        console.log("Accepting friend request");
+        acceptFriendRequest(request.from_user);
       });
 
       const rejectButton = document.createElement("button");
       rejectButton.textContent = "Reject";
       rejectButton.classList.add("reject-button");
       rejectButton.addEventListener("click", () => {
-        console.log("Rejecting friend request");
+        rejectFriendRequest(request.from_user);
       });
 
+      buttonDiv = document.createElement("div");
+      buttonDiv.appendChild(acceptButton);
+      buttonDiv.appendChild(rejectButton);
       requestDiv.appendChild(fromUserSpan);
-      requestDiv.appendChild(acceptButton);
-      requestDiv.appendChild(rejectButton);
+      requestDiv.appendChild(buttonDiv);
       list.appendChild(requestDiv);
     });
   }
 });
+
+function acceptFriendRequest(username) {
+  const message = {
+    type: "acceptFriendRequest",
+    username: username,
+  };
+  acceptFriendRequestSocket.send(JSON.stringify(message));
+}
+
+function rejectFriendRequest(username) {
+  const message = {
+    type: "rejectFriendRequest",
+    username: username,
+  };
+  rejectFriendRequestSocket.send(JSON.stringify(message));
+}
+
+acceptFriendRequestSocket.addEventListener("message", (event) => {
+  updateFriendRequests(event);
+});
+
+rejectFriendRequestSocket.addEventListener("message", (event) => {
+  updateFriendRequests(event);
+});
+
+function updateFriendRequests(event) {
+  const data = JSON.parse(event.data);
+  if (data.success) {
+    list = friendRequestModal.querySelector("#friend-request-list");
+    for (let i = 0; i < list.children.length; i++) {
+      const child = list.children[i];
+      if (child.textContent.includes(data.username)) {
+        list.removeChild(child);
+      }
+    }
+    console.log(data.success);
+  } else {
+    console.log(data.error);
+  }
+}
 
 friendRequestButton.addEventListener("click", () => {
   const username = document
@@ -106,12 +154,12 @@ sendFriendRequestSocket.addEventListener("message", (event) => {
   if (data.error) {
     requestSent.textContent = data.error;
     requestSent.style.color = "red";
-    friendRequestButton.disabled = true;
   } else {
     requestSent.textContent = data.success;
     requestSent.style.color = "green";
   }
 
+  friendRequestButton.disabled = true;
   response.appendChild(lineBreak);
   response.appendChild(requestSent);
 });
