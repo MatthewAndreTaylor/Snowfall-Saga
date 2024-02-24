@@ -135,7 +135,11 @@ function updateFriendRequests(event) {
         list.removeChild(child);
       }
     }
-    console.log(data.success);
+    if (list.children.length === 0) {
+      const noRequests = document.createElement("div");
+      noRequests.textContent = "No pending friend requests";
+      list.appendChild(noRequests);
+    }
   } else {
     console.log(data.error);
   }
@@ -221,11 +225,6 @@ getFriendsSocket.addEventListener("message", (event) => {
 
       friendDiv.classList.add("user-box-item");
       friendDiv.classList.add("friend-item");
-      if (i % 2 == 0) {
-        friendDiv.classList.add("even");
-      } else {
-        friendDiv.classList.add("odd");
-      }
 
       friendBox.appendChild(friendDiv);
       i++;
@@ -255,11 +254,6 @@ function addUserToBox(username) {
   const user = document.createElement("div");
 
   user.classList.add("user-box-item");
-  if (addedUsers.size % 2 == 0) {
-    user.classList.add("even");
-  } else {
-    user.classList.add("odd");
-  }
 
   user.textContent = username.toUpperCase();
   user.setAttribute("username", username);

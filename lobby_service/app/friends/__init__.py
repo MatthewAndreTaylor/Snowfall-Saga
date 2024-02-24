@@ -218,7 +218,8 @@ def send_friend_request(connection, from_user):
                     friendship.status = 0
                     db.session.commit()
                     message = {"success": "Friend request sent"}
-            elif friendship2 is not None:
+
+            if message is None and friendship2 is not None:
                 if friendship2.status == 0:
                     message = {
                         "error": "Friend request already sent to you",

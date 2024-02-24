@@ -160,9 +160,10 @@ body {
   gap: 0.5em;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid white;
   color: white;
   cursor: pointer;
+  background: rgba(119, 138, 198, 0.95);
 }
 
 .friend-item {
@@ -179,14 +180,15 @@ body {
   cursor: pointer;
   margin: 0;
   padding: 0.5em;
-  background: rgba(119, 138, 198, 0.95);
+  background: rgba(93, 104, 138, 0.95);
   width: 100%;
   height: 100%;
   text-align: center;
+  border-bottom: 2px solid white;
 }
 
 .tab.active {
-  background-color: black;
+  background: rgba(119, 138, 198, 0.95);
   color: white;
 }
 
@@ -198,14 +200,6 @@ body {
 
 .content.active {
   display: block;
-}
-
-.odd {
-  background: rgba(43, 68, 148, 0.85);
-}
-
-.even {
-  background: rgba(43, 68, 148, 0.65);
 }
 
 /* Messages */
