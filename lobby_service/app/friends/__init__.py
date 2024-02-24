@@ -19,6 +19,40 @@ clients = {}
 users = {}
 
 
+@sock.route("/get_friends")
+@login_required
+def get_friends(connection):
+    while True:
+        try:
+            event = connection.receive()
+            data = json.loads(event)
+            type = data["type"]
+            if type == "getFriends":
+                friends = Friendship.query.filter_by(
+                    user_id=current_user.id, status=1
+                ).all()
+                friends2 = Friendship.query.filter_by(
+                    friend_id=current_user.id, status=1
+                ).all()
+
+                friend_list = []
+
+                for friend in friends:
+                    user = User.query.filter_by(id=friend.friend_id).first()
+                    friend_list.append({"username": user.username})
+                for friend in friends2:
+                    user = User.query.filter_by(id=friend.user_id).first()
+                    friend_list.append({"username": user.username})
+
+                message = {
+                    "type": "friends",
+                    "friends": friend_list,
+                }
+                connection.send(json.dumps(message))
+        except (KeyError, ConnectionError, ConnectionClosed):
+            break
+
+
 @sock.route("/get_friend_requests")
 @login_required
 def get_friend_requests(connection):

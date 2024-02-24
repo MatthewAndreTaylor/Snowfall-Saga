@@ -165,6 +165,10 @@ body {
   cursor: pointer;
 }
 
+.friend-item {
+  cursor: default;
+}
+
 .tab-container {
   display: flex;
   justify-content: space-between;

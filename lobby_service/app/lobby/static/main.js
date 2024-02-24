@@ -14,6 +14,7 @@ const acceptFriendRequestSocket = new WebSocket(
 const rejectFriendRequestSocket = new WebSocket(
   `ws://${location.host}/reject_friend_request`,
 );
+const getFriendsSocket = new WebSocket(`ws://${location.host}/get_friends`);
 
 let playerRef;
 let players = {};
@@ -23,6 +24,7 @@ const addedUsers = new Set();
 
 const userBox = document.querySelector("#user-box");
 const chatBox = document.querySelector("#chat-box");
+const friendBox = document.querySelector("#friend-box");
 const messageInput = document.querySelector("#chat-input");
 
 const inventoryContainer = document.querySelector(".inventory-container");
@@ -112,6 +114,7 @@ function rejectFriendRequest(username) {
 
 acceptFriendRequestSocket.addEventListener("message", (event) => {
   updateFriendRequests(event);
+  getFriends();
 });
 
 rejectFriendRequestSocket.addEventListener("message", (event) => {
@@ -189,7 +192,42 @@ function toggleTab(tab) {
   });
   document.getElementById(tab + "-box").classList.add("active");
   document.getElementById(tab + "-tab").classList.add("active");
+  getFriends();
 }
+
+function getFriends() {
+  const message = {
+    type: "getFriends",
+  };
+  getFriendsSocket.send(JSON.stringify(message));
+}
+
+getFriendsSocket.addEventListener("open", (event) => {
+  getFriends();
+});
+
+getFriendsSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === "friends") {
+    friendBox.innerHTML = "";
+    let i = 0;
+    data.friends.forEach((friend) => {
+      const friendDiv = document.createElement("div");
+      friendDiv.textContent = friend.username.toUpperCase();
+
+      friendDiv.classList.add("user-box-item");
+      friendDiv.classList.add("friend-item");
+      if (i % 2 == 0) {
+        friendDiv.classList.add("even");
+      } else {
+        friendDiv.classList.add("odd");
+      }
+
+      friendBox.appendChild(friendDiv);
+      i++;
+    });
+  }
+});
 
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {
@@ -339,7 +377,6 @@ socket.addEventListener("close", (event) => {
 
 messageSocket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  //console.log(data);
 
   const node = document.createElement("div");
   if (data.type != "newMessage") {
