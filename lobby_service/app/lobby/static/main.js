@@ -2,13 +2,29 @@
 const socket = new WebSocket(`ws://${location.host}/echo`);
 const messageSocket = new WebSocket(`ws://${location.host}/message`);
 
+const sendFriendRequestSocket = new WebSocket(
+  `ws://${location.host}/send_friend_request`,
+);
+const getFriendRequestsSocket = new WebSocket(
+  `ws://${location.host}/get_friend_requests`,
+);
+const acceptFriendRequestSocket = new WebSocket(
+  `ws://${location.host}/accept_friend_request`,
+);
+const rejectFriendRequestSocket = new WebSocket(
+  `ws://${location.host}/reject_friend_request`,
+);
+const getFriendsSocket = new WebSocket(`ws://${location.host}/get_friends`);
+
 let playerRef;
 let players = {};
 let playerElements = {};
 const gameContainer = document.querySelector(".game-container");
+const addedUsers = new Set();
 
 const userBox = document.querySelector("#user-box");
 const chatBox = document.querySelector("#chat-box");
+const friendBox = document.querySelector("#friend-box");
 const messageInput = document.querySelector("#chat-input");
 
 const inventoryContainer = document.querySelector(".inventory-container");
@@ -16,6 +32,207 @@ const inventoryButton = document.querySelector("#inv-btn");
 const spriteGrid = document.querySelector("#sprite-grid");
 
 const pointsCount = document.querySelector("#points-count");
+
+const modal = document.getElementById("user-modal");
+const modalContent = modal.querySelector(".modal-content");
+const response = modalContent.querySelector(".request-info");
+
+const closeButton1 = document.querySelector("#c1");
+const closeButton2 = document.querySelector("#c2");
+
+const friendRequestModal = document.getElementById("friend-request-modal");
+const friendRequestButton = document.querySelector("#add-friend");
+const friendRequests = document.querySelector("#friend-requests");
+
+friendRequests.addEventListener("click", () => {
+  const message = {
+    type: "getFriendRequests",
+  };
+  getFriendRequestsSocket.send(JSON.stringify(message));
+  friendRequestModal.style.display = "block";
+});
+
+getFriendRequestsSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === "friend_requests") {
+    const modalContent = friendRequestModal.querySelector(".modal-content");
+    const list = modalContent.querySelector("#friend-request-list");
+    list.innerHTML = "";
+
+    const friendRequests = data.requests;
+
+    if (friendRequests.length === 0) {
+      const noRequests = document.createElement("div");
+      noRequests.textContent = "No pending friend requests";
+      list.appendChild(noRequests);
+    }
+
+    friendRequests.forEach((request) => {
+      const requestDiv = document.createElement("div");
+      requestDiv.classList.add("friend-request");
+
+      const fromUserSpan = document.createElement("span");
+      fromUserSpan.textContent = "From: " + request.from_user;
+
+      const acceptButton = document.createElement("button");
+      acceptButton.textContent = "Accept";
+      acceptButton.classList.add("accept-button");
+      acceptButton.addEventListener("click", () => {
+        acceptFriendRequest(request.from_user);
+      });
+
+      const rejectButton = document.createElement("button");
+      rejectButton.textContent = "Reject";
+      rejectButton.classList.add("reject-button");
+      rejectButton.addEventListener("click", () => {
+        rejectFriendRequest(request.from_user);
+      });
+
+      buttonDiv = document.createElement("div");
+      buttonDiv.appendChild(acceptButton);
+      buttonDiv.appendChild(rejectButton);
+      requestDiv.appendChild(fromUserSpan);
+      requestDiv.appendChild(buttonDiv);
+      list.appendChild(requestDiv);
+    });
+  }
+});
+
+function acceptFriendRequest(username) {
+  const message = {
+    type: "acceptFriendRequest",
+    username: username,
+  };
+  acceptFriendRequestSocket.send(JSON.stringify(message));
+}
+
+function rejectFriendRequest(username) {
+  const message = {
+    type: "rejectFriendRequest",
+    username: username,
+  };
+  rejectFriendRequestSocket.send(JSON.stringify(message));
+}
+
+acceptFriendRequestSocket.addEventListener("message", (event) => {
+  updateFriendRequests(event);
+  const data = JSON.parse(event.data);
+  if (data.success) {
+    sent_from = data.username;
+    getFriends((sent_from = sent_from));
+  }
+});
+
+rejectFriendRequestSocket.addEventListener("message", (event) => {
+  updateFriendRequests(event);
+});
+
+function updateFriendRequests(event) {
+  const data = JSON.parse(event.data);
+  if (data.success) {
+    list = friendRequestModal.querySelector("#friend-request-list");
+    for (let i = 0; i < list.children.length; i++) {
+      const child = list.children[i];
+      if (child.textContent.includes(data.username)) {
+        list.removeChild(child);
+      }
+    }
+    if (list.children.length === 0) {
+      const noRequests = document.createElement("div");
+      noRequests.textContent = "No pending friend requests";
+      list.appendChild(noRequests);
+    }
+  } else {
+    console.log(data.error);
+  }
+}
+
+friendRequestButton.addEventListener("click", () => {
+  const username = document
+    .querySelector(".modal-username")
+    .textContent.split(": ")[1];
+  const message = {
+    type: "friendRequest",
+    username: username,
+  };
+  sendFriendRequestSocket.send(JSON.stringify(message));
+});
+
+sendFriendRequestSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  response.innerHTML = "";
+  const lineBreak = document.createElement("br");
+  const requestSent = document.createElement("div");
+
+  if (data.error) {
+    requestSent.textContent = data.error;
+    requestSent.style.color = "red";
+  } else {
+    requestSent.textContent = data.success;
+    requestSent.style.color = "green";
+  }
+
+  friendRequestButton.disabled = true;
+  response.appendChild(lineBreak);
+  response.appendChild(requestSent);
+});
+
+closeButton1.onclick = function () {
+  modal.style.display = "none";
+};
+
+closeButton2.onclick = function () {
+  friendRequestModal.style.display = "none";
+};
+
+window.onclick = function (event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  } else if (event.target == friendRequestModal) {
+    friendRequestModal.style.display = "none";
+  }
+};
+
+function toggleTab(tab) {
+  document.querySelectorAll(".content").forEach(function (content) {
+    content.classList.remove("active");
+  });
+  document.querySelectorAll(".tab").forEach(function (tab) {
+    tab.classList.remove("active");
+  });
+  document.getElementById(tab + "-box").classList.add("active");
+  document.getElementById(tab + "-tab").classList.add("active");
+}
+
+function getFriends(sent_from = "") {
+  const message = {
+    type: "getFriends",
+    sent_from: sent_from,
+  };
+  getFriendsSocket.send(JSON.stringify(message));
+}
+
+getFriendsSocket.addEventListener("open", (event) => {
+  getFriends();
+});
+
+getFriendsSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === "friends") {
+    friendBox.innerHTML = "";
+    let i = 0;
+    data.friends.forEach((friend) => {
+      const friendDiv = document.createElement("div");
+      friendDiv.textContent = friend.username.toUpperCase();
+
+      friendDiv.classList.add("user-box-item");
+      friendDiv.classList.add("friend-item");
+
+      friendBox.appendChild(friendDiv);
+      i++;
+    });
+  }
+});
 
 function handleMove(newX, newY) {
   if (newX > players[playerId].x) {
@@ -32,15 +249,46 @@ function handleMove(newX, newY) {
   socket.send(JSON.stringify(message));
 }
 
+function addUserToBox(username) {
+  if (addedUsers.has(username) || username === players[playerId].name) {
+    return;
+  }
+  const user = document.createElement("div");
+
+  user.classList.add("user-box-item");
+
+  user.textContent = username.toUpperCase();
+  user.setAttribute("username", username);
+  userBox.appendChild(user);
+  addedUsers.add(username);
+
+  user.addEventListener("click", function () {
+    response.innerHTML = "";
+    friendRequestButton.disabled = false;
+    document.querySelector(".modal-username").textContent = "User: " + username;
+    modal.style.display = "block";
+  });
+}
+
+function removeUserFromBox(username) {
+  if (addedUsers.has(username)) {
+    const user = userBox.querySelector(`[username="${username}"]`);
+    userBox.removeChild(user);
+    addedUsers.delete(username);
+  }
+}
+
 socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  //console.log(data);
 
   switch (data.type) {
     case "playersUpdate":
       players = data.value || {};
       Object.keys(players).forEach((key) => {
         const playerState = players[key];
+
+        addUserToBox(playerState.name);
+
         if (key in playerElements) {
           let el = playerElements[key];
           el.querySelector(".player_name").innerText = playerState.name;
@@ -81,6 +329,9 @@ socket.addEventListener("message", (event) => {
     case "playerRemoved":
       const key = data.id;
       gameContainer.removeChild(playerElements[key]);
+
+      removeUserFromBox(players[key].name);
+
       delete playerElements[key];
       break;
     case "getSprites":
@@ -127,7 +378,6 @@ socket.addEventListener("close", (event) => {
 
 messageSocket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
-  //console.log(data);
 
   const node = document.createElement("div");
   if (data.type != "newMessage") {

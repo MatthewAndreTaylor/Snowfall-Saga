@@ -44,6 +44,10 @@ def create_app():
 
         app.register_blueprint(store_view)
 
+        from .friends import friendship
+
+        app.register_blueprint(friendship)
+
     with app.app_context():
         db.create_all()
 

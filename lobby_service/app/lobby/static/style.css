@@ -103,6 +103,105 @@ body {
   background: url(/static/images/shadow.png) no-repeat no-repeat;
 }
 
+#friend-requests {
+  position: fixed;
+  top: 23%;
+  padding: 0.5em;
+  right: 0;
+  cursor: pointer;
+  border-radius: 10px;
+  margin: 10px;
+  border: 2px solid black;
+  background: rgba(119, 138, 198, 0.75);
+}
+
+.friend-request {
+  margin: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.accept-button,
+.reject-button {
+  color: white;
+  border: 1px solid black;
+  margin-left: 1em;
+  padding: 0.5em;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.accept-button {
+  background-color: green;
+}
+
+.reject-button {
+  background-color: red;
+}
+
+.user-container {
+  position: fixed;
+  flex-direction: column;
+  top: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  height: 200px;
+  width: 250px;
+  background: rgba(119, 138, 198, 0.75);
+  border-radius: 0 0 0 10px;
+}
+
+.user-box-item {
+  padding: 0.5em;
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid white;
+  color: white;
+  cursor: pointer;
+  background: rgba(119, 138, 198, 0.95);
+}
+
+.friend-item {
+  cursor: default;
+}
+
+.tab-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tab {
+  cursor: pointer;
+  margin: 0;
+  padding: 0.5em;
+  background: rgba(93, 104, 138, 0.95);
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border-bottom: 2px solid white;
+}
+
+.tab.active {
+  background: rgba(119, 138, 198, 0.95);
+  color: white;
+}
+
+.content {
+  display: none;
+  overflow-y: auto;
+  max-height: auto;
+}
+
+.content.active {
+  display: block;
+}
+
 /* messages */
 input {
   padding: 8px;
@@ -348,4 +447,39 @@ input {
 
 .store-button:hover {
   filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+  max-width: 400px;
+  border-radius: 10px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
