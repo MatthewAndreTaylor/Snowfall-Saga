@@ -15,6 +15,17 @@ const rejectFriendRequestSocket = new WebSocket(
   `ws://${location.host}/reject_friend_request`,
 );
 const getFriendsSocket = new WebSocket(`ws://${location.host}/get_friends`);
+const collisionSound = new Audio("/static/audio/snowballHit.mp3");
+
+function playCollisionSound() {
+  collisionSound.play();
+}
+
+function randomChoice(arr) {
+  return arr[Math.floor(arr.length * Math.random())];
+}
+
+const playerColors = ["blue", "red", "orange", "yellow", "green", "purple"];
 
 let playerRef;
 let players = {};
@@ -282,6 +293,49 @@ socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
 
   switch (data.type) {
+    case "throwSnowball":
+      const snowballStartX = players[data.value.id].x * 3;
+      const snowballStartY = (players[data.value.id].y - 8) * 3;
+      const targetX = data.value.destinationX;
+      const targetY = data.value.destinationY;
+
+      const deltaX = targetX - snowballStartX;
+      const deltaY = targetY - snowballStartY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const speed = 9; // Adjust speed as needed
+      const velocityX = (deltaX / distance) * speed;
+      const velocityY = (deltaY / distance) * speed;
+
+      const snowball = document.createElement("div");
+      snowball.classList.add("snowball");
+      snowball.style.left = snowballStartX + "px";
+      snowball.style.top = snowballStartY + "px";
+      document.body.appendChild(snowball);
+
+      snowball.classList.add("throw-animation");
+
+      const animationInterval = setInterval(() => {
+        const snowballX = parseInt(snowball.style.left);
+        const snowballY = parseInt(snowball.style.top);
+        if (
+          Math.abs(snowballX - snowballStartX) >= Math.abs(deltaX) ||
+          Math.abs(snowballY - snowballStartY) >= Math.abs(deltaY)
+        ) {
+          clearInterval(animationInterval);
+          snowball.remove();
+          playCollisionSound();
+          snowball.classList.add("collision");
+          const explosion = document.createElement("div");
+          explosion.classList.add("explosion");
+          explosion.style.left = snowballX + "px";
+          explosion.style.top = snowballY + "px";
+          document.body.appendChild(explosion);
+        }
+        snowball.style.left = parseInt(snowball.style.left) + velocityX + "px";
+        snowball.style.top = parseInt(snowball.style.top) + velocityY + "px";
+      }, 10);
+      break;
+
     case "playersUpdate":
       players = data.value || {};
       Object.keys(players).forEach((key) => {
@@ -544,4 +598,19 @@ gameContainer.addEventListener("click", (event) => {
     const clickY = (event.clientY - 16) / 3;
     handleMove(clickX, clickY);
   }
+});
+
+// Handle user choice - Snowball
+gameContainer.addEventListener("contextmenu", (event) => {
+  event.preventDefault();
+
+  const message = {
+    type: "throwSnowball",
+    value: {
+      id: playerId,
+      destinationX: event.clientX,
+      destinationY: event.clientY,
+    },
+  };
+  socket.send(JSON.stringify(message));
 });

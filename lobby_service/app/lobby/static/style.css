@@ -483,3 +483,46 @@ input {
   text-decoration: none;
   cursor: pointer;
 }
+
+/* snowball */
+.snowball {
+  width: 32px;
+  height: 32px;
+  background: url(/static/images/snowball.png) no-repeat;
+  background-size: contain;
+  position: absolute;
+}
+
+@keyframes explosionAnimation {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+
+.throw-animation {
+  animation: showThrowGif 0.5s ease-in-out forwards;
+}
+
+@keyframes showThrowGif {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Add styles for the explosion */
+.explosion {
+  width: 40px;
+  height: 40px;
+  background: url(/static/images/explosion.png) no-repeat;
+  background-size: contain;
+  position: absolute;
+  animation: explosionAnimation 0.5s ease-in-out forwards;
+}

@@ -89,6 +89,21 @@ def echo(connection):
                 }
                 connection.send(json.dumps(message))
 
+            elif data["type"] == "throwSnowball":
+                player_id = current_user.id
+                destination_x = data["value"]["destinationX"]
+                destination_y = data["value"]["destinationY"]
+
+                throw_message = {
+                    "type": "throwSnowball",
+                    "value": {
+                        "id": player_id,
+                        "destinationX": destination_x,
+                        "destinationY": destination_y,
+                    },
+                }
+                send_to_all_clients(throw_message)
+
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
             send_to_all_clients({"type": "playerRemoved", "id": current_user.id})
