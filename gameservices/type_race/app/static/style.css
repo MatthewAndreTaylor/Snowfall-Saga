@@ -8,8 +8,15 @@
   color: green;
 }
 
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
 body {
   background-color: #007ba7;
+  background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
 }
 
 h1,
@@ -18,10 +25,24 @@ p {
   font-size: 50px;
   white-space: nowrap;
   overflow-x: hidden;
+
+  color: #ff984a;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 #text {
   width: 100%;
+
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 #countdown {
@@ -32,6 +53,31 @@ p {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000;
+}
+
+#accuracy {
+  font-size: 20px;
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+#game-over {
+  font-size: 20px;
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 ul {
@@ -57,7 +103,7 @@ ul li {
 }
 
 .reindeer-image {
-  width: 30px;
+  width: 50px;
   height: auto; /* Maintain aspect ratio */
   position: absolute;
   top: 0;
