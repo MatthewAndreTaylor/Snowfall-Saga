@@ -5,6 +5,8 @@ from flask_sock import Sock
 import requests
 from collections import deque
 import json
+from .. import db
+from ..models import User
 
 lobby_view = Blueprint(
     "lobby_view",
@@ -22,9 +24,6 @@ players = {}
 # Set of all client connections
 clients = set()
 
-# Previous messages before the player spawned are saved
-message_cache = deque(maxlen=6)
-
 
 @lobby_view.route("/")
 @login_required
@@ -39,18 +38,25 @@ def trivia():
     return redirect("http://127.0.0.1:9999/trivia")
 
 
+@lobby_view.route("/blizzard_bounce", methods=["GET"])
+@login_required
+def blizzard_bounce():
+    return redirect("http://127.0.0.1:9998")
+
+
 @sock.route("/echo")
 def echo(connection):
     if connection in clients or current_user.id in players:
         return
 
     clients.add(connection)
-    players[current_user.id] = {"name": current_user.username, "id": current_user.id}
+    players[current_user.id] = {
+        "name": current_user.username,
+        "id": current_user.id,
+        "sprite": current_user.sprite,
+        "points": current_user.points,
+    }
     print(f"{current_user.username} joined with connection {connection}")
-
-    # Send the last few messages a player missed before they spawned
-    for message in message_cache:
-        connection.send(json.dumps(message))
 
     while True:
         try:
@@ -58,6 +64,15 @@ def echo(connection):
             data = json.loads(event)
 
             if data["type"] == "playerUpdate":
+                # Update database with user's new sprite ONLY IF sprite changes
+                if (
+                    "sprite" in data["value"]
+                    and data["value"]["sprite"] != current_user.sprite
+                ):
+                    user = User.query.filter_by(username=current_user.username).first()
+                    user.sprite = data["value"]["sprite"]
+                    db.session.commit()
+
                 players[current_user.id].update(data["value"])
                 send_to_all_clients({"type": "playersUpdate", "value": players})
 
@@ -67,17 +82,27 @@ def echo(connection):
                     del players[player_id]
                 send_to_all_clients({"type": "playerRemoved", "id": player_id})
 
-            elif data["type"] == "newMessage":
-                text = data["text"]
-
-                new_message = {
-                    "type": "newMessage",
-                    "text": text,
-                    "id": current_user.id,
-                    "name": current_user.username,
+            elif data["type"] == "getSprites":
+                message = {
+                    "type": "getSprites",
+                    "inventory": current_user.sprite_inventory,
                 }
-                message_cache.append(new_message)
-                send_to_all_clients(new_message)
+                connection.send(json.dumps(message))
+
+            elif data["type"] == "throwSnowball":
+                player_id = current_user.id
+                destination_x = data["value"]["destinationX"]
+                destination_y = data["value"]["destinationY"]
+
+                throw_message = {
+                    "type": "throwSnowball",
+                    "value": {
+                        "id": player_id,
+                        "destinationX": destination_x,
+                        "destinationY": destination_y,
+                    },
+                }
+                send_to_all_clients(throw_message)
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('store_view.static', filename='store.css') }}"
+    />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="/static/snow.css" />
+    <title>Store</title>
+  </head>
+  <body>
+    <h1>POLAR POST OFFICE</h1>
+    <a class="back-button" href="{{ url_for('lobby_view.lobby') }}"
+      >Back to Lobby</a
+    >
+    <div class="points-container">
+      <div class="coin"></div>
+      <span id="points" class="points">{{ player_points }}</span>
+    </div>
+    <div id="sprite-container" class="sprite-container"></div>
+    <div class="game-container"></div>
+    <script>
+      const onSale = {{ on_sale }};
+    </script>
+    <script src="{{ url_for('store_view.static', filename='store.js') }}"></script>
+    <script src="/static/snow.js"></script>
+  </body>
+</html>

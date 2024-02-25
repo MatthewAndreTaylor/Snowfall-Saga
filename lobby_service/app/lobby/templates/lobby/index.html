@@ -13,11 +13,16 @@
       rel="stylesheet"
       href="{{ url_for('lobby_view.static', filename='style.css') }}"
     />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
     <link rel="stylesheet" href="/static/snow.css" type="text/css" />
   </head>
+
   <body>
     <div class="game-container">
       <a class="christmas-tree-button" href="/trivia"></a>
+      <a class="blizzard_bounce-button" href="/blizzard_bounce"></a>
+      <a class="leaderboard-button" href="/leaderboard"></a>
+      <a class="store-button" href="{{ url_for('store_view.store') }}"></a>
     </div>
     <div id="chat" class="chat-container">
       <div id="chat-box" class="chat-box"></div>
@@ -25,10 +30,48 @@
         <input id="chat-input" type="text" maxlength="40" />
       </div>
     </div>
+    <div class="inventory-container">
+      <div class="points">
+        <div class="coin"></div>
+        <span id="points-count" class="points-count"></span>
+      </div>
+      <div id="sprite-grid" class="sprite-grid"></div>
+      <button type="button" id="inv-btn" class="inventory-btn">
+        Inventory
+      </button>
+    </div>
+    <div class="user-container">
+      <div class="tab-container">
+        <div id="user-tab" class="tab active" onclick="toggleTab('user')">
+          Users
+        </div>
+        <div id="friend-tab" class="tab" onclick="toggleTab('friend')">
+          Friends
+        </div>
+      </div>
+      <div id="user-box" class="content active"></div>
+      <div id="friend-box" class="content"></div>
+    </div>
+    <div id="friend-requests">Friend Requests</div>
+    <div id="user-modal" class="modal">
+      <div class="modal-content">
+        <span id="c1" class="close">&times;</span>
+        <h2 class="modal-username"></h2>
+        <button id="add-friend">Send Friend Request</button>
+        <div class="request-info"></div>
+      </div>
+    </div>
+    <div id="friend-request-modal" class="modal">
+      <div class="modal-content">
+        <span id="c2" class="close">&times;</span>
+        <h2>Friend Requests</h2>
+        <div id="friend-request-list"></div>
+      </div>
+    </div>
     <script>
       const playerId = "{{ player_id }}";
     </script>
     <script src="{{ url_for('lobby_view.static', filename='main.js') }}"></script>
-    <script src="/static/snow.js"></script>
+    <!-- <script src="/static/snow.js"></script> -->
   </body>
 </html>
