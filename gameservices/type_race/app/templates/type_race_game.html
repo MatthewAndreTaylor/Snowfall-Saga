@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reindeer Racing</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Reindeer Racing</h1>
+    <p id="text">{{ text }}</p>
+    <div id="accuracy"></div>
+    <div id="countdown"></div>
+    <div id="game-over"></div>
+    <div class="progress-container">
+      <!--      <h2>Progress</h2>-->
+      <ul id="progress-list"></ul>
+      <div class="finish-line"></div>
+      <ul id="finished-list"></ul>
+    </div>
+    <div id="snowflakes"></div>
+    <script src="{{ url_for('static', filename='type_race.js') }}"></script>
+    <script src="{{ url_for('static', filename='snow.js') }}"></script>
+  </body>
+</html>
