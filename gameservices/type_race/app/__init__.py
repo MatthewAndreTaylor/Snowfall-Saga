@@ -5,8 +5,8 @@ from collections import defaultdict
 from flask import Flask, Blueprint, render_template, request
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
-from gameservices.type_race.app.user import User
-from gameservices.type_race.app.text import get_text
+from .user import User
+from .text import get_text
 
 type_race_game = Blueprint(
     "type_race_game",
