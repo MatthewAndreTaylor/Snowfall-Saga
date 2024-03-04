@@ -3,56 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="author" content="Snowfall-Saga-Team" />
+    <meta name="description" content="Snowfall-Saga" />
     <title>Snowfall Saga</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
     <link
       rel="stylesheet"
       href="{{ url_for('lobby_view.static', filename='style.css') }}"
     />
+    <link
+      rel="preload"
+      href="{{ url_for('friendship.static', filename='friends.css') }}"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="{{ url_for('friendship.static', filename='friends.css') }}"
+    /></noscript>
+    <link
+      rel="preload"
+      href="{{ url_for('messenger.static', filename='messages.css') }}"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript
+      ><link
+        rel="stylesheet"
+        href="{{ url_for('messenger.static', filename='messages.css') }}"
+    /></noscript>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
-    <link rel="stylesheet" href="/static/snow.css" type="text/css" />
   </head>
-
   <body>
     <div class="game-container">
-      <a class="christmas-tree-button" href="/trivia"></a>
-      <a class="blizzard_bounce-button" href="/blizzard_bounce"></a>
-      <a class="leaderboard-button" href="/leaderboard"></a>
-      <a class="store-button" href="{{ url_for('store_view.store') }}"></a>
+      <a class="christmas-tree-button" href="/trivia" aria-label="Trivia"></a>
+      <a
+        class="blizzard_bounce-button"
+        href="/blizzard_bounce"
+        aria-label="Blizzard Bounce"
+      ></a>
+      <a
+        class="leaderboard-button"
+        href="/leaderboard"
+        aria-label="Leaderboard"
+      ></a>
+      <a class="store-button" href="/store" aria-label="Store"></a>
     </div>
     <div id="chat" class="chat-container">
-      <div id="chat-box" class="chat-box"></div>
-      <div>
-        <input id="chat-input" type="text" maxlength="40" />
-      </div>
+      <div id="chat-box" class="chat-box hidden"></div>
     </div>
     <div class="inventory-container">
-      <div class="points">
-        <div class="coin"></div>
-        <span id="points-count" class="points-count"></span>
-      </div>
-      <div id="sprite-grid" class="sprite-grid"></div>
-      <button type="button" id="inv-btn" class="inventory-btn">
-        Inventory
-      </button>
+      <div id="sprite-container" class="hidden"></div>
     </div>
-    <div class="user-container">
-      <div class="tab-container">
-        <div id="user-tab" class="tab active" onclick="toggleTab('user')">
-          Users
+    <div class="user-list">
+      <div id="user-container">
+        <div class="tab-container">
+          <div id="user-tab" class="tab active">Users</div>
+          <div id="friend-tab" class="tab">Friends</div>
         </div>
-        <div id="friend-tab" class="tab" onclick="toggleTab('friend')">
-          Friends
-        </div>
+        <div id="user-box" class="content active"></div>
+        <div id="friend-box" class="content"></div>
       </div>
-      <div id="user-box" class="content active"></div>
-      <div id="friend-box" class="content"></div>
+      <button id="user-container-collapse">...</button>
     </div>
-    <div id="friend-requests">Friend Requests</div>
     <div id="user-modal" class="modal">
       <div class="modal-content">
         <span id="c1" class="close">&times;</span>
@@ -68,10 +83,53 @@
         <div id="friend-request-list"></div>
       </div>
     </div>
+    <div class="navbar">
+      <button>
+        <img src="/static/images/coin.png" alt="coin" width="17" height="17" />
+      </button>
+      <button id="inv-btn">
+        <img src="/static/images/items.png" alt="coin" width="17" height="17" />
+      </button>
+      <button id="friend-requests" aria-label="friend-requests">
+        <img
+          src="/static/images/friend.png"
+          alt="friend"
+          width="17"
+          height="17"
+        />
+      </button>
+      <button id="toggleButton" aria-label="throw-snowball">
+        <img
+          src="/static/images/snowball-icon.png"
+          alt="snowball"
+          width="17"
+          height="17"
+        />
+      </button>
+      <div>
+        <button id="message-btn" aria-label="toggle-message-box">
+          <img
+            src="/static/images/message.png"
+            alt="message"
+            width="17"
+            height="17"
+          />
+        </button>
+        <input
+          id="chat-input"
+          type="text"
+          placeholder="Type a message..."
+          maxlength="40"
+          aria-label="message-input"
+        />
+      </div>
+    </div>
     <script>
       const playerId = "{{ player_id }}";
     </script>
-    <script src="{{ url_for('lobby_view.static', filename='main.js') }}"></script>
-    <!-- <script src="/static/snow.js"></script> -->
+    <script
+      type="module"
+      src="{{ url_for('lobby_view.static', filename='main.js') }}"
+    ></script>
   </body>
 </html>

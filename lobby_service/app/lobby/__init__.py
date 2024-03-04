@@ -54,7 +54,6 @@ def echo(connection):
         "name": current_user.username,
         "id": current_user.id,
         "sprite": current_user.sprite,
-        "points": current_user.points,
     }
     print(f"{current_user.username} joined with connection {connection}")
 
@@ -69,8 +68,7 @@ def echo(connection):
                     "sprite" in data["value"]
                     and data["value"]["sprite"] != current_user.sprite
                 ):
-                    user = User.query.filter_by(username=current_user.username).first()
-                    user.sprite = data["value"]["sprite"]
+                    current_user.sprite = data["value"]["sprite"]
                     db.session.commit()
 
                 players[current_user.id].update(data["value"])
