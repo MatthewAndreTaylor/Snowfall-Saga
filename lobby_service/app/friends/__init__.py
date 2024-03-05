@@ -150,9 +150,10 @@ def friends(connection):
                         {"type": "friends", "friends": queryFriends(current_user)}
                     )
                 )
-                users[user.username].send(
-                    json.dumps({"type": "friends", "friends": queryFriends(user)})
-                )
+                if user.username in users:
+                    users[user.username].send(
+                        json.dumps({"type": "friends", "friends": queryFriends(user)})
+                    )
 
             if data["type"] == "rejectFriendRequest":
                 sent_from = data["username"]
@@ -174,10 +175,48 @@ def friends(connection):
                 # print(current_user.username, " rejected friend request from ", user.username, " message: ", message)
                 connection.send(json.dumps(message))
 
-            # Update the rejecting user's requests list
-            connection.send(
-                json.dumps({"type": "friend_requests", "requests": myFriendRequests()})
-            )
+                # Update the rejecting user's requests list
+                connection.send(
+                    json.dumps(
+                        {"type": "friend_requests", "requests": myFriendRequests()}
+                    )
+                )
+
+            if data["type"] == "removeFriend":
+                friend = User.query.filter_by(username=data["username"]).first()
+                if friend is None:
+                    message = {"error": "User not found"}
+                    connection.send(json.dumps(message))
+                    continue
+                friendship = Friendship.query.filter_by(
+                    user_id=current_user.id, friend_id=friend.id, status=1
+                ).first()
+                if friendship is None:
+                    friendship = Friendship.query.filter_by(
+                        user_id=friend.id, friend_id=current_user.id, status=1
+                    ).first()
+                    if friendship is None:
+                        message = {"error": "Friend not found"}
+                        connection.send(json.dumps(message))
+                        continue
+                friendship.status = 2
+                db.session.commit()
+                message = {"success": "Friend removed", "username": data["username"]}
+                # print(current_user.username, " removed friend ", friend.username, " message: ", message)
+                connection.send(json.dumps(message))
+
+                # Update the removing user's friend list
+                connection.send(
+                    json.dumps(
+                        {"type": "friends", "friends": queryFriends(current_user)}
+                    )
+                )
+
+                # Signal the removed friend that they are no longer friends
+                if friend.username in users:
+                    users[friend.username].send(
+                        json.dumps({"type": "friends", "friends": queryFriends(friend)})
+                    )
 
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost friend socket connection", current_user.username)

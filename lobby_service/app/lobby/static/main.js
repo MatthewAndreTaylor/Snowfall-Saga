@@ -327,6 +327,7 @@ const response = modalContent.querySelector(".request-info");
 
 const friendRequestModal = document.getElementById("friend-request-modal");
 const friendRequestButton = document.querySelector("#add-friend");
+const friendRemoveButton = document.querySelector("#remove-friend");
 const friendRequests = document.getElementById("friend-requests");
 
 document.querySelector("#c1").onclick = () => (modal.style.display = "none");
@@ -359,6 +360,16 @@ friendSocket.addEventListener("message", (event) => {
         friendDiv.classList.add("user-box-item");
         friendDiv.classList.add("friend-item");
         friendBox.appendChild(friendDiv);
+
+        // Removing a friend
+        friendDiv.addEventListener("click", () => {
+          response.innerHTML = "";
+          document.querySelector(".modal-username").textContent =
+            "User: " + friendName;
+          modal.style.display = "block";
+          friendRequestButton.style.display = "none";
+          friendRemoveButton.style.display = "block";
+        });
       });
       break;
     case "friend_requests":
@@ -436,6 +447,19 @@ friendRequestButton.addEventListener("click", () => {
   );
 });
 
+friendRemoveButton.addEventListener("click", () => {
+  const username = document
+    .querySelector(".modal-username")
+    .textContent.split(": ")[1];
+  friendSocket.send(
+    JSON.stringify({
+      type: "removeFriend",
+      username: username,
+    }),
+  );
+  modal.style.display = "none";
+});
+
 function addUserToBox(username) {
   if (addedUsers.has(username) || username === players[playerId].name) {
     return;
@@ -452,6 +476,8 @@ function addUserToBox(username) {
     friendRequestButton.disabled = false;
     document.querySelector(".modal-username").textContent = "User: " + username;
     modal.style.display = "block";
+    friendRemoveButton.style.display = "none";
+    friendRequestButton.style.display = "block";
   });
 }
 
