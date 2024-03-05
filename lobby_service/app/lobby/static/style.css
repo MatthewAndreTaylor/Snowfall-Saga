@@ -161,6 +161,7 @@ img {
 
 .tab.active {
   background: rgba(119, 138, 198, 0.95);
+  text-decoration: underline;
   color: white;
 }
 

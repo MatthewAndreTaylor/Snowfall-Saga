@@ -221,5 +221,5 @@ def friends(connection):
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost friend socket connection", current_user.username)
             clients.remove(connection)
-            del users[connection]
+            del users[current_user.username]
             break
