@@ -1,7 +1,9 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_squeeze import Squeeze
 
+squeeze = Squeeze()
 db = SQLAlchemy()
 login_manager = LoginManager()
 
@@ -13,6 +15,8 @@ def create_app():
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///accounts.db"
+
+    squeeze.init_app(app)
 
     db.init_app(app)
 
