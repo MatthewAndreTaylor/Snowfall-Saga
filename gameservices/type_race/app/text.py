@@ -53,5 +53,5 @@ paragraphs = [
 ]
 
 
-def get_text(num):
+def get_text(num: int) -> list:
     return random.sample(paragraphs, num)

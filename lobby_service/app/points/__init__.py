@@ -18,7 +18,13 @@ def update_points():
     return "Success!", 200
 
 
-def update_database(username, points):
+def update_database(username: str, points: int):
+    """Update the points of a user in the database.
+
+    Args:
+        username (str): The username of the user.
+        points (int): The number of points to add to the user's current points.
+    """
     user = User.query.filter_by(username=username).first()
     user.points += points
     db.session.commit()

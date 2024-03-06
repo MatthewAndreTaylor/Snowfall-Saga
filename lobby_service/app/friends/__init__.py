@@ -20,6 +20,11 @@ clients = set()
 
 
 def myFriendRequests() -> list:
+    """Returns a list of usernames representing pending friend requests.
+
+    Returns:
+        list: A list of usernames representing pending friend requests.
+    """
     pending = Friendship.query.filter_by(friend_id=current_user.id, status=0).all()
     friend_requests = [
         User.query.filter_by(id=request.user_id).first().username for request in pending
@@ -28,6 +33,16 @@ def myFriendRequests() -> list:
 
 
 def queryFriends(user: User) -> list:
+    """Query the friends of a user.
+
+    This function retrieves the friends of a given user from the database.
+
+    Args:
+        user (User): The user for whom to retrieve the friends.
+
+    Returns:
+        list: A list of usernames representing the friends of the user.
+    """
     friends = Friendship.query.filter_by(user_id=user.id, status=1).all()
     friends2 = Friendship.query.filter_by(friend_id=user.id, status=1).all()
     friend_list = []

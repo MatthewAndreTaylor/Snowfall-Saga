@@ -88,6 +88,9 @@ def process_purchase(connection, curr_user):
 def load_sprite():
     """Queries the user and obtains their inventory sprites to see
     which sprites they can purchase of those for sale.
+
+    Returns:
+        list: A list of indices representing the sprites that can be purchased.
     """
     user = User.query.filter_by(username=current_user.username).first()
     sprite_inventory = user.sprite_inventory
@@ -103,19 +106,20 @@ def load_sprite():
 
 
 # Adds purchased sprite to player's inventory and commits to database
-def update_inventory(sprite, curr_user):
+def update_inventory(sprite: str, user: User):
     """Updates a user's sprite inventory after making a successful purchase.
 
     Args:
         sprite (int): The n-th bit that represents the costume.
+        user (User): The user object for whom the inventory needs to be updated.
     """
     # For testing purposes
-    if not curr_user.id:
-        curr_user.points -= 100
-        curr_user.sprite_inventory = curr_user.sprite_inventory | 1 << sprite
+    if not user.id:
+        user.points -= 100
+        user.sprite_inventory = user.sprite_inventory | 1 << sprite
         return
 
-    user = User.query.filter_by(username=curr_user.username).first()
+    user = User.query.filter_by(username=user.username).first()
     user.points -= 100
     user.sprite_inventory = user.sprite_inventory | 1 << sprite
     db.session.commit()

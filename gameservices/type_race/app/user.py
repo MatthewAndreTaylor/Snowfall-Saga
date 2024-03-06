@@ -2,7 +2,7 @@ from collections import deque
 
 
 class User:
-    def __init__(self, username):
+    def __init__(self, username: str):
         self.username = username
         self.typed = ""
         self.correct = 0
