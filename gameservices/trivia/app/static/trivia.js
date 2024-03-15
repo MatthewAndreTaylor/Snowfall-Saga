@@ -3,6 +3,18 @@ const socket = io.connect(
 );
 let username;
 
+// Send the user back to lobby
+document.addEventListener("DOMContentLoaded", function () {
+  const lobbyButton = document.getElementById("lobbyButton");
+
+  lobbyButton.addEventListener("click", function () {
+    // Redirect the user to the lobby URL
+    window.location.href = "http://127.0.0.1:5000/";
+  });
+});
+
+
+
 socket.on("connect", () => {
   // Connection established, print a message on the screen
   document.getElementById("message").innerText =
