@@ -72,17 +72,17 @@ def run_game(connection):
             event = connection.receive()
             data = json.loads(event)
 
-            if data['type'] == 'makeMove':
-                move = chess.Move.from_uci(data['move'])
+            if data["type"] == "makeMove":
+                move = chess.Move.from_uci(data["move"])
                 if move in board.legal_moves:
                     print(move)
                     board.push(move)
                     send_board(clients, board)
                 else:
-                    print('Illegal move!')
+                    print("Illegal move!")
 
                 if board.is_checkmate():
-                    print('The game is over!')
+                    print("The game is over!")
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
@@ -92,5 +92,4 @@ def run_game(connection):
 
 def send_board(players, board):
     for player in players:
-        player.send(json.dumps({'type': 'board', 'board': str(board)}))
-
+        player.send(json.dumps({"type": "board", "board": str(board)}))

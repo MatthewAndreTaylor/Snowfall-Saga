@@ -9,7 +9,7 @@
       type="text/css"
       href="{{ url_for('static', filename='style.css') }}"
     />
-<!--    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>-->
+    <!--    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>-->
     <link
       rel="stylesheet"
       type="text/css"
@@ -21,102 +21,102 @@
     <div class="container">
       <div class="board-container">
         <!-- Row labels -->
-<!--        <div class="labels-column">-->
-<!--            <div class="label"></div> &lt;!&ndash; Empty square at top left corner &ndash;&gt;-->
-<!--            <div class="label">8</div>-->
-<!--            <div class="label">7</div>-->
-<!--            <div class="label">6</div>-->
-<!--            <div class="label">5</div>-->
-<!--            <div class="label">4</div>-->
-<!--            <div class="label">3</div>-->
-<!--            <div class="label">2</div>-->
-<!--            <div class="label">1</div>-->
-<!--        </div>-->
-      <div class="chessboard" id="chessboard">
-    <div id="a8" class="light" onclick="squareClicked('a8')"></div>
-    <div id="b8" class="dark" onclick="squareClicked('b8')"></div>
-    <div id="c8" class="light" onclick="squareClicked('c8')"></div>
-    <div id="d8" class="dark" onclick="squareClicked('d8')"></div>
-    <div id="e8" class="light" onclick="squareClicked('e8')"></div>
-    <div id="f8" class="dark" onclick="squareClicked('f8')"></div>
-    <div id="g8" class="light" onclick="squareClicked('g8')"></div>
-    <div id="h8" class="dark" onclick="squareClicked('h8')"></div>
-    <!-- 7 -->
-    <div id="a7" class="dark" onclick="squareClicked('a7')"></div>
-    <div id="b7" class="light" onclick="squareClicked('b7')"></div>
-    <div id="c7" class="dark" onclick="squareClicked('c7')"></div>
-    <div id="d7" class="light" onclick="squareClicked('d7')"></div>
-    <div id="e7" class="dark" onclick="squareClicked('e7')"></div>
-    <div id="f7" class="light" onclick="squareClicked('f7')"></div>
-    <div id="g7" class="dark" onclick="squareClicked('g7')"></div>
-    <div id="h7" class="light" onclick="squareClicked('h7')"></div>
-    <!-- 6 -->
-    <div id="a6" class="light" onclick="squareClicked('a6')"></div>
-    <div id="b6" class="dark" onclick="squareClicked('b6')"></div>
-    <div id="c6" class="light" onclick="squareClicked('c6')"></div>
-    <div id="d6" class="dark" onclick="squareClicked('d6')"></div>
-    <div id="e6" class="light" onclick="squareClicked('e6')"></div>
-    <div id="f6" class="dark" onclick="squareClicked('f6')"></div>
-    <div id="g6" class="light" onclick="squareClicked('g6')"></div>
-    <div id="h6" class="dark" onclick="squareClicked('h6')"></div>
-    <!-- 5 -->
-    <div id="a5" class="dark" onclick="squareClicked('a5')"></div>
-    <div id="b5" class="light" onclick="squareClicked('b5')"></div>
-    <div id="c5" class="dark" onclick="squareClicked('c5')"></div>
-    <div id="d5" class="light" onclick="squareClicked('d5')"></div>
-    <div id="e5" class="dark" onclick="squareClicked('e5')"></div>
-    <div id="f5" class="light" onclick="squareClicked('f5')"></div>
-    <div id="g5" class="dark" onclick="squareClicked('g5')"></div>
-    <div id="h5" class="light" onclick="squareClicked('h5')"></div>
-    <!-- 4 -->
-    <div id="a4" class="light" onclick="squareClicked('a4')"></div>
-    <div id="b4" class="dark" onclick="squareClicked('b4')"></div>
-    <div id="c4" class="light" onclick="squareClicked('c4')"></div>
-    <div id="d4" class="dark" onclick="squareClicked('d4')"></div>
-    <div id="e4" class="light" onclick="squareClicked('e4')"></div>
-    <div id="f4" class="dark" onclick="squareClicked('f4')"></div>
-    <div id="g4" class="light" onclick="squareClicked('g4')"></div>
-    <div id="h4" class="dark" onclick="squareClicked('h4')"></div>
-    <!-- 3 -->
-    <div id="a3" class="dark" onclick="squareClicked('a3')"></div>
-    <div id="b3" class="light" onclick="squareClicked('b3')"></div>
-    <div id="c3" class="dark" onclick="squareClicked('c3')"></div>
-    <div id="d3" class="light" onclick="squareClicked('d3')"></div>
-    <div id="e3" class="dark" onclick="squareClicked('e3')"></div>
-    <div id="f3" class="light" onclick="squareClicked('f3')"></div>
-    <div id="g3" class="dark" onclick="squareClicked('g3')"></div>
-    <div id="h3" class="light" onclick="squareClicked('h3')"></div>
-    <!-- 2 -->
-    <div id="a2" class="light" onclick="squareClicked('a2')"></div>
-    <div id="b2" class="dark" onclick="squareClicked('b2')"></div>
-    <div id="c2" class="light" onclick="squareClicked('c2')"></div>
-    <div id="d2" class="dark" onclick="squareClicked('d2')"></div>
-    <div id="e2" class="light" onclick="squareClicked('e2')"></div>
-    <div id="f2" class="dark" onclick="squareClicked('f2')"></div>
-    <div id="g2" class="light" onclick="squareClicked('g2')"></div>
-    <div id="h2" class="dark" onclick="squareClicked('h2')"></div>
-    <!-- 1 -->
-    <div id="a1" class="dark" onclick="squareClicked('a1')"></div>
-    <div id="b1" class="light" onclick="squareClicked('b1')"></div>
-    <div id="c1" class="dark" onclick="squareClicked('c1')"></div>
-    <div id="d1" class="light" onclick="squareClicked('d1')"></div>
-    <div id="e1" class="dark" onclick="squareClicked('e1')"></div>
-    <div id="f1" class="light" onclick="squareClicked('f1')"></div>
-    <div id="g1" class="dark" onclick="squareClicked('g1')"></div>
-    <div id="h1" class="light" onclick="squareClicked('h1')"></div>
-</div>
-<!--      <div class="labels-column">-->
-<!--        <div class="label"></div> &lt;!&ndash; Empty square at top left corner &ndash;&gt;-->
-<!--        <div class="label">a</div>-->
-<!--        <div class="label">b</div>-->
-<!--        <div class="label">c</div>-->
-<!--        <div class="label">d</div>-->
-<!--        <div class="label">e</div>-->
-<!--        <div class="label">f</div>-->
-<!--        <div class="label">g</div>-->
-<!--        <div class="label">h</div>-->
-<!--    </div>-->
-    </div>
+        <!--        <div class="labels-column">-->
+        <!--            <div class="label"></div> &lt;!&ndash; Empty square at top left corner &ndash;&gt;-->
+        <!--            <div class="label">8</div>-->
+        <!--            <div class="label">7</div>-->
+        <!--            <div class="label">6</div>-->
+        <!--            <div class="label">5</div>-->
+        <!--            <div class="label">4</div>-->
+        <!--            <div class="label">3</div>-->
+        <!--            <div class="label">2</div>-->
+        <!--            <div class="label">1</div>-->
+        <!--        </div>-->
+        <div class="chessboard" id="chessboard">
+          <div id="a8" class="light" onclick="squareClicked('a8')"></div>
+          <div id="b8" class="dark" onclick="squareClicked('b8')"></div>
+          <div id="c8" class="light" onclick="squareClicked('c8')"></div>
+          <div id="d8" class="dark" onclick="squareClicked('d8')"></div>
+          <div id="e8" class="light" onclick="squareClicked('e8')"></div>
+          <div id="f8" class="dark" onclick="squareClicked('f8')"></div>
+          <div id="g8" class="light" onclick="squareClicked('g8')"></div>
+          <div id="h8" class="dark" onclick="squareClicked('h8')"></div>
+          <!-- 7 -->
+          <div id="a7" class="dark" onclick="squareClicked('a7')"></div>
+          <div id="b7" class="light" onclick="squareClicked('b7')"></div>
+          <div id="c7" class="dark" onclick="squareClicked('c7')"></div>
+          <div id="d7" class="light" onclick="squareClicked('d7')"></div>
+          <div id="e7" class="dark" onclick="squareClicked('e7')"></div>
+          <div id="f7" class="light" onclick="squareClicked('f7')"></div>
+          <div id="g7" class="dark" onclick="squareClicked('g7')"></div>
+          <div id="h7" class="light" onclick="squareClicked('h7')"></div>
+          <!-- 6 -->
+          <div id="a6" class="light" onclick="squareClicked('a6')"></div>
+          <div id="b6" class="dark" onclick="squareClicked('b6')"></div>
+          <div id="c6" class="light" onclick="squareClicked('c6')"></div>
+          <div id="d6" class="dark" onclick="squareClicked('d6')"></div>
+          <div id="e6" class="light" onclick="squareClicked('e6')"></div>
+          <div id="f6" class="dark" onclick="squareClicked('f6')"></div>
+          <div id="g6" class="light" onclick="squareClicked('g6')"></div>
+          <div id="h6" class="dark" onclick="squareClicked('h6')"></div>
+          <!-- 5 -->
+          <div id="a5" class="dark" onclick="squareClicked('a5')"></div>
+          <div id="b5" class="light" onclick="squareClicked('b5')"></div>
+          <div id="c5" class="dark" onclick="squareClicked('c5')"></div>
+          <div id="d5" class="light" onclick="squareClicked('d5')"></div>
+          <div id="e5" class="dark" onclick="squareClicked('e5')"></div>
+          <div id="f5" class="light" onclick="squareClicked('f5')"></div>
+          <div id="g5" class="dark" onclick="squareClicked('g5')"></div>
+          <div id="h5" class="light" onclick="squareClicked('h5')"></div>
+          <!-- 4 -->
+          <div id="a4" class="light" onclick="squareClicked('a4')"></div>
+          <div id="b4" class="dark" onclick="squareClicked('b4')"></div>
+          <div id="c4" class="light" onclick="squareClicked('c4')"></div>
+          <div id="d4" class="dark" onclick="squareClicked('d4')"></div>
+          <div id="e4" class="light" onclick="squareClicked('e4')"></div>
+          <div id="f4" class="dark" onclick="squareClicked('f4')"></div>
+          <div id="g4" class="light" onclick="squareClicked('g4')"></div>
+          <div id="h4" class="dark" onclick="squareClicked('h4')"></div>
+          <!-- 3 -->
+          <div id="a3" class="dark" onclick="squareClicked('a3')"></div>
+          <div id="b3" class="light" onclick="squareClicked('b3')"></div>
+          <div id="c3" class="dark" onclick="squareClicked('c3')"></div>
+          <div id="d3" class="light" onclick="squareClicked('d3')"></div>
+          <div id="e3" class="dark" onclick="squareClicked('e3')"></div>
+          <div id="f3" class="light" onclick="squareClicked('f3')"></div>
+          <div id="g3" class="dark" onclick="squareClicked('g3')"></div>
+          <div id="h3" class="light" onclick="squareClicked('h3')"></div>
+          <!-- 2 -->
+          <div id="a2" class="light" onclick="squareClicked('a2')"></div>
+          <div id="b2" class="dark" onclick="squareClicked('b2')"></div>
+          <div id="c2" class="light" onclick="squareClicked('c2')"></div>
+          <div id="d2" class="dark" onclick="squareClicked('d2')"></div>
+          <div id="e2" class="light" onclick="squareClicked('e2')"></div>
+          <div id="f2" class="dark" onclick="squareClicked('f2')"></div>
+          <div id="g2" class="light" onclick="squareClicked('g2')"></div>
+          <div id="h2" class="dark" onclick="squareClicked('h2')"></div>
+          <!-- 1 -->
+          <div id="a1" class="dark" onclick="squareClicked('a1')"></div>
+          <div id="b1" class="light" onclick="squareClicked('b1')"></div>
+          <div id="c1" class="dark" onclick="squareClicked('c1')"></div>
+          <div id="d1" class="light" onclick="squareClicked('d1')"></div>
+          <div id="e1" class="dark" onclick="squareClicked('e1')"></div>
+          <div id="f1" class="light" onclick="squareClicked('f1')"></div>
+          <div id="g1" class="dark" onclick="squareClicked('g1')"></div>
+          <div id="h1" class="light" onclick="squareClicked('h1')"></div>
+        </div>
+        <!--      <div class="labels-column">-->
+        <!--        <div class="label"></div> &lt;!&ndash; Empty square at top left corner &ndash;&gt;-->
+        <!--        <div class="label">a</div>-->
+        <!--        <div class="label">b</div>-->
+        <!--        <div class="label">c</div>-->
+        <!--        <div class="label">d</div>-->
+        <!--        <div class="label">e</div>-->
+        <!--        <div class="label">f</div>-->
+        <!--        <div class="label">g</div>-->
+        <!--        <div class="label">h</div>-->
+        <!--    </div>-->
+      </div>
     </div>
     <div id="snowflakes"></div>
     <script src="{{ url_for('static', filename='chess.js') }}"></script>

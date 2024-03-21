@@ -1,52 +1,51 @@
 body {
-    background-color: #007ba7;
-    height: 100%;
-    margin: 0;
+  background-color: #007ba7;
+  height: 100%;
+  margin: 0;
 
-    background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
-    background-repeat: no-repeat;
+  background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
+  background-repeat: no-repeat;
 }
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 91.5vh; /* Set the height of the container to 100% of viewport height */
-    overflow: hidden; /* Hide overflow to prevent scrolling */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 91.5vh; /* Set the height of the container to 100% of viewport height */
+  overflow: hidden; /* Hide overflow to prevent scrolling */
 }
 .board-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .labels-column {
-    display: flex;
-    flex-direction: column;
-
+  display: flex;
+  flex-direction: column;
 }
 .chessboard {
-    display: grid;
-    grid-template-columns: repeat(8, 50px);
-    grid-template-rows: repeat(8, 50px);
+  display: grid;
+  grid-template-columns: repeat(8, 50px);
+  grid-template-rows: repeat(8, 50px);
 }
 .chessboard div {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    border: 1px solid black;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid black;
 }
 .light {
-    background-color: #f0d9b5;
+  background-color: #f0d9b5;
 }
 .dark {
-    background-color: #b58863;
+  background-color: #b58863;
 }
 .label {
-    font-size: 20px;
-    color: black;
-    text-align: center;
+  font-size: 20px;
+  color: black;
+  text-align: center;
 }
 
 .snowfall {
