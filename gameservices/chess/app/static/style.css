@@ -1,0 +1,96 @@
+body {
+    background-color: #007ba7;
+    height: 100%;
+    margin: 0;
+
+    background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
+    background-repeat: no-repeat;
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 91.5vh; /* Set the height of the container to 100% of viewport height */
+    overflow: hidden; /* Hide overflow to prevent scrolling */
+}
+.board-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.labels-column {
+    display: flex;
+    flex-direction: column;
+
+}
+.chessboard {
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+}
+.chessboard div {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: 1px solid black;
+}
+.light {
+    background-color: #f0d9b5;
+}
+.dark {
+    background-color: #b58863;
+}
+.label {
+    font-size: 20px;
+    color: black;
+    text-align: center;
+}
+
+.snowfall {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  background:
+    url("snowflake.png") repeat,
+    url("snowflake2.png") repeat;
+  animation: snowfall 5s linear infinite;
+}
+
+@keyframes snowfall {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(100vh);
+  }
+}
+
+#snowflakes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.snowflake {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: snowfall linear infinite;
+}
+
+/* Animation for snowfall */
+@keyframes snowfall {
+  to {
+    transform: translateY(100vh);
+  }
+}
