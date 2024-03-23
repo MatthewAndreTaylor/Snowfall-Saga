@@ -32,6 +32,14 @@ let done = false;
 
 slideText();
 
+document.addEventListener("DOMContentLoaded", function () {
+  // Redirect the user to the lobby URL
+  const lobbyButton = document.getElementById("lobbyButton");
+  lobbyButton.addEventListener("click", function () {
+    window.location.href = "http://127.0.0.1:5000/";
+  });
+});
+
 socket.addEventListener("open", (event) => {
   socket.send(
     JSON.stringify({

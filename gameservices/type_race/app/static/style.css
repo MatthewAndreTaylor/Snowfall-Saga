@@ -179,3 +179,22 @@ ul li {
     transform: translateY(100vh);
   }
 }
+
+
+#lobbyButton, #triviaLobbyButton {
+  display: block;
+  margin: 10px auto; /* Adjust margin as needed */
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+#lobbyButton:hover, #triviaLobbyButton:hover {
+  background-color: #555;
+}

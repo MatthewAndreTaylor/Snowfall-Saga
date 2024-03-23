@@ -6,6 +6,7 @@ socket.addEventListener("open", (event) => {
   socket.send(JSON.stringify({ type: "username", username: username }));
 });
 
+
 socket.addEventListener("message", (message) => {
   const data = JSON.parse(message.data);
 
