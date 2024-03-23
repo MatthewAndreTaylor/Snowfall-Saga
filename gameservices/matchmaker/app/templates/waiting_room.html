@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='snow.css') }}"
+    />
+  </head>
+
+  <body>
+    <h1>Rooms For: Game</h1>
+    <button id="create-room">Create Room</button>
+    <div class="room-container"></div>
+
+    <div class="popup">
+      <div class="popup-content">
+        <h2>Create Room</h2>
+        <input type="text" placeholder="Room Name" id="room-name-input" />
+        <button onclick="confirmRoom()">Confirm</button>
+        <button onclick="closePopup()">Cancel</button>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='snow.js') }}"></script> -->
+  </body>
+</html>

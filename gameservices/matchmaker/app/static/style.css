@@ -1,0 +1,103 @@
+body {
+  background-color: #d5e2f7;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+}
+
+.room-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.room {
+  border: 0.125em solid #4682b4;
+  border-radius: 0.5em;
+  padding: 1.25em;
+  margin: 1.25em;
+  width: 20em;
+  background-color: #fff;
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
+  flex-grow: 1;
+  flex-basis: 15em;
+}
+
+.room h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.room .players {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 1em;
+}
+
+#create-room {
+  position: absolute;
+  top: 1em;
+  right: 1.25em;
+}
+
+button {
+  background-color: #4682b4;
+  color: #fff;
+  border: none;
+  padding: 0.625em 1.25em;
+  font-size: 1em;
+  border-radius: 0.3125em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #36648b;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  background-color: #fefefe;
+  margin: 25% auto;
+  padding: 1.25em;
+  width: 80%;
+  max-width: 25em;
+  border-radius: 0.5em;
+  box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
+}
+
+.popup-content h2 {
+  text-align: center;
+}
+
+.popup-content input {
+  width: 100%;
+  margin-bottom: 0.625em;
+}
+
+.popup-content button {
+  display: block;
+  width: 100%;
+  padding: 0.625em 0;
+  margin-top: 0.625em;
+}
+
+.popup-content .close {
+  position: absolute;
+  top: 0.625em;
+  right: 0.9375em;
+  font-size: 1.5;
+  cursor: pointer;
+}
