@@ -76,28 +76,30 @@ button:hover {
   max-width: 25em;
   border-radius: 0.5em;
   box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .popup-content h2 {
+  margin-top: 0;
   text-align: center;
 }
 
 .popup-content input {
-  width: 100%;
+  width: 75%;
   margin-bottom: 0.625em;
 }
 
-.popup-content button {
-  display: block;
+.popup-content .buttons-container {
+  display: flex;
+  justify-content: center;
   width: 100%;
-  padding: 0.625em 0;
-  margin-top: 0.625em;
+  margin-top: 1em;
+  text-align: center;
 }
 
-.popup-content .close {
-  position: absolute;
-  top: 0.625em;
-  right: 0.9375em;
-  font-size: 1.5;
-  cursor: pointer;
+.popup-content button {
+  display: inline-block;
+  width: 35%;
+  padding: 0.625em 0;
+  margin: 0 0.625em;
 }

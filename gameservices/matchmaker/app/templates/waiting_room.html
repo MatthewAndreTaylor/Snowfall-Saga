@@ -13,6 +13,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='snow.css') }}"
     />
+    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
   </head>
 
   <body>
@@ -23,9 +24,16 @@
     <div class="popup">
       <div class="popup-content">
         <h2>Create Room</h2>
-        <input type="text" placeholder="Room Name" id="room-name-input" />
-        <button onclick="confirmRoom()">Confirm</button>
-        <button onclick="closePopup()">Cancel</button>
+        <input
+          type="text"
+          placeholder="Room Name"
+          id="room-name-input"
+          maxlength="30"
+        />
+        <div class="buttons-container">
+          <button onclick="confirmRoom()">Confirm</button>
+          <button onclick="closePopup()">Cancel</button>
+        </div>
       </div>
     </div>
 

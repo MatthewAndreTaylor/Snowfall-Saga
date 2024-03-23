@@ -1,15 +1,29 @@
+const createRoomSocket = new WebSocket("ws://localhost:10000/create_room");
+
 const roomContainer = document.querySelector(".room-container");
+const popup = document.querySelector(".popup");
+
+createRoomSocket.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  switch (data.type) {
+    case "create":
+      createRoom(data.room);
+      break;
+  }
+});
 
 const openPopup = () => {
-  document.querySelector(".popup").style.display = "block";
+  popup.style.display = "block";
 };
 
 const closePopup = () => {
-  document.querySelector(".popup").style.display = "none";
+  const input = document.querySelector("#room-name-input");
+  input.value = "";
+  popup.style.display = "none";
 };
 
 const closePopupOutside = (event) => {
-  if (event.target === document.querySelector(".popup")) {
+  if (event.target === popup) {
     closePopup();
   }
 };
@@ -17,7 +31,7 @@ const closePopupOutside = (event) => {
 const confirmRoom = () => {
   const roomName = document.querySelector("#room-name-input").value.trim();
   if (roomName !== "") {
-    createRoom(roomName);
+    createRoomSocket.send(JSON.stringify({ room: roomName }));
     closePopup();
   } else {
     alert("Please enter a room name");
@@ -38,6 +52,7 @@ const createRoom = (roomName) => {
   roomElement.appendChild(joinButton);
 
   roomContainer.appendChild(roomElement);
+  joinRoom(roomName);
 };
 
 const joinRoom = (room) => {
@@ -45,4 +60,4 @@ const joinRoom = (room) => {
 };
 
 document.querySelector("#create-room").addEventListener("click", openPopup);
-document.querySelector(".popup").addEventListener("click", closePopupOutside);
+popup.addEventListener("click", closePopupOutside);
