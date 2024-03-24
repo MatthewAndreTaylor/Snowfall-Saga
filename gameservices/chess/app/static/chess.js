@@ -24,7 +24,7 @@ function squareClicked(squareId) {
   if (selectedSquare === null) {
     selectedSquare = squareId;
     console.log(squareId);
-    document.getElementById(squareId).style.backgroundColor = "red"; // Change background color to red
+    document.getElementById(squareId).style.backgroundColor = "red";
   } else {
     make_move(selectedSquare, squareId);
     selectedSquare = null;
@@ -39,7 +39,6 @@ function make_move(startSquare, endSquare) {
     ? "#f0d9b5"
     : "#b58863";
 
-  // This is where you can handle the move logic
   console.log("Move from " + startSquare + " to " + endSquare);
   if (startSquare === endSquare) {
     return;
@@ -72,7 +71,7 @@ function displayChessBoard(chessBoardString) {
   const rows = chessBoardString.trim().split("\n");
 
   const chessboardElement = document.getElementById("chessboard");
-  chessboardElement.innerHTML = ""; // Clear previous content
+  chessboardElement.innerHTML = "";
 
   rows.forEach((row, rowIndex) => {
     // Split each row into individual squares
@@ -85,22 +84,18 @@ function displayChessBoard(chessBoardString) {
       squareElement.className =
         (rowIndex + colIndex) % 2 === 0 ? "light" : "dark";
 
-      // Create an image element for the piece
       const pieceImg = document.createElement("img");
       if (piece !== ".") {
         const pieceFilename =
           piece === piece.toUpperCase() ? `${piece}w.png` : `${piece}b.png`;
         pieceImg.src = `../../static/${pieceFilename}`;
-        pieceImg.alt = piece; // Set alt text to the piece representation
+        pieceImg.alt = piece;
       }
 
-      // Append the piece image to the square element
       squareElement.appendChild(pieceImg);
 
-      // Attach event listener to the square element
       squareElement.addEventListener("click", () => squareClicked(squareId));
 
-      // Append the square element to the chessboard
       chessboardElement.appendChild(squareElement);
     });
   });

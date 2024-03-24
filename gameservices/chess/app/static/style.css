@@ -24,8 +24,8 @@ h1 {
 .container {
   display: flex;
   justify-content: center;
-  align-items: center; /* Align items to the start of the flex container (top) */
-  height: 80vh; /* Set the height of the container to 100% of viewport height */
+  align-items: center;
+  height: 80vh;
   overflow: hidden;
 }
 
@@ -62,22 +62,22 @@ h1 {
 }
 
 .status {
-  margin-top: 20px; /* Adjust margin as needed */
-  color: black; /* Text color */
+  margin-top: 20px;
+  color: black;
   font-size: 20px;
-  text-align: center; /* Center text */
+  text-align: center;
 }
 
 .player-container {
   display: flex;
-  flex-direction: column; /* Arrange children vertically */
-  margin-left: 20px; /* Adjust margin as needed */
+  flex-direction: column;
+  margin-left: 20px;
 }
 
 .player-section {
   margin-right: 50px;
-  color: black; /* Text color */
-  text-align: center; /* Center text */
+  color: black;
+  text-align: center;
 }
 
 .player-section-white {
@@ -88,7 +88,7 @@ h1 {
     1px -1px 0 black,
     -1px 1px 0 black,
     1px 1px 0 black;
-  text-align: center; /* Center text */
+  text-align: center;
 }
 
 .player-section-black {
@@ -99,7 +99,7 @@ h1 {
     1px -1px 0 white,
     -1px 1px 0 white,
     1px 1px 0 white;
-  text-align: center; /* Center text */
+  text-align: center;
 }
 
 .snowfall {
