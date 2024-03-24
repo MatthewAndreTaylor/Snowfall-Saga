@@ -3,6 +3,10 @@ from flask_login import login_user
 from .. import db, login_manager
 from ..models import User
 
+from better_profanity import profanity
+
+profanity.load_censor_words_from_file("lobby_service/app/static/bad-words.txt")
+
 login_view = Blueprint(
     "login_view",
     __name__,
@@ -40,12 +44,16 @@ def login():
 def register():
     username = request.form.get("username")
     password = request.form.get("password")
+
     if username is None or password is None:
         return redirect(url_for("login_view.login"))
 
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
         return "Username already exists. Please choose a different username."
+
+    if profanity.contains_profanity(username):
+        return "We are sorry this username goes against our terms of service."
 
     # Hashing the user's password before adding it to the database
     password = User.hash_password(password)
