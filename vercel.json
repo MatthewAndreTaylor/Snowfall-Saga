@@ -1,9 +1,0 @@
-{
-    "version": 2,
-    "builds": [
-      { "src": "lobby_service/run.py", "use": "@vercel/python" }
-    ],
-    "routes": [
-      { "src": "/(.*)", "dest": "lobby_service/run.py" }
-    ]
-  }

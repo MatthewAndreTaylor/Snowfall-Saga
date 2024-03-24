@@ -24,7 +24,7 @@ game_info = {"num_questions": 10, "timer": 10, "game_id": 0}
 current_user = {"username": "JOE"}
 
 
-@app.route("/trivia", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         print("Got HERE")

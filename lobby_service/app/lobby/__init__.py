@@ -34,14 +34,13 @@ def lobby():
 @lobby_view.route("/trivia", methods=["GET"])
 @login_required
 def trivia():
-    requests.post("http://127.0.0.1:9999/trivia", json=current_user.to_dict())
-    return redirect("http://127.0.0.1:9999/trivia")
+    return redirect("http://127.0.0.1:8002")
 
 
 @lobby_view.route("/blizzard_bounce", methods=["GET"])
 @login_required
 def blizzard_bounce():
-    return redirect("http://127.0.0.1:9998")
+    return redirect("http://127.0.0.1:8001")
 
 
 @sock.route("/echo")
