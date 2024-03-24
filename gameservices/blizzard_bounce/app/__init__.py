@@ -44,7 +44,7 @@ p0_player_bodies.append(
     world.CreateDynamicBody(
         position=(WIDTH / 2 / 10, 5),
         shapes=b2CircleShape(radius=3),
-        linearDamping=0.5,
+        linearDamping=0.6,
         angularDamping=0.5,
     )
 )
@@ -64,7 +64,7 @@ p1_player_bodies.append(
     world.CreateDynamicBody(
         position=(WIDTH / 2 / 10, HEIGHT / 10 - 5),
         shapes=b2CircleShape(radius=3),
-        linearDamping=0.5,
+        linearDamping=0.6,
         angularDamping=0.5,
     )
 )
@@ -83,9 +83,9 @@ for _ in range(10):
     x = random.randint(100, WIDTH - 100) / 10
     y = random.randint(100, HEIGHT - 100) / 10
     body = world.CreateDynamicBody(
-        position=(x, y), linearDamping=0.1, angularDamping=0.2
+        position=(x, y), linearDamping=0.1, angularDamping=0.4
     )
-    shape = body.CreateCircleFixture(radius=2, density=0.02, friction=0.2)
+    shape = body.CreateCircleFixture(radius=2, density=0.02, friction=0.3)
     balls.append((body, shape))
 
 wall_top = world.CreateStaticBody(

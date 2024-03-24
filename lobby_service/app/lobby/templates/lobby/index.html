@@ -125,12 +125,17 @@
         />
       </div>
     </div>
+    <canvas id="snowfall" class="canvas-container"></canvas>
     <script>
       const playerId = "{{ player_id }}";
     </script>
     <script
       type="module"
       src="{{ url_for('lobby_view.static', filename='main.js') }}"
+    ></script>
+    <script
+      type="module"
+      src="{{ url_for('lobby_view.static', filename='snowfall.js') }}"
     ></script>
   </body>
 </html>

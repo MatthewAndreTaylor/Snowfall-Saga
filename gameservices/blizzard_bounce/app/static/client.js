@@ -8,6 +8,7 @@ const two = new Two({
 
 const borderWidth = 5;
 const border = two.makeRectangle(width / 2, height / 2, width, height);
+border.fill = "rgba(189,216,228)";
 border.linewidth = borderWidth;
 border.stroke = "black";
 
@@ -22,16 +23,27 @@ const bottomGoal = two.makeRectangle(width / 2, height - 15, width / 3, 30);
 bottomGoal.fill = "purple";
 bottomGoal.noStroke();
 
+// Boundary lines
+const boundaryLine = two.makeRectangle(width / 2, height / 2, width - 5, 5);
+boundaryLine.fill = "rgba(255,255,255,0.75)";
+boundaryLine.noStroke();
+
 let my_id = Math.random().toString(36).substring(7);
 console.log(my_id);
 
 // Define a function to create a circle shape in Two.js
 function createCircle(x, y, radius, color) {
   const circle = two.makeCircle(x, y, radius);
-  circle.fill = color;
-  circle.noStroke();
+  circle.fill = "rgba(" + color + "," + 0.75 + ")";
+  circle.stroke = "rgb(" + color + ")";
+  circle.linewidth = 2;
   return circle;
 }
+
+// Boundary circle
+const boundaryCircle = createCircle(width / 2, height / 2, 125, "255,255,255");
+boundaryCircle.noFill();
+boundaryCircle.linewidth = 5;
 
 // Track player circle
 let player0 = {};
@@ -63,14 +75,14 @@ socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data);
 
     // Update scores
-    document.getElementById("blueScore").innerText = data.scores[0];
+    document.getElementById("redScore").innerText = data.scores[0];
     document.getElementById("greenScore").innerText = data.scores[1];
 
     // Update player0's circle positions
     data.player0.forEach((playerData) => {
       let player = player0[playerData.id];
       if (!player) {
-        player = createCircle(playerData.x, playerData.y, 30, "blue");
+        player = createCircle(playerData.x, playerData.y, 30, "188,90,101");
         player0[playerData.id] = player;
       } else {
         tweenPlayerCircle(player, playerData.x, playerData.y);
@@ -81,7 +93,7 @@ socket.addEventListener("message", (event) => {
     data.player1.forEach((playerData) => {
       let player = player1[playerData.id];
       if (!player) {
-        player = createCircle(playerData.x, playerData.y, 30, "green");
+        player = createCircle(playerData.x, playerData.y, 30, "101,188,90");
         player1[playerData.id] = player;
       } else {
         tweenPlayerCircle(player, playerData.x, playerData.y);
@@ -92,7 +104,7 @@ socket.addEventListener("message", (event) => {
     data.balls.forEach((ballData) => {
       let ball = balls[ballData.id];
       if (!ball) {
-        ball = createCircle(ballData.x, ballData.y, 20, "red");
+        ball = createCircle(ballData.x, ballData.y, 20, "46,101,125");
         balls[ballData.id] = ball;
       } else {
         tweenBall(ball, ballData.x, ballData.y);
