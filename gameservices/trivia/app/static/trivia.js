@@ -5,18 +5,9 @@ let username;
 
 // Send the user back to lobby
 document.addEventListener("DOMContentLoaded", function () {
-  // Redirect the user to the lobby URL
   const lobbyButton = document.getElementById("lobbyButton");
   lobbyButton.addEventListener("click", function () {
     window.location.href = "http://127.0.0.1:5000/";
-  });
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  // Redirect the user to the lobby URL
-  const lobbyButton = document.getElementById("triviaLobbyButton");
-  lobbyButton.addEventListener("click", function () {
-    window.location.href = "http://127.0.0.1:9999/trivia";
   });
 });
 
