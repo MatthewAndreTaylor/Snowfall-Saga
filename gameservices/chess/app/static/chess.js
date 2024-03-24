@@ -67,7 +67,6 @@ document.body.addEventListener("click", function (event) {
   }
 });
 
-
 function displayChessBoard(chessBoardString) {
   // Split the string representation into rows
   const rows = chessBoardString.trim().split("\n");
