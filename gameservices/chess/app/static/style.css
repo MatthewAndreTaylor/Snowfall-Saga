@@ -1,27 +1,40 @@
+html,
 body {
-  background-color: #007ba7;
   height: 100%;
   margin: 0;
+}
 
+body,
+html {
   background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
   background-repeat: no-repeat;
 }
+
+h1 {
+  margin-left: 30px;
+  font-size: 30px;
+  color: gold;
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+}
+
 .container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 91.5vh; /* Set the height of the container to 100% of viewport height */
-  overflow: hidden; /* Hide overflow to prevent scrolling */
+  align-items: center; /* Align items to the start of the flex container (top) */
+  height: 80vh; /* Set the height of the container to 100% of viewport height */
+  overflow: hidden;
 }
+
 .board-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.labels-column {
-  display: flex;
-  flex-direction: column;
-}
+
 .chessboard {
   display: grid;
   grid-template-columns: repeat(8, 50px);
@@ -46,6 +59,47 @@ body {
   font-size: 20px;
   color: black;
   text-align: center;
+}
+
+.status {
+  margin-top: 20px; /* Adjust margin as needed */
+  color: black; /* Text color */
+  font-size: 20px;
+  text-align: center; /* Center text */
+}
+
+.player-container {
+  display: flex;
+  flex-direction: column; /* Arrange children vertically */
+  margin-left: 20px; /* Adjust margin as needed */
+}
+
+.player-section {
+  margin-right: 50px;
+  color: black; /* Text color */
+  text-align: center; /* Center text */
+}
+
+.player-section-white {
+  margin-right: 50px;
+  color: white;
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+  text-align: center; /* Center text */
+}
+
+.player-section-black {
+  margin-right: 50px;
+  color: black;
+  text-shadow:
+    -1px -1px 0 white,
+    1px -1px 0 white,
+    -1px 1px 0 white,
+    1px 1px 0 white;
+  text-align: center; /* Center text */
 }
 
 .snowfall {

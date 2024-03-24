@@ -19,7 +19,22 @@
   <body>
     <h1>Chess</h1>
     <div class="container">
+      <div class="player-container">
+        <!-- Player 1 section -->
+        <div class="player-section-white">
+          <h2 id="player1">Waiting for Player 1...</h2>
+        </div>
+        <div class="player-section">
+          <h2>VS</h2>
+        </div>
+        <!-- Player 2 section -->
+        <div class="player-section-black">
+          <h2 id="player2">Waiting for Player 2...</h2>
+          <!-- Add content for Player 2 here -->
+        </div>
+      </div>
       <div class="board-container">
+        <h2 id="timer">05:00</h2>
         <!-- Row labels -->
         <!--        <div class="labels-column">-->
         <!--            <div class="label"></div> &lt;!&ndash; Empty square at top left corner &ndash;&gt;-->
@@ -116,6 +131,7 @@
         <!--        <div class="label">g</div>-->
         <!--        <div class="label">h</div>-->
         <!--    </div>-->
+        <div class="status" id="status"></div>
       </div>
     </div>
     <div id="snowflakes"></div>
