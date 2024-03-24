@@ -1,31 +1,27 @@
-const loadRoomSocket = new WebSocket("ws://localhost:10000/load_rooms");
-const createRoomSocket = new WebSocket("ws://localhost:10000/create_room");
-const joinRoomSocket = new WebSocket("ws://localhost:10000/join_room");
+const socket = new WebSocket("ws://localhost:10000/room_events");
 
 const roomContainer = document.querySelector(".room-container");
-const popup = document.querySelector(".popup");
 const createRoomButton = document.querySelector("#create-room");
+const popup = document.querySelector(".popup");
 
-loadRoomSocket.addEventListener("open", (event) => {
-  loadRoomSocket.send(JSON.stringify({ type: "load", user: username }));
+socket.addEventListener("open", (event) => {
+  socket.send(JSON.stringify({ type: "load", user: username }));
 });
 
-loadRoomSocket.addEventListener("message", (event) => {
+socket.addEventListener("message", (event) => {
   const data = JSON.parse(event.data);
   switch (data.type) {
     case "rooms":
       if (data.rooms) {
         data.rooms.forEach((room) => {
-          createRoom(room);
+          createRoom(room.name);
+          room.users.forEach((user) => {
+            joinRoom(room.name, user);
+          });
         });
       }
       break;
-  }
-});
 
-createRoomSocket.addEventListener("message", (event) => {
-  const data = JSON.parse(event.data);
-  switch (data.type) {
     case "create":
       if (data.error) {
         alert(data.error);
@@ -37,17 +33,12 @@ createRoomSocket.addEventListener("message", (event) => {
 
         createRoomButton.disabled = true;
         createRoomButton.classList.add("disabled");
-        joinRoomSocket.send(
-          JSON.stringify({ room: data.room, user: username }),
+        socket.send(
+          JSON.stringify({ type: "join", room: data.room, user: username }),
         );
       }
       break;
-  }
-});
 
-joinRoomSocket.addEventListener("message", (event) => {
-  const data = JSON.parse(event.data);
-  switch (data.type) {
     case "join":
       if (data.error) {
         alert(data.error);
@@ -55,6 +46,16 @@ joinRoomSocket.addEventListener("message", (event) => {
         joinRoom(data.room, data.other);
       } else {
         joinRoom(data.room, username);
+      }
+      break;
+
+    case "leave":
+      if (data.error) {
+        alert(data.error);
+      } else if (data.other) {
+        leaveRoom(data.room, data.other);
+      } else {
+        leaveRoom(data.room, username);
       }
       break;
   }
@@ -79,7 +80,9 @@ const closePopupOutside = (event) => {
 const confirmRoom = () => {
   const roomName = document.querySelector("#room-name-input").value.trim();
   if (roomName !== "") {
-    createRoomSocket.send(JSON.stringify({ room: roomName, user: username }));
+    socket.send(
+      JSON.stringify({ type: "create", room: roomName, user: username }),
+    );
   } else {
     alert("Please enter a room name");
   }
@@ -99,23 +102,75 @@ const createRoom = (roomName) => {
   roomElement.appendChild(userList);
 
   const joinButton = document.createElement("button");
+  joinButton.classList.add("join");
   joinButton.textContent = "Join Room";
 
   joinButton.addEventListener("click", () => {
-    joinRoomSocket.send(JSON.stringify({ room: roomName, user: username }));
+    socket.send(
+      JSON.stringify({ type: "join", room: roomName, user: username }),
+    );
   });
   roomElement.appendChild(joinButton);
+
+  const leaveButton = document.createElement("button");
+  leaveButton.classList.add("leave");
+  leaveButton.textContent = "Leave Room";
+  leaveButton.disabled = true;
+  leaveButton.classList.add("disabled");
+
+  leaveButton.addEventListener("click", () => {
+    socket.send(
+      JSON.stringify({ type: "leave", room: roomName, user: username }),
+    );
+  });
+  roomElement.appendChild(leaveButton);
 
   roomContainer.appendChild(roomElement);
 };
 
-const joinRoom = (room, username) => {
+const joinRoom = (room, user) => {
   const roomElement = roomContainer.querySelector(`[data-room="${room}"]`);
   if (roomElement) {
     const userList = roomElement.querySelector(".user-list");
     const userElement = document.createElement("li");
-    userElement.textContent = username;
+    userElement.textContent = user;
+    userElement.setAttribute("data-user", user);
     userList.appendChild(userElement);
+  }
+  if (user == username) {
+    createRoomButton.disabled = true;
+    createRoomButton.classList.add("disabled");
+
+    const joinButton = roomElement.querySelector("button.join");
+    joinButton.disabled = true;
+    joinButton.classList.add("disabled");
+
+    const leaveButton = roomElement.querySelector("button.leave");
+    leaveButton.disabled = false;
+    leaveButton.classList.remove("disabled");
+  }
+};
+
+const leaveRoom = (room, user) => {
+  const roomElement = roomContainer.querySelector(`[data-room="${room}"]`);
+  if (roomElement) {
+    const userList = roomElement.querySelector(".user-list");
+    const userElement = userList.querySelector(`[data-user="${user}"]`);
+    if (userElement) {
+      userList.removeChild(userElement);
+    }
+  }
+  if (user == username) {
+    createRoomButton.disabled = false;
+    createRoomButton.classList.remove("disabled");
+
+    const joinButton = roomElement.querySelector("button.join");
+    joinButton.disabled = false;
+    joinButton.classList.remove("disabled");
+
+    const leaveButton = roomElement.querySelector("button.leave");
+    leaveButton.disabled = true;
+    leaveButton.classList.add("disabled");
   }
 };
 
