@@ -8,6 +8,10 @@ from functools import partial
 import json
 from ..models import User
 
+from better_profanity import profanity
+
+profanity.load_censor_words_from_file("app/static/bad-words.txt")
+
 messenger = Blueprint(
     "messenger",
     __name__,
@@ -60,21 +64,26 @@ def send_message(connection, curr_user):
             event = connection.receive()
             data = json.loads(event)
 
+            message_type = data.get("type", "")
+            message_content = data.get("text", "")
+            if profanity.contains_profanity(message_content):
+                message_content = len(message_content) * "*"
+
             # Create a new message object
             new_message = {
-                "type": data["type"],
-                "text": data["text"],
+                "type": message_type,
+                "text": message_content,
                 "id": curr_user.id,
                 "name": curr_user.username,
                 "time": datetime.now().isoformat(),
             }
 
-            if data["type"] == "newMessage":
+            if message_type == "newMessage":
                 message_caches["all"].append(new_message)
                 send_to_all_clients(new_message)
 
-            elif data["type"] == "directMessage":
-                to = data["to"]
+            elif message_type == "directMessage":
+                to = data.get("to", connection)
                 if connection != users.get(to):
                     # Show on both your screen and the other person
                     connection.send(json.dumps(new_message))
