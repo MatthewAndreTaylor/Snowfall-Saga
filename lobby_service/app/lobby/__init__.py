@@ -44,6 +44,18 @@ def blizzard_bounce():
     return redirect("http://127.0.0.1:9998")
 
 
+@lobby_view.route("/type_race", methods=["GET"])
+@login_required
+def type_race():
+    return redirect("http://127.0.0.1:7777/type_race")
+
+
+@lobby_view.route("/chess", methods=["GET"])
+@login_required
+def chess():
+    return redirect("http://127.0.0.1:8888/chess")
+
+
 @sock.route("/echo")
 def echo(connection):
     if connection in clients or current_user.id in players:
