@@ -44,6 +44,13 @@ def blizzard_bounce():
     return redirect("http://127.0.0.1:9998")
 
 
+@lobby_view.route("/matchmaking", methods=["GET"])
+@login_required
+def matchmaking():
+    requests.post("http://127.0.0.1:10000/matchmaking", json=current_user.to_dict())
+    return redirect("http://127.0.0.1:10000/matchmaking")
+
+
 @sock.route("/echo")
 def echo(connection):
     if connection in clients or current_user.id in players:

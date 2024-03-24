@@ -57,6 +57,13 @@ button:hover {
   background-color: #36648b;
 }
 
+button.disabled {
+  background-color: #ccc;
+  color: black;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .popup {
   display: none;
   position: fixed;
@@ -70,7 +77,7 @@ button:hover {
 
 .popup-content {
   background-color: #fefefe;
-  margin: 25% auto;
+  margin: 15% auto;
   padding: 1.25em;
   width: 80%;
   max-width: 25em;
