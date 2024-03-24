@@ -5,7 +5,7 @@ from ..models import User
 
 from better_profanity import profanity
 
-profanity.load_censor_words_from_file("app/static/bad-words.txt")
+profanity.load_censor_words_from_file("lobby_service/app/static/bad-words.txt")
 
 login_view = Blueprint(
     "login_view",
