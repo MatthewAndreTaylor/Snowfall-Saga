@@ -157,17 +157,9 @@ def handle_leave(connection, data):
 
         if user in room.users:
             if user == room.host:
-                connection.send(
-                    json.dumps(
-                        {
-                            "type": "leave",
-                            "error": "You cannot leave a room you are hosting",
-                        }
-                    )
-                )
-                return
-
-            room.users.remove(user)
+                handle_delete({"room": room_name})
+            else:
+                room.users.remove(user)
 
             client_response = {
                 "type": "leave",
@@ -187,6 +179,32 @@ def handle_leave(connection, data):
                     }
                 )
             )
+
+
+def handle_delete(data):
+    room_name = data.get("room")
+    if room_name:
+        room = rooms.get(room_name)
+        if not room:
+            return
+
+        for user in room.users:
+            user_response = {
+                "type": "leave",
+                "room": room_name,
+            }
+            users[user].send(json.dumps(user_response))
+
+        del rooms[room_name]
+        del hosts[room.host]
+
+        client_response = {
+            "type": "delete",
+            "room": room_name,
+        }
+
+        for client in clients:
+            client.send(json.dumps(client_response))
 
 
 @sock.route("/room_events")
@@ -219,6 +237,8 @@ def handle_matchmaking(connection):
                 handle_load(connection)
             elif type == "leave":
                 handle_leave(connection, data)
+            elif type == "delete":
+                handle_delete(data)
 
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost matchmaking socket connection")

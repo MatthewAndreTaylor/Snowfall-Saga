@@ -58,6 +58,9 @@ socket.addEventListener("message", (event) => {
         leaveRoom(data.room, username);
       }
       break;
+
+    case "delete":
+      deleteRoom(data.room);
   }
 });
 
@@ -136,18 +139,19 @@ const joinRoom = (room, user) => {
     userElement.textContent = user;
     userElement.setAttribute("data-user", user);
     userList.appendChild(userElement);
-  }
-  if (user == username) {
-    createRoomButton.disabled = true;
-    createRoomButton.classList.add("disabled");
 
-    const joinButton = roomElement.querySelector("button.join");
-    joinButton.disabled = true;
-    joinButton.classList.add("disabled");
+    if (user == username) {
+      createRoomButton.disabled = true;
+      createRoomButton.classList.add("disabled");
 
-    const leaveButton = roomElement.querySelector("button.leave");
-    leaveButton.disabled = false;
-    leaveButton.classList.remove("disabled");
+      const joinButton = roomElement.querySelector("button.join");
+      joinButton.disabled = true;
+      joinButton.classList.add("disabled");
+
+      const leaveButton = roomElement.querySelector("button.leave");
+      leaveButton.disabled = false;
+      leaveButton.classList.remove("disabled");
+    }
   }
 };
 
@@ -159,18 +163,26 @@ const leaveRoom = (room, user) => {
     if (userElement) {
       userList.removeChild(userElement);
     }
+
+    if (user == username) {
+      createRoomButton.disabled = false;
+      createRoomButton.classList.remove("disabled");
+
+      const joinButton = roomElement.querySelector("button.join");
+      joinButton.disabled = false;
+      joinButton.classList.remove("disabled");
+
+      const leaveButton = roomElement.querySelector("button.leave");
+      leaveButton.disabled = true;
+      leaveButton.classList.add("disabled");
+    }
   }
-  if (user == username) {
-    createRoomButton.disabled = false;
-    createRoomButton.classList.remove("disabled");
+};
 
-    const joinButton = roomElement.querySelector("button.join");
-    joinButton.disabled = false;
-    joinButton.classList.remove("disabled");
-
-    const leaveButton = roomElement.querySelector("button.leave");
-    leaveButton.disabled = true;
-    leaveButton.classList.add("disabled");
+const deleteRoom = (room) => {
+  const roomElement = roomContainer.querySelector(`[data-room="${room}"]`);
+  if (roomElement) {
+    roomContainer.removeChild(roomElement);
   }
 };
 
