@@ -1,3 +1,4 @@
+better-profanity==0.7.0
 box2d-py==2.3.8
 Flask==2.2.5
 Flask-Bcrypt==1.0.1
@@ -20,4 +21,3 @@ swig==4.2.0
 urllib3==1.26.15
 Werkzeug==2.2.2
 WTForms==3.0.1
-better-profanity==0.7.0
