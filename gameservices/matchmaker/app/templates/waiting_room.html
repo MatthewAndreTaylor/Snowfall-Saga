@@ -21,22 +21,6 @@
     <button id="create-room">Create Room</button>
     <div class="room-container"></div>
 
-    <div class="popup">
-      <div class="popup-content">
-        <h2>Create Room</h2>
-        <input
-          type="text"
-          placeholder="Room Name"
-          id="room-name-input"
-          maxlength="30"
-        />
-        <div class="buttons-container">
-          <button onclick="confirmRoom()">Confirm</button>
-          <button onclick="closePopup()">Cancel</button>
-        </div>
-      </div>
-    </div>
-
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     <!-- <script src="{{ url_for('static', filename='snow.js') }}"></script> -->
     <script>

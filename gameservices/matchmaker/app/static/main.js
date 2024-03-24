@@ -2,7 +2,6 @@ const socket = new WebSocket("ws://localhost:10000/room_events");
 
 const roomContainer = document.querySelector(".room-container");
 const createRoomButton = document.querySelector("#create-room");
-const popup = document.querySelector(".popup");
 
 socket.addEventListener("open", (event) => {
   socket.send(JSON.stringify({ type: "load", user: username }));
@@ -28,7 +27,6 @@ socket.addEventListener("message", (event) => {
       } else if (data.other) {
         createRoom(data.room);
       } else {
-        closePopup();
         createRoom(data.room, true);
 
         createRoomButton.disabled = true;
@@ -68,33 +66,6 @@ socket.addEventListener("message", (event) => {
       break;
   }
 });
-
-const openPopup = () => {
-  popup.style.display = "block";
-};
-
-const closePopup = () => {
-  const input = document.querySelector("#room-name-input");
-  input.value = "";
-  popup.style.display = "none";
-};
-
-const closePopupOutside = (event) => {
-  if (event.target === popup) {
-    closePopup();
-  }
-};
-
-const confirmRoom = () => {
-  const roomName = document.querySelector("#room-name-input").value.trim();
-  if (roomName !== "") {
-    socket.send(
-      JSON.stringify({ type: "create", room: roomName, user: username }),
-    );
-  } else {
-    alert("Please enter a room name");
-  }
-};
 
 const createRoom = (roomName, isHost = false) => {
   const roomElement = document.createElement("div");
@@ -205,5 +176,6 @@ const deleteRoom = (room) => {
   }
 };
 
-createRoomButton.addEventListener("click", openPopup);
-popup.addEventListener("click", closePopupOutside);
+createRoomButton.addEventListener("click", () => {
+  socket.send(JSON.stringify({ type: "create", user: username }));
+});

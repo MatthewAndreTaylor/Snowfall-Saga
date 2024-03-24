@@ -3,6 +3,7 @@ from flask_sock import Sock
 from simple_websocket import ConnectionClosed, ConnectionError
 import json
 import requests
+import random
 
 
 app = Flask(
@@ -15,6 +16,8 @@ sock = Sock(app)
 
 rooms, users, hosts, clients = {}, {}, {}, set()
 current_user = {"username": "Guest"}
+
+character_set = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 
 class Room:
@@ -52,28 +55,21 @@ def handle_create(connection, data):
         )
         return
 
-    room_name = data.get("room")
-    if room_name:
-        if room_name in rooms:
-            response = {
-                "type": "create",
-                "error": f"Room {room_name} already exists",
-            }
-        else:
-            rooms[room_name] = Room(name=room_name, host=user)
-            hosts[user] = room_name
-            response = {"type": "create", "room": room_name}
+    room_name = "".join(random.choices(character_set, k=6))
+    rooms[room_name] = Room(name=room_name, host=user)
+    hosts[user] = room_name
+    response = {"type": "create", "room": room_name}
 
-            client_response = {
-                "type": "create",
-                "room": room_name,
-                "other": True,
-            }
-            for client in clients:
-                if client != connection:
-                    client.send(json.dumps(client_response))
+    client_response = {
+        "type": "create",
+        "room": room_name,
+        "other": True,
+    }
+    for client in clients:
+        if client != connection:
+            client.send(json.dumps(client_response))
 
-        connection.send(json.dumps(response))
+    connection.send(json.dumps(response))
 
 
 def handle_join(connection, data):
