@@ -1,0 +1,149 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body,
+html {
+  background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
+  background-repeat: no-repeat;
+}
+
+h1 {
+  margin-left: 30px;
+  font-size: 30px;
+  color: gold;
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  overflow: hidden;
+}
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chessboard {
+  display: grid;
+  grid-template-columns: repeat(8, 50px);
+  grid-template-rows: repeat(8, 50px);
+}
+.chessboard div {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid black;
+}
+.light {
+  background-color: #f0d9b5;
+}
+.dark {
+  background-color: #b58863;
+}
+.label {
+  font-size: 20px;
+  color: black;
+  text-align: center;
+}
+
+.status {
+  margin-top: 20px;
+  color: black;
+  font-size: 20px;
+  text-align: center;
+}
+
+.player-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.player-section {
+  margin-right: 50px;
+  color: black;
+  text-align: center;
+}
+
+.player-section-white {
+  margin-right: 50px;
+  color: white;
+  text-shadow:
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black,
+    1px 1px 0 black;
+  text-align: center;
+}
+
+.player-section-black {
+  margin-right: 50px;
+  color: black;
+  text-shadow:
+    -1px -1px 0 white,
+    1px -1px 0 white,
+    -1px 1px 0 white,
+    1px 1px 0 white;
+  text-align: center;
+}
+
+.snowfall {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  background:
+    url("snowflake.png") repeat,
+    url("snowflake2.png") repeat;
+  animation: snowfall 5s linear infinite;
+}
+
+@keyframes snowfall {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(100vh);
+  }
+}
+
+#snowflakes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.snowflake {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: snowfall linear infinite;
+}
+
+/* Animation for snowfall */
+@keyframes snowfall {
+  to {
+    transform: translateY(100vh);
+  }
+}
