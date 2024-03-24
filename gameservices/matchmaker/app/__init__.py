@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sock import Sock
-import json
 from simple_websocket import ConnectionClosed, ConnectionError
+import json
+import requests
+
 
 app = Flask(
     __name__,
@@ -207,6 +209,27 @@ def handle_delete(data):
             client.send(json.dumps(client_response))
 
 
+def handle_start(data):
+    room_name = data.get("room")
+    user = data.get("user")
+    if not user:
+        return
+
+    if room_name:
+        room = rooms.get(room_name)
+        if not room:
+            return
+
+        if user != room.host:
+            return
+
+        handle_delete(data)
+
+        user_response = {"type": "start"}
+        for user in room.users:
+            users[user].send(json.dumps(user_response))
+
+
 @sock.route("/room_events")
 def handle_matchmaking(connection):
     if connection in clients:
@@ -239,11 +262,21 @@ def handle_matchmaking(connection):
                 handle_leave(connection, data)
             elif type == "delete":
                 handle_delete(data)
+            elif type == "start":
+                handle_start(data)
 
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost matchmaking socket connection")
             clients.remove(connection)
             break
+
+
+@sock.route("/trivia", methods=["GET"])
+def trivia():
+    requests.post(
+        "http://127.0.0.1:9999/trivia", json={"username": current_user["username"]}
+    )
+    return redirect("http://127.0.0.1:9999/trivia")
 
 
 @app.route("/matchmaking", methods=["GET", "POST"])

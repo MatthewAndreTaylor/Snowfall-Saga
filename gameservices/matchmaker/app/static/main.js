@@ -29,7 +29,7 @@ socket.addEventListener("message", (event) => {
         createRoom(data.room);
       } else {
         closePopup();
-        createRoom(data.room);
+        createRoom(data.room, true);
 
         createRoomButton.disabled = true;
         createRoomButton.classList.add("disabled");
@@ -61,6 +61,11 @@ socket.addEventListener("message", (event) => {
 
     case "delete":
       deleteRoom(data.room);
+      break;
+
+    case "start":
+      window.location.href = "http://127.0.0.1:9999/trivia";
+      break;
   }
 });
 
@@ -91,7 +96,7 @@ const confirmRoom = () => {
   }
 };
 
-const createRoom = (roomName) => {
+const createRoom = (roomName, isHost = false) => {
   const roomElement = document.createElement("div");
   roomElement.classList.add("room");
   roomElement.setAttribute("data-room", roomName);
@@ -127,6 +132,20 @@ const createRoom = (roomName) => {
     );
   });
   roomElement.appendChild(leaveButton);
+
+  if (isHost) {
+    const startButton = document.createElement("button");
+    startButton.classList.add("start");
+    startButton.textContent = "Start Game";
+
+    startButton.addEventListener("click", () => {
+      socket.send(
+        JSON.stringify({ type: "start", room: roomName, user: username }),
+      );
+    });
+
+    roomElement.appendChild(startButton);
+  }
 
   roomContainer.appendChild(roomElement);
 };
