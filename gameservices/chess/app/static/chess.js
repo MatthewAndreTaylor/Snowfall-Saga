@@ -9,15 +9,7 @@ const socket = new WebSocket(
   `ws://${document.domain}:${location.port}/chess/game/${gameId}`,
 );
 
-document.addEventListener("DOMContentLoaded", function () {
-  const lobbyButton = document.getElementById("lobbyButton");
-  lobbyButton.addEventListener("click", function () {
-    window.location.href = "http://127.0.0.1:5000/";
-  });
-});
-
 let selectedSquare = null;
-
 socket.addEventListener("open", (event) => {
   socket.send(
     JSON.stringify({
