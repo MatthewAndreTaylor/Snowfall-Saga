@@ -2,10 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user
 from .. import db, login_manager
 from ..models import User
-
+from ..badwords import words
 from better_profanity import profanity
 
-profanity.load_censor_words_from_file("lobby_service/app/static/bad-words.txt")
+profanity.load_censor_words(words)
 
 login_view = Blueprint(
     "login_view",

@@ -6,6 +6,11 @@ services:
     ports:
       - "5000:5000"
 
+  matchmaker:
+    build: ./gameservices/matchmaker
+    ports:
+      - "5001:5001"
+
   blizzard_bounce:
     build: ./gameservices/blizzard_bounce
     ports:
@@ -20,3 +25,8 @@ services:
     build: ./gameservices/type_race
     ports:
       - "8003:8003"
+
+  chess:
+    build: ./gameservices/chess
+    ports:
+      - "8004:8004"

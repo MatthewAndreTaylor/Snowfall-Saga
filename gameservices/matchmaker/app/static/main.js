@@ -1,4 +1,4 @@
-const socket = new WebSocket(`ws://localhost:10000/room_events/${game}`);
+const socket = new WebSocket(`ws://${location.host}/room_events/${game}`);
 
 const roomContainer = document.querySelector(".room-container");
 const createRoomButton = document.querySelector("#create-room");
