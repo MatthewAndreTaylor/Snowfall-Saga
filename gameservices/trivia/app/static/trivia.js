@@ -11,6 +11,13 @@ socket.on("connect", () => {
   socket.emit("register", username);
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+  const lobbyButton = document.getElementById("lobbyButton");
+  lobbyButton.addEventListener("click", function () {
+    window.location.href = "http://127.0.0.1:5000/";
+  });
+});
+
 socket.on("disconnect", () => {
   // Connection lost, print a message on the screen
   document.getElementById("message").innerText =

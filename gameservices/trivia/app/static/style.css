@@ -220,3 +220,23 @@ h2 {
     transform: translateY(100vh);
   }
 }
+
+#lobbyButton {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  transition:
+    background-color 0.3s,
+    transform 0.3s;
+}
+
+#lobbyButton:hover {
+  background-color: #555;
+}
