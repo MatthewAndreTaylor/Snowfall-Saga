@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="{{ url_for('lobby_view.static', filename='style.css') }}"
     />
+    <link rel="stylesheet" href="/static/snow.css" />
     <link
       rel="preload"
       href="{{ url_for('friendship.static', filename='friends.css') }}"
@@ -38,17 +39,27 @@
   </head>
   <body>
     <div class="game-container">
-      <a class="christmas-tree-button" href="/trivia" aria-label="Trivia"></a>
+      <a
+        class="christmas-tree-button"
+        href="/matchmaking/trivia"
+        aria-label="Trivia"
+      ></a>
       <a
         class="blizzard_bounce-button"
-        href="/blizzard_bounce"
-        aria-label="Blizzard Bounce"
+        href="/matchmaking/blizzard_bounce"
+        aria-label="Trivia"
       ></a>
       <a
         class="leaderboard-button"
-        href="/leaderboard"
+        href="/matchmaking/leaderboard"
         aria-label="Leaderboard"
       ></a>
+      <a
+        class="type_race-button"
+        href="/matchmaking/type_race"
+        aria-label="Type Race"
+      ></a>
+      <a class="chess-button" href="/matchmaking/chess" aria-label="Chess"></a>
       <a class="store-button" href="/store" aria-label="Store"></a>
     </div>
     <div id="chat" class="chat-container">
@@ -125,6 +136,7 @@
         />
       </div>
     </div>
+    <canvas id="snowfall"></canvas>
     <script>
       const playerId = "{{ player_id }}";
     </script>
@@ -132,5 +144,6 @@
       type="module"
       src="{{ url_for('lobby_view.static', filename='main.js') }}"
     ></script>
+    <script src="/static/snow.js" defer></script>
   </body>
 </html>

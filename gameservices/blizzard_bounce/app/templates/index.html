@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <title>Blizzard Bounce</title>
     <script
@@ -9,16 +9,27 @@
       referrerpolicy="no-referrer"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/20.0.0/tween.umd.js"></script>
+    <link rel="stylesheet" href="./static/style.css" />
   </head>
   <body>
+    <canvas id="snowfall"></canvas>
+    <script src="./static/snow.js" defer></script>
     <script src="./static/client.js"></script>
-    <div>
-      <p>Blue Score:</p>
-      <p id="blueScore">0</p>
-    </div>
-    <div>
-      <p>Green Score:</p>
-      <p id="greenScore">0</p>
+    <div id="score-container" class="box">
+      <a id="lobbyButton" href="http://127.0.0.1:5000">Return to Lobby</a>
+      <div class="score red">
+        <p>Red Score:</p>
+        <p id="redScore" class="points">0</p>
+      </div>
+      <div class="score green">
+        <p>Green Score:</p>
+        <p id="greenScore" class="points">0</p>
+      </div>
+      <p>
+        Use the arrow keys to<br />move your ornament<br />around to knock the
+        balls<br />into the opponent's goal!<br /><br />First to five points
+        wins!
+      </p>
     </div>
   </body>
 </html>

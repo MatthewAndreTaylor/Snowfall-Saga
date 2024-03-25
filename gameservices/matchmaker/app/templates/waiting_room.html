@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
+  </head>
+
+  <body>
+    <h1>Rooms For: {{ game }}</h1>
+    <button id="create-room">Create Room</button>
+    <div class="room-container"></div>
+
+    <script>
+      const username = "{{ username }}";
+      const game = "{{ game }}";
+    </script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+  </body>
+</html>

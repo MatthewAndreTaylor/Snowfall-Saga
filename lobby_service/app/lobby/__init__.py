@@ -31,16 +31,12 @@ def lobby():
     return render_template("lobby/index.html", player_id=current_user.id)
 
 
-@lobby_view.route("/trivia", methods=["GET"])
+@lobby_view.route("/matchmaking/<string:game>", methods=["GET"])
 @login_required
-def trivia():
-    return redirect("http://127.0.0.1:8002")
-
-
-@lobby_view.route("/blizzard_bounce", methods=["GET"])
-@login_required
-def blizzard_bounce():
-    return redirect("http://127.0.0.1:8001")
+def matchmaking(game: str):
+    resp = redirect(f"http://127.0.0.1:10000/matchmaking/{game}")
+    resp.set_cookie("Authorization", current_user.username)
+    return resp
 
 
 @sock.route("/echo")
