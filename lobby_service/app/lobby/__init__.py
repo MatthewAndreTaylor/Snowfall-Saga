@@ -44,6 +44,18 @@ def blizzard_bounce():
     return redirect("http://127.0.0.1:9998")
 
 
+@lobby_view.route("/type_race", methods=["GET"])
+@login_required
+def type_race():
+    return redirect("http://127.0.0.1:7777/type_race")
+
+
+@lobby_view.route("/chess", methods=["GET"])
+@login_required
+def chess():
+    return redirect("http://127.0.0.1:8888/chess")
+
+
 @lobby_view.route("/matchmaking", methods=["GET"])
 @login_required
 def matchmaking():

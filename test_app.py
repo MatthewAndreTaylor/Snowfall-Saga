@@ -1,6 +1,7 @@
 from lobby_service.app import create_app
 from gameservices.trivia.app import app
 from gameservices.type_race.app import create_type_race_app
+from gameservices.chess.app import create_chess_app
 from lobby_service.app.messages import send_message
 from lobby_service.app.store import process_purchase
 import pytest
@@ -38,19 +39,19 @@ def test_login(client):
 
     # Attempt to log in with incorrect credentials
     response = client.post("/login", data={}, follow_redirects=True)
-    assert response.status_code == 400
+    assert response.status_code == 200
 
     response = client.post(
         "/login",
         data={"username": "testuser", "password": "1234"},
         follow_redirects=True,
     )
-    assert response.status_code == 401
+    assert response.status_code == 200
 
     response = client.post(
         "/login", data={"username": "", "password": ""}, follow_redirects=True
     )
-    assert response.status_code == 401
+    assert response.status_code == 200
 
     response = client.post(
         "/login",
@@ -158,4 +159,16 @@ def type_client():
 
 def test_type_connect(type_client):
     response = type_client.get("/type_race")
+    assert response.status_code == 200
+
+
+@pytest.fixture
+def chess_client():
+    chess_app = create_chess_app()
+    with chess_app.test_client() as chess_client:
+        yield chess_client
+
+
+def test_chess_connect(chess_client):
+    response = chess_client.get("/chess")
     assert response.status_code == 200

@@ -9,7 +9,7 @@ app = Flask(
     template_folder="templates",
     static_folder="static",
 )
-app.config["SECRET KEY"] = "secret"
+app.config["SECRET KEY"] = "SECRET"
 socketio = SocketIO(app)
 
 csv_file_path = os.path.join(

@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="{{ url_for('lobby_view.static', filename='style.css') }}"
     />
+    <link rel="stylesheet" href="/static/snow.css" />
     <link
       rel="preload"
       href="{{ url_for('friendship.static', filename='friends.css') }}"
@@ -55,6 +56,8 @@
         aria-label="Leaderboard"
       ></a>
       <a class="store-button" href="/store" aria-label="Store"></a>
+      <a class="type_race-button" href="/type_race" aria-label="Type Race"></a>
+      <a class="chess-button" href="/chess" aria-label="Chess"></a>
     </div>
     <div id="chat" class="chat-container">
       <div id="chat-box" class="chat-box hidden"></div>
@@ -130,6 +133,7 @@
         />
       </div>
     </div>
+    <canvas id="snowfall"></canvas>
     <script>
       const playerId = "{{ player_id }}";
     </script>
@@ -137,5 +141,6 @@
       type="module"
       src="{{ url_for('lobby_view.static', filename='main.js') }}"
     ></script>
+    <script src="/static/snow.js" defer></script>
   </body>
 </html>

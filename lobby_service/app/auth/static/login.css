@@ -49,3 +49,23 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-color: #3366cc;
 }
+
+.flash {
+  background: #ff3333;
+  color: white;
+  padding: 0.75em;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
