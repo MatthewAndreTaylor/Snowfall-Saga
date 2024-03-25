@@ -50,7 +50,7 @@ function handleKey(e) {
   if (inputtedString.length >= text.length) {
     return;
   }
-  if (/^[a-zA-Z\s,.!?'":;]$/.test(event.key)) {
+  if (/^[a-zA-Z\s,.!?'":;]$/.test(e.key)) {
     inputtedString = inputtedString + e.key;
     console.log(inputtedString);
     console.log(text);
@@ -73,15 +73,15 @@ function handleKey(e) {
       }
     }
     updateAccuracy();
-    //    textElement.innerHTML = characters.join('');
     slideText();
     i = i + 1;
-  } else if (event.key == "Backspace") {
+  } else if (e.key == "Backspace" && i > 0) {
     i = i - 1;
     characters[i] = characters[i].split(">")[1][0];
-    //    textElement.innerHTML = characters.join('');
     slideText();
     inputtedString = inputtedString.slice(0, -1);
+  } else {
+    console.log("Invalid key");
   }
 
   if (correct >= 200 && !done) {
@@ -120,7 +120,6 @@ socket.addEventListener("message", (message) => {
       break;
 
     case "newText":
-      //        textElement.innerHTML = data['text'];
       text = data["text"];
       i = 0;
       characters = text.split("");

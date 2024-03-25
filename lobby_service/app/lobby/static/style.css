@@ -264,6 +264,26 @@ img {
   background: url(/static/images/store.png) no-repeat no-repeat;
 }
 
+.type_race-button {
+  position: fixed;
+  top: 150px;
+  left: 600px;
+  width: 30px;
+  height: 30px;
+  scale: 4;
+  background: url(/static/images/sleigh.png) no-repeat no-repeat;
+}
+
+.chess-button {
+  position: fixed;
+  top: 400px;
+  left: 150px;
+  width: 30px;
+  height: 32px;
+  scale: 3;
+  background: url(/static/images/chess.png) no-repeat no-repeat;
+}
+
 .christmas-tree-button:hover {
   filter: drop-shadow(0 0 0.75rem yellow);
 }
@@ -277,6 +297,14 @@ img {
 }
 
 .store-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.type_race-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.chess-button:hover {
   filter: drop-shadow(0 0 0.75rem yellow);
 }
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user
 from .. import db, login_manager
 from ..models import User
@@ -29,18 +29,19 @@ def login():
     username = request.form.get("username")
     password = request.form.get("password")
     if username is None or password is None:
-        return redirect(url_for("login_view.login"), 400)
+        return redirect("/login")
 
     user = User.query.filter_by(username=username).first()
     # Hash the users password
     password = User.hash_password(password)
     if user and user.verify_password(password):
         login_user(user)
-        return redirect(url_for("lobby_view.lobby"))
-    return redirect(url_for("login_view.login"), 401)
+        return redirect("/")
+    flash("Invalid username or password")
+    return redirect("/login")
 
 
-@login_view.route("/register", methods=["GET", "POST"])
+@login_view.route("/register", methods=["POST"])
 def register():
     username = request.form.get("username")
     password = request.form.get("password")
@@ -50,10 +51,12 @@ def register():
 
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
-        return "Username already exists. Please choose a different username."
+        flash("Username already exists. Please choose another username")
+        return redirect("/login")
 
     if profanity.contains_profanity(username):
-        return "We are sorry this username goes against our terms of service."
+        flash("Username already exists. Please choose another username")
+        return redirect("/login")
 
     # Hashing the user's password before adding it to the database
     password = User.hash_password(password)
