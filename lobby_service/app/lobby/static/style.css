@@ -11,13 +11,6 @@ body {
   justify-content: center;
 }
 
-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-}
-
 .game-container {
   position: fixed;
   top: 0;

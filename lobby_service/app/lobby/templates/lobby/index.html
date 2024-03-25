@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="{{ url_for('lobby_view.static', filename='style.css') }}"
     />
+    <link rel="stylesheet" href="/static/snow.css" />
     <link
       rel="preload"
       href="{{ url_for('friendship.static', filename='friends.css') }}"
@@ -127,7 +128,7 @@
         />
       </div>
     </div>
-    <canvas id="snowfall" class="canvas-container"></canvas>
+    <canvas id="snowfall"></canvas>
     <script>
       const playerId = "{{ player_id }}";
     </script>
@@ -135,9 +136,6 @@
       type="module"
       src="{{ url_for('lobby_view.static', filename='main.js') }}"
     ></script>
-    <script
-      type="module"
-      src="{{ url_for('lobby_view.static', filename='snowfall.js') }}"
-    ></script>
+    <script src="/static/snow.js" defer></script>
   </body>
 </html>

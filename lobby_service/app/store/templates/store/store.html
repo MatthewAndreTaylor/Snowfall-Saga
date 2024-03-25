@@ -26,10 +26,11 @@
     </div>
     <div id="sprite-container" class="sprite-container"></div>
     <div class="game-container"></div>
+    <canvas id="snowfall"></canvas>
     <script>
       const onSale = {{ on_sale }};
     </script>
     <script src="{{ url_for('store_view.static', filename='store.js') }}"></script>
-    <script src="/static/snow.js"></script>
+    <script src="/static/snow.js" defer></script>
   </body>
 </html>
