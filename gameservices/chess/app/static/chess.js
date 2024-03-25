@@ -10,7 +10,6 @@ const socket = new WebSocket(
 );
 
 let selectedSquare = null;
-
 socket.addEventListener("open", (event) => {
   socket.send(
     JSON.stringify({
