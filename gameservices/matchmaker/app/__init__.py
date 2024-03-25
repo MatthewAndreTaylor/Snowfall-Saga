@@ -4,7 +4,7 @@ from simple_websocket import ConnectionClosed, ConnectionError
 import json
 import requests
 import random
-
+from functools import wraps
 
 app = Flask(
     __name__,
@@ -14,10 +14,23 @@ app = Flask(
 
 sock = Sock(app)
 
-rooms, users, hosts, clients = {}, {}, {}, set()
-current_user = {"username": "Guest"}
 
-character_set = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+class RoomManager:
+    def __init__(self):
+        self.rooms = {}
+        self.users = {}
+        self.hosts = {}
+        self.clients = set()
+
+
+game_rooms = {
+    "trivia": RoomManager(),
+    "blizzard_bounce": RoomManager(),
+    "chess": RoomManager(),
+    "type_race": RoomManager(),
+}
+
+character_set = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 
 class Room:
@@ -27,9 +40,9 @@ class Room:
         self.users = set()
 
 
-def handle_load(connection):
+def handle_load(connection, room_manager):
     rooms_data = []
-    for room_name, room_obj in rooms.items():
+    for room_name, room_obj in room_manager.rooms.items():
         rooms_data.append(
             {
                 "name": room_name,
@@ -42,9 +55,9 @@ def handle_load(connection):
     connection.send(json.dumps(response))
 
 
-def handle_create(connection, data):
+def handle_create(connection, data, room_manager):
     user = data.get("user")
-    if user in hosts:
+    if user in room_manager.hosts:
         connection.send(
             json.dumps(
                 {
@@ -56,8 +69,8 @@ def handle_create(connection, data):
         return
 
     room_name = "".join(random.choices(character_set, k=6))
-    rooms[room_name] = Room(name=room_name, host=user)
-    hosts[user] = room_name
+    room_manager.rooms[room_name] = Room(name=room_name, host=user)
+    room_manager.hosts[user] = room_name
     response = {"type": "create", "room": room_name}
 
     client_response = {
@@ -65,21 +78,21 @@ def handle_create(connection, data):
         "room": room_name,
         "other": True,
     }
-    for client in clients:
+    for client in room_manager.clients:
         if client != connection:
             client.send(json.dumps(client_response))
 
     connection.send(json.dumps(response))
 
 
-def handle_join(connection, data):
+def handle_join(connection, data, room_manager):
     user = data.get("user")
     room_name = data.get("room")
     if room_name:
-        room = rooms.get(room_name)
+        room = room_manager.rooms.get(room_name)
         if room:
             if user not in room.users:
-                for existing_room_name, existing_room in rooms.items():
+                for existing_room_name, existing_room in room_manager.rooms.items():
                     if user in existing_room.users:
                         if user == existing_room.host:
                             connection.send(
@@ -99,7 +112,7 @@ def handle_join(connection, data):
                             "other": user,
                         }
 
-                        for client in clients:
+                        for client in room_manager.clients:
                             if client != connection:
                                 client.send(json.dumps(client_response))
 
@@ -119,7 +132,7 @@ def handle_join(connection, data):
                     "room": room_name,
                     "other": user,
                 }
-                for client in clients:
+                for client in room_manager.clients:
                     if client != connection:
                         client.send(json.dumps(client_response))
 
@@ -145,17 +158,17 @@ def handle_join(connection, data):
             )
 
 
-def handle_leave(connection, data):
+def handle_leave(connection, data, room_manager):
     user = data.get("user")
     room_name = data.get("room")
     if room_name:
-        room = rooms.get(room_name)
+        room = room_manager.rooms.get(room_name)
         if not room:
             return
 
         if user in room.users:
             if user == room.host:
-                handle_delete({"room": room_name})
+                handle_delete({"room": room_name}, room_manager)
             else:
                 room.users.remove(user)
 
@@ -165,7 +178,7 @@ def handle_leave(connection, data):
                 "other": user,
             }
 
-            for client in clients:
+            for client in room_manager.clients:
                 if client != connection:
                     client.send(json.dumps(client_response))
 
@@ -179,10 +192,10 @@ def handle_leave(connection, data):
             )
 
 
-def handle_delete(data):
+def handle_delete(data, room_manager):
     room_name = data.get("room")
     if room_name:
-        room = rooms.get(room_name)
+        room = room_manager.rooms.get(room_name)
         if not room:
             return
 
@@ -191,47 +204,49 @@ def handle_delete(data):
                 "type": "leave",
                 "room": room_name,
             }
-            users[user].send(json.dumps(user_response))
+            room_manager.users[user].send(json.dumps(user_response))
 
-        del rooms[room_name]
-        del hosts[room.host]
+        del room_manager.rooms[room_name]
+        del room_manager.hosts[room.host]
 
         client_response = {
             "type": "delete",
             "room": room_name,
         }
 
-        for client in clients:
+        for client in room_manager.clients:
             client.send(json.dumps(client_response))
 
 
-def handle_start(data):
+def handle_start(data, room_manager):
     room_name = data.get("room")
     user = data.get("user")
     if not user:
         return
 
     if room_name:
-        room = rooms.get(room_name)
+        room = room_manager.rooms.get(room_name)
         if not room:
             return
 
         if user != room.host:
             return
 
-        handle_delete(data)
+        handle_delete(data, room_manager)
 
         user_response = {"type": "start"}
         for user in room.users:
-            users[user].send(json.dumps(user_response))
+            room_manager.users[user].send(json.dumps(user_response))
 
 
-@sock.route("/room_events")
-def handle_matchmaking(connection):
-    if connection in clients:
+@sock.route("/room_events/<string:game>")
+def handle_matchmaking(connection, game: str):
+    manager = game_rooms[game]
+
+    if connection in manager.clients:
         return
 
-    clients.add(connection)
+    manager.clients.add(connection)
 
     while True:
         try:
@@ -239,8 +254,8 @@ def handle_matchmaking(connection):
             data = json.loads(event)
 
             user = data.get("user")
-            if user and user not in users:
-                users[user] = connection
+            if user and user not in manager.users:
+                manager.users[user] = connection
             elif not user:
                 continue
 
@@ -249,34 +264,38 @@ def handle_matchmaking(connection):
                 continue
 
             if type == "create":
-                handle_create(connection, data)
+                handle_create(connection, data, manager)
             elif type == "join":
-                handle_join(connection, data)
+                handle_join(connection, data, manager)
             elif type == "load":
-                handle_load(connection)
+                handle_load(connection, manager)
             elif type == "leave":
-                handle_leave(connection, data)
+                handle_leave(connection, data, manager)
             elif type == "delete":
-                handle_delete(data)
+                handle_delete(data, manager)
             elif type == "start":
-                handle_start(data)
+                handle_start(data, manager)
 
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost matchmaking socket connection")
-            clients.remove(connection)
+            manager.clients.remove(connection)
             break
 
 
-@sock.route("/trivia", methods=["GET"])
-def trivia():
-    requests.post(
-        "http://127.0.0.1:9999/trivia", json={"username": current_user["username"]}
-    )
-    return redirect("http://127.0.0.1:9999/trivia")
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if "Authorization" in request.cookies:
+            token = request.cookies["Authorization"]
+            return f(token, *args, **kwargs)
+        else:
+            redirect("127.0.0.1:5000")
+
+    return decorated
 
 
-@app.route("/matchmaking", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        current_user["username"] = request.json["username"]
-    return render_template("waiting_room.html", username=current_user["username"])
+@app.route("/matchmaking/<string:game>", methods=["GET"])
+@token_required
+def index(token: str, game: str):
+    return render_template("waiting_room.html", username=token, game=game)

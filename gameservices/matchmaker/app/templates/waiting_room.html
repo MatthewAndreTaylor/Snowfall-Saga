@@ -9,22 +9,18 @@
       type="text/css"
       href="{{ url_for('static', filename='style.css') }}"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='snow.css') }}"
-    />
     <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
   </head>
 
   <body>
-    <h1>Rooms For: Game</h1>
+    <h1>Rooms For: {{ game }}</h1>
     <button id="create-room">Create Room</button>
     <div class="room-container"></div>
 
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
-    <!-- <script src="{{ url_for('static', filename='snow.js') }}"></script> -->
     <script>
       const username = "{{ username }}";
+      const game = "{{ game }}";
     </script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
   </body>
 </html>
