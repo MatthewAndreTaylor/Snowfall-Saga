@@ -146,7 +146,7 @@ def trivia_client():
 
 
 def test_trivia_page(trivia_client):
-    response = trivia_client.get("/trivia")
+    response = trivia_client.get("/")
     assert response.status_code == 200
 
 

@@ -7,10 +7,11 @@ from collections import deque, defaultdict
 from functools import partial
 import json
 from ..models import User
+from ..badwords import words
 
 from better_profanity import profanity
 
-profanity.load_censor_words_from_file("lobby_service/app/static/bad-words.txt")
+profanity.load_censor_words(words)
 
 messenger = Blueprint(
     "messenger",

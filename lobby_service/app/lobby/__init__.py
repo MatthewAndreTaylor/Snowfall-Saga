@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, redirect
 from flask_login import current_user, login_required
 from simple_websocket import ConnectionClosed
 from flask_sock import Sock
-import requests
 from collections import deque
 import json
 from .. import db
@@ -34,7 +33,7 @@ def lobby():
 @lobby_view.route("/matchmaking/<string:game>", methods=["GET"])
 @login_required
 def matchmaking(game: str):
-    resp = redirect(f"http://127.0.0.1:10000/matchmaking/{game}")
+    resp = redirect(f"http://127.0.0.1:5001/matchmaking/{game}")
     resp.set_cookie("Authorization", current_user.username)
     return resp
 
