@@ -25,7 +25,7 @@ function drawSnowflakes() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "rgba(200, 200, 255, 0.8)";
   ctx.beginPath();
-  snowflakes.forEach(flake => {
+  snowflakes.forEach((flake) => {
     ctx.moveTo(flake.x, flake.y);
     ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
   });
@@ -33,13 +33,12 @@ function drawSnowflakes() {
 }
 
 function moveSnowflakes() {
-  console.log("Here")
-  snowflakes.forEach(flake => {
+  snowflakes.forEach((flake) => {
     flake.x += flake.speedX;
     flake.y += flake.speedY;
     if (flake.y > canvas.height) {
-        flake.x = Math.random() * canvas.width;
-        flake.y = -flake.radius * 2;
+      flake.x = Math.random() * canvas.width;
+      flake.y = -flake.radius * 2;
     }
   });
 }

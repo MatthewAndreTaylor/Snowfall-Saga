@@ -16,6 +16,9 @@
     <title>Login</title>
   </head>
   <body>
+    {% block content %} {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+    {% endfor %} {% endblock %}
     <h1>SNOWFALL SAGA</h1>
     <h2>Login</h2>
     <form method="post" action="{{ url_for('login_view.login') }}">

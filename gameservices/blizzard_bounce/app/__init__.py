@@ -1,5 +1,5 @@
 from collections import deque
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
 from Box2D import (
@@ -220,11 +220,14 @@ def echo(connection):
             if scores[0] >= 5:
                 # User 0 wins
                 # if current user team is 0, current_user.points increase by 200
-                break
+                print("User 0 wins")
+                redirect("127.0.0.1:5000")
+
             elif scores[1] >= 5:
                 # User 1 wins
                 # if current user team is 0, current_user.points increase by 200
-                break
+                print("User 1 wins")
+                redirect("127.0.0.1:5000")
 
             connection.send(json.dumps(message))
         except (ConnectionClosed, ConnectionError):
