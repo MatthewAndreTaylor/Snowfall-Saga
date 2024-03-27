@@ -1,4 +1,4 @@
-const socket = io.connect(`ws://${document.domain}:${location.port}/trivia`);
+const socket = io.connect(`ws://${location.host}/trivia`);
 
 // Send the username after the socket connection is established
 socket.on("connect", () => {
@@ -78,7 +78,7 @@ function displayTimer(timerValue) {
 }
 
 document.getElementById("startButton").addEventListener("click", () => {
-  socket.emit("start_game");
+  socket.emit("start_game", game_id);
 });
 
 socket.on("switch_page", (data) => {

@@ -1,4 +1,4 @@
-const socket = new WebSocket(`ws://${document.domain}:${location.port}/chess`);
+const socket = new WebSocket(`ws://${location.host}/chess`);
 
 socket.addEventListener("open", (event) => {
   socket.send(JSON.stringify({ type: "username", username: username }));

@@ -1,188 +1,161 @@
+from functools import wraps
 import json
-import random
-from collections import defaultdict
+import re
+from collections import defaultdict, deque
+import time
 
-from flask import Flask, Blueprint, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
-from .user import User
-from .text import get_text
+from flask_login import LoginManager, UserMixin, login_user, current_user
+from .text import sample_paragraph
 
-type_race_game = Blueprint(
-    "type_race_game",
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-    static_url_path="/assets/type_race",
-)
+app = Flask(__name__)
+app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+sock = Sock(app)
 
-sock = Sock(type_race_game)
-
-players_waiting = {}
-clients = set()
-
-text = {}
-
-current_user = {"username": "JOE", "game_id": 0}
-
-players = defaultdict(dict)
-players_won = defaultdict(list)
-players_lost = defaultdict(list)
+login_manager = LoginManager(app)
 
 
-def create_type_race_app():
-    app = Flask(__name__)
-    app.secret_key = "MYSECRET"
-    app.config["SESSION_COOKIE_SECURE"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-
-    with app.app_context():
-        app.register_blueprint(type_race_game)
-
-    return app
+def is_plain_char(char: str) -> bool:
+    return re.match(r'[a-zA-Z\s,.!?\'":;]', char)
 
 
-@type_race_game.route("/type_race", methods=["GET", "POST"])
-def type_race():
-    if request.method == "POST":
-        print("Got HERE")
-        current_user["username"] = request.json["username"]
-    else:
-        current_user["username"] = "JOE" + str(random.randint(1, 10000))
+users = {}
+
+
+@login_manager.user_loader
+def load_user(username):
+    return users.get(username)
+
+
+class TypeRacer(UserMixin):
+    def __init__(self, username: str):
+        self.id = username
+        self.text = sample_paragraph()
+        self.typed = []
+        self.correct = 0
+        self.incorrect = 0
+        self.first_timestamp = time.perf_counter_ns()
+        self.latest_timestamp = self.first_timestamp
+
+
+class TypeRaceRoom:
+    def __init__(self):
+        self.players_won = defaultdict(list)
+        self.players_lost = defaultdict(list)
+        self.type_racers = {}
+
+
+rooms = defaultdict(TypeRaceRoom)
+
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if "Authorization" in request.cookies:
+            token = request.cookies["Authorization"]
+            return f(token, *args, **kwargs)
+        else:
+            redirect("127.0.0.1:5000")
+
+    return decorated
+
+
+@app.route("/<string:token>/<string:game_id>", methods=["GET"])
+def type_race(token: str, game_id: str):
+    if token not in users:
+        users[token] = TypeRacer(token)
+    login_user(users[token])
+    type_race_room = rooms[game_id]
+    type_race_room.type_racers[token] = users[token]
+
     return render_template(
-        "type_race_waiting_room.html",
-        username=current_user["username"],
-        gameId=current_user["game_id"],
+        "type_race_game.html",
+        username=token,
+        game_id=game_id,
+        text="".join(users[token].text),
     )
 
 
-@type_race_game.route("/type_race/game/<game_id>", methods=["GET"])
-def send_to_game(game_id):
-    return render_template("type_race_game.html", text=text[int(game_id)][0])
-
-
-@sock.route("/type_race")
-def waiting_room(connection):
-    print("Got a connection")
-    clients.add(connection)
+@sock.route("/type_race/echo/<game_id>")
+def echo(connection, game_id: str):
+    type_race_room = rooms[game_id]
 
     while True:
         try:
-            event = connection.receive()
-            data = json.loads(event)
+            for p in type_race_room.type_racers.values():
+                p.latest_timestamp = time.perf_counter_ns()
+                p.wpm = round(
+                    ((p.correct // 5) / (p.latest_timestamp - p.first_timestamp))
+                    * 60e9,
+                    2,
+                )
 
-            if data["type"] == "username":
-                players_waiting[connection] = data["username"]
-                update_player_list()
-
-            elif data["type"] == "startGame":
-                text[current_user["game_id"]] = get_text(3)
-                current_user["game_id"] += 1
-                for client in clients:
-                    client.send(
-                        json.dumps({"type": "switchPage", "url": "type_race/game"})
-                    )
+            updates = {
+                p.id: [p.wpm, len(p.typed)] for p in type_race_room.type_racers.values()
+            }
+            connection.send(json.dumps({"type": "updates", "updates": updates}))
+            print(updates)
 
         except (KeyError, ConnectionError, ConnectionClosed):
-            clients.remove(connection)
-            players_waiting.pop(connection)
-            update_player_list()
             break
 
 
-def update_player_list():
-    for client in players_waiting:
-        client.send(
-            json.dumps({"type": "playerList", "data": list(players_waiting.values())})
-        )
+@sock.route("/type_race/input/<game_id>")
+def input(connection, game_id: str):
+    type_race_room = rooms[game_id]
 
+    my_progress = type_race_room.type_racers[current_user.id]
+    progress = {
+        "typed": my_progress.typed,
+        "correct": my_progress.correct,
+        "incorrect": my_progress.incorrect,
+    }
 
-@sock.route("/type_race/game/<game_id>")
-def run_game(connection, game_id):
-    game_id = int(game_id)
-    print("got a connection")
-    if connection in clients:
-        return
-
-    clients.add(connection)
-    players_here = players[game_id]
+    connection.send(json.dumps({"type": "progress", "progress": progress}))
 
     while True:
         try:
             event = connection.receive()
             data = json.loads(event)
 
-            if data["type"] == "playerUpdate":
-                print("Received player update from", players_here[connection].username)
-                words_typed = (data["correct"] - players_here[connection].correct) / 5
+            if "key" in data:
+                user = type_race_room.type_racers[current_user.id]
 
-                if data["correct"] > 0:
-                    players_here[connection].wpm_queue.append(words_typed * 120)
-                    players_here[connection].wpm = round(
-                        sum(players_here[connection].wpm_queue)
-                        / len(players_here[connection].wpm_queue)
-                    )
+                if data["key"] == "Backspace" and len(user.typed) > 0:
+                    if user.typed[-1] == user.text[len(user.typed) - 1]:
+                        user.correct -= 1
+                    else:
+                        user.incorrect -= 1
+                    user.typed.pop()
+                elif is_plain_char(data["key"]) and not data["key"] == "Backspace":
+                    user.typed.append(data["key"])
 
-                players_here[connection].correct = data["correct"]
-                print("correct:", data["correct"], "wpm", players_here[connection].wpm)
-                update = {
-                    p.username: (p.correct // 2, p.wpm, p.standings)
-                    for p in players_here.values()
+                    if user.typed[-1] == user.text[len(user.typed) - 1]:
+                        user.correct += 1
+                    else:
+                        user.incorrect += 1
+
+                my_progress = type_race_room.type_racers[current_user.id]
+                progress = {
+                    "typed": my_progress.typed,
+                    "correct": my_progress.correct,
+                    "incorrect": my_progress.incorrect,
                 }
-                update["type"] = "playerUpdate"
-                connection.send(json.dumps(update))
 
-            elif data["type"] == "username":
-                players_here[connection] = User(data["username"])
-
-            elif data["type"] == "done":
-                print(
-                    "Player", players_here[connection].username, "finished a paragraph"
-                )
-                players_here[connection].text_pos += 1
-                if players_here[connection].text_pos < 3:
-                    update = {
-                        "type": "newText",
-                        "text": text[game_id][players_here[connection].text_pos],
-                    }
-                    connection.send(json.dumps(update))
-                else:
-                    # The player is done, calculate standings.
-                    players_lost[game_id].append(connection)
-                    players_here[connection].done = True
-                    update_standings(game_id)
-
-            elif data["type"] == "win":
-                print(players_here[connection].username, "won!")
-                players_won[game_id].append(connection)
-                players_here[connection].done = True
-                update_standings(game_id)
+                connection.send(json.dumps({"type": "progress", "progress": progress}))
 
         except (KeyError, ConnectionError, ConnectionClosed):
-            clients.remove(connection)
-            players_here.pop(connection)
-
-            if connection in players_won[game_id]:
-                players_won[game_id].remove(connection)
-            if connection in players_lost[game_id]:
-                players_lost[game_id].remove(connection)
-
             break
 
 
 def update_standings(game_id):
-    standings = players_won[game_id] + players_lost[game_id]
-    print(standings)
-    players_here = players[game_id]
-    players_here[standings[0]].standings = "1st"
-    if len(standings) > 1:
-        players_here[standings[1]].standings = "2nd"
-    if len(standings) > 2:
-        players_here[standings[2]].standings = "3rd"
-    i = 4
-    while i <= len(standings):
-        players_here[standings[i - 1]].standings = str(i) + "th"
+    type_race_room = rooms[game_id]
 
-    if len(standings) == len(players_here):
-        for client in players_here:
-            client.send(json.dumps({"type": "gameOver"}))
+    standings = type_race_room.players_won + type_race_room.players_lost
+    for player in standings:
+        player.send(json.dumps({"type": "standings", "standings": standings}))

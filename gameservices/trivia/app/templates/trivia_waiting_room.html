@@ -18,6 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
       const username = `{{ username }}` || "Guest";
+      const game_id = `{{ game_id }}`;
     </script>
     <script src="{{ url_for('static', filename='trivia_queue.js') }}"></script>
   </body>

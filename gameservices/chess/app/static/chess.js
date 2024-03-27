@@ -5,9 +5,7 @@ if (gameId === null) {
     "Could not find a game to connect to.";
 }
 
-const socket = new WebSocket(
-  `ws://${document.domain}:${location.port}/chess/game/${gameId}`,
-);
+const socket = new WebSocket(`ws://${location.host}/chess/game/${gameId}`);
 
 let selectedSquare = null;
 socket.addEventListener("open", (event) => {

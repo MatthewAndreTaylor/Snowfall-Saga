@@ -5,15 +5,17 @@ import random
 import requests
 
 
-def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
+def trivia_game(
+    socketio: SocketIO, users: dict, game_info: dict, game_id: str, db: TriviaDB
+):
     points = {}
-    namespace = "/trivia/game/" + str(game_info["game_id"])
+    namespace = "/trivia/game/" + game_id
 
     def update_room_user_list():
         socketio.emit(
             "user_list",
             list(users.keys()),
-            room=game_info["game_id"],
+            room=game_id,
             namespace=namespace,
         )
 
@@ -21,8 +23,8 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
     def connect():
         print("Client joined the game")
         socketio.emit("hi", namespace=namespace)
-        join_room(game_info["game_id"])
-        print(f"Users in room {game_info['game_id']}, {users.keys()}")
+        join_room(game_id)
+        print(f"Users in room {game_id}, {users.keys()}")
         socketio.emit(
             "user_list", list(users.keys()), room=request.sid, namespace=namespace
         )
@@ -30,7 +32,7 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
     @socketio.on("disconnect", namespace=namespace)
     def disconnect():
         # Remove the user from users
-        print(f"Users in room {game_info['game_id']}, {users.keys()}")
+        print(f"Users in room {game_id}, {users.keys()}")
         if session.get("username") in users:
             users.pop(session.get("username"))
             update_room_user_list()
@@ -48,9 +50,7 @@ def trivia_game(socketio: SocketIO, users: dict, game_info: dict, db: TriviaDB):
         while question_number <= game_info["num_questions"]:
             categories = db.get_categories()
             question = db.get_question_by_category(random.choice(categories))
-            socketio.emit(
-                "question", question, room=game_info["game_id"], namespace=namespace
-            )
+            socketio.emit("question", question, room=game_id, namespace=namespace)
 
             answers = {}
 

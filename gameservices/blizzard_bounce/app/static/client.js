@@ -28,9 +28,6 @@ const boundaryLine = two.makeRectangle(width / 2, height / 2, width - 5, 5);
 boundaryLine.fill = "rgba(255,255,255,0.75)";
 boundaryLine.noStroke();
 
-let my_id = Math.random().toString(36).substring(7);
-console.log(my_id);
-
 // Define a function to create a circle shape in Two.js
 function createCircle(x, y, radius, color) {
   const circle = two.makeCircle(x, y, radius);
@@ -46,8 +43,8 @@ boundaryCircle.noFill();
 boundaryCircle.linewidth = 5;
 
 // Track player circle
-let player0 = {};
-let player1 = {};
+let player0;
+let player1;
 let balls = {};
 
 function tweenPlayerCircle(player, x, y) {
@@ -64,7 +61,7 @@ function tweenBall(ball, x, y) {
 }
 
 // Connect to the WebSocket for receiving game state
-const socket = new WebSocket(`ws://${location.host}/echo`);
+const socket = new WebSocket(`ws://${location.host}/echo/${room_id}`);
 
 socket.addEventListener("open", (event) => {
   console.log("Connected to server: ", event);
@@ -74,31 +71,27 @@ socket.addEventListener("message", (event) => {
   try {
     const data = JSON.parse(event.data);
 
+    if (data.winner === 0 || data.winner === 1) {
+      window.location.replace("http://127.0.0.1:5000");
+    }
+
     // Update scores
     document.getElementById("redScore").innerText = data.scores[0];
     document.getElementById("greenScore").innerText = data.scores[1];
 
     // Update player0's circle positions
-    data.player0.forEach((playerData) => {
-      let player = player0[playerData.id];
-      if (!player) {
-        player = createCircle(playerData.x, playerData.y, 30, "188,90,101");
-        player0[playerData.id] = player;
-      } else {
-        tweenPlayerCircle(player, playerData.x, playerData.y);
-      }
-    });
+    if (!player0) {
+      player0 = createCircle(data.player0.x, data.player0.y, 30, "188,90,101");
+    } else {
+      tweenPlayerCircle(player0, data.player0.x, data.player0.y);
+    }
 
     // Update player1's circle positions
-    data.player1.forEach((playerData) => {
-      let player = player1[playerData.id];
-      if (!player) {
-        player = createCircle(playerData.x, playerData.y, 30, "101,188,90");
-        player1[playerData.id] = player;
-      } else {
-        tweenPlayerCircle(player, playerData.x, playerData.y);
-      }
-    });
+    if (!player1) {
+      player1 = createCircle(data.player1.x, data.player1.y, 30, "101,188,90");
+    } else {
+      tweenPlayerCircle(player1, data.player1.x, data.player1.y);
+    }
 
     // Update other circles (balls)
     data.balls.forEach((ballData) => {
@@ -129,7 +122,7 @@ socket.addEventListener("close", (event) => {
 });
 
 // Send user input via WebSocket
-const inputSocket = new WebSocket(`ws://${location.host}/input`);
+const inputSocket = new WebSocket(`ws://${location.host}/input/${room_id}`);
 
 inputSocket.addEventListener("message", (event) => {
   try {

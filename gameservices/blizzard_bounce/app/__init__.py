@@ -18,110 +18,18 @@ import pygame
 app = Flask(__name__)
 sock = Sock(app)
 
+rooms = {}
+
 WIDTH, HEIGHT = 800, 1000
-world = b2World(gravity=(0, 0), doSleep=True)
-
-goal_width = WIDTH / 3 / 10
-goal_height = 3
-
-top_goal = world.CreateStaticBody(
-    position=(WIDTH / 2 / 10, HEIGHT / 10 - goal_height / 2),
-    fixtures=b2FixtureDef(
-        shape=b2PolygonShape(box=(goal_width / 2, goal_height / 2)), restitution=1.0
-    ),
-)
-
-bottom_goal = world.CreateStaticBody(
-    position=(WIDTH / 2 / 10, goal_height / 2),
-    fixtures=b2FixtureDef(
-        shape=b2PolygonShape(box=(goal_width / 2, goal_height / 2)), restitution=1.0
-    ),
-)
-
-p0_player_bodies = []
-
-p0_player_bodies.append(
-    world.CreateDynamicBody(
-        position=(WIDTH / 2 / 10, 5),
-        shapes=b2CircleShape(radius=3),
-        linearDamping=0.6,
-        angularDamping=0.5,
-    )
-)
-
-# p0_player_bodies.append(
-#     world.CreateDynamicBody(
-#         position=(WIDTH / 4 / 10, 5),
-#         shapes=b2CircleShape(radius=2),
-#         linearDamping=0.5,
-#         angularDamping=0.5
-#     )
-# )
-
-p1_player_bodies = []
-
-p1_player_bodies.append(
-    world.CreateDynamicBody(
-        position=(WIDTH / 2 / 10, HEIGHT / 10 - 5),
-        shapes=b2CircleShape(radius=3),
-        linearDamping=0.6,
-        angularDamping=0.5,
-    )
-)
-
-# p1_player_bodies.append(
-#     world.CreateDynamicBody(
-#         position=(WIDTH / 4 / 10, 10),
-#         shapes=b2CircleShape(radius=2),
-#         linearDamping=0.5,
-#         angularDamping=0.5
-#     )
-# )
-
-balls = []
-for _ in range(10):
-    x = random.randint(100, WIDTH - 100) / 10
-    y = random.randint(100, HEIGHT - 100) / 10
-    body = world.CreateDynamicBody(
-        position=(x, y), linearDamping=0.1, angularDamping=0.4
-    )
-    shape = body.CreateCircleFixture(radius=2, density=0.02, friction=0.3)
-    balls.append((body, shape))
-
-wall_top = world.CreateStaticBody(
-    position=(0, HEIGHT / 10),
-    fixtures=b2FixtureDef(
-        shape=b2EdgeShape(vertices=[(0, 0), (WIDTH / 10, 0)]), restitution=1.0
-    ),
-)
-
-wall_bottom = world.CreateStaticBody(
-    position=(0, 0),
-    fixtures=b2FixtureDef(
-        shape=b2EdgeShape(vertices=[(0, 0), (WIDTH / 10, 0)]), restitution=1.0
-    ),
-)
-
-wall_left = world.CreateStaticBody(
-    position=(0, 0),
-    fixtures=b2FixtureDef(
-        shape=b2EdgeShape(vertices=[(0, 0), (0, HEIGHT / 10)]), restitution=1.0
-    ),
-)
-
-wall_right = world.CreateStaticBody(
-    position=(WIDTH / 10, 0),
-    fixtures=b2FixtureDef(
-        shape=b2EdgeShape(vertices=[(0, 0), (0, HEIGHT / 10)]), restitution=1.0
-    ),
-)
-
-scores = [0, 0]
 
 
 class GoalContactListener(b2ContactListener):
-    def __init__(self):
+    def __init__(self, top_goal, bottom_goal, balls, scores):
         super(GoalContactListener, self).__init__()
+        self.top_goal = top_goal
+        self.bottom_goal = bottom_goal
+        self.balls = balls
+        self.scores = scores
         self.bodies_to_remove = []
 
     def BeginContact(self, contact):
@@ -129,27 +37,19 @@ class GoalContactListener(b2ContactListener):
         fixtureB = contact.fixtureB
 
         # Check if one of the fixtures is a ball and the other is a goal
-        if fixtureA.body in [ball[0] for ball in balls] and fixtureB.body in [
-            top_goal,
-            bottom_goal,
+        if fixtureA.body in [ball[0] for ball in self.balls] and fixtureB.body in [
+            self.top_goal,
+            self.bottom_goal,
         ]:
-            ball_body = fixtureA.body
-            self.bodies_to_remove.append(ball_body)
-            if fixtureB.body == bottom_goal:
-                scores[1] += 1
-            else:
-                scores[0] += 1
+            self.bodies_to_remove.append(fixtureA.body)
+            self.scores[1 if fixtureB.body == self.bottom_goal else 0] += 1
 
-        elif fixtureB.body in [ball[0] for ball in balls] and fixtureA.body in [
-            top_goal,
-            bottom_goal,
+        elif fixtureB.body in [ball[0] for ball in self.balls] and fixtureA.body in [
+            self.top_goal,
+            self.bottom_goal,
         ]:
-            ball_body = fixtureB.body
-            self.bodies_to_remove.append(ball_body)
-            if fixtureA.body == bottom_goal:
-                scores[1] += 1
-            else:
-                scores[0] += 1
+            self.bodies_to_remove.append(fixtureB.body)
+            self.scores[1 if fixtureA.body == self.bottom_goal else 0] += 1
 
     def remove_bodies(self):
         for body in self.bodies_to_remove:
@@ -158,53 +58,127 @@ class GoalContactListener(b2ContactListener):
         self.bodies_to_remove = []
 
 
-# Set up the contact listener
-contact_listener = GoalContactListener()
-world.contactListener = contact_listener
+class BlizzardBounceGame:
+    def __init__(self):
+        self.world = b2World(gravity=(0, 0), doSleep=True)
+        goal_width = WIDTH / 3 / 10
+        goal_height = 3
 
-pygame.init()
-clock = pygame.time.Clock()
+        self.top_goal = self.world.CreateStaticBody(
+            position=(WIDTH / 2 / 10, HEIGHT / 10 - goal_height / 2),
+            fixtures=b2FixtureDef(
+                shape=b2PolygonShape(box=(goal_width / 2, goal_height / 2)),
+                restitution=1.0,
+            ),
+        )
+
+        self.bottom_goal = self.world.CreateStaticBody(
+            position=(WIDTH / 2 / 10, goal_height / 2),
+            fixtures=b2FixtureDef(
+                shape=b2PolygonShape(box=(goal_width / 2, goal_height / 2)),
+                restitution=1.0,
+            ),
+        )
+
+        self.p0_body = self.world.CreateDynamicBody(
+            position=(WIDTH / 2 / 10, 5),
+            shapes=b2CircleShape(radius=3),
+            linearDamping=0.6,
+            angularDamping=0.5,
+        )
+
+        self.p1_body = self.world.CreateDynamicBody(
+            position=(WIDTH / 2 / 10, HEIGHT / 10 - 5),
+            shapes=b2CircleShape(radius=3),
+            linearDamping=0.6,
+            angularDamping=0.5,
+        )
+
+        self.balls = []
+
+        for _ in range(10):
+            x = random.randint(100, WIDTH - 100) / 10
+            y = random.randint(100, HEIGHT - 100) / 10
+            body = self.world.CreateDynamicBody(
+                position=(x, y), linearDamping=0.1, angularDamping=0.4
+            )
+            shape = body.CreateCircleFixture(radius=2, density=0.02, friction=0.3)
+            self.balls.append((body, shape))
+
+        self.world.CreateStaticBody(
+            position=(0, HEIGHT / 10),
+            fixtures=b2FixtureDef(
+                shape=b2EdgeShape(vertices=[(0, 0), (WIDTH / 10, 0)]), restitution=1.0
+            ),
+        )
+
+        self.world.CreateStaticBody(
+            position=(0, 0),
+            fixtures=b2FixtureDef(
+                shape=b2EdgeShape(vertices=[(0, 0), (WIDTH / 10, 0)]), restitution=1.0
+            ),
+        )
+
+        self.world.CreateStaticBody(
+            position=(0, 0),
+            fixtures=b2FixtureDef(
+                shape=b2EdgeShape(vertices=[(0, 0), (0, HEIGHT / 10)]), restitution=1.0
+            ),
+        )
+
+        self.world.CreateStaticBody(
+            position=(WIDTH / 10, 0),
+            fixtures=b2FixtureDef(
+                shape=b2EdgeShape(vertices=[(0, 0), (0, HEIGHT / 10)]), restitution=1.0
+            ),
+        )
+
+        self.scores = [0, 0]
+
+        # Set up the contact listener
+        self.world.contactListener = GoalContactListener(
+            self.top_goal, self.bottom_goal, self.balls, self.scores
+        )
+        self.clock = pygame.time.Clock()
 
 
-@app.route("/", methods=["GET", "POST"])
-def home():
-    return render_template("index.html")
+class BlizzardBounceRoom:
+    def __init__(self):
+        self.game = BlizzardBounceGame()
+        self.player0 = None
+        self.player1 = None
 
 
-@sock.route("/echo")
-def echo(connection):
+@app.route("/<string:room_id>", methods=["GET"])
+def home(room_id: str):
+    return render_template("index.html", room_id=room_id)
+
+
+@sock.route("/echo/<string:room_id>")
+def echo(connection, room_id: str):
     print("Client connected", connection)
 
+    if room_id not in rooms:
+        rooms[room_id] = BlizzardBounceRoom()
+
     while True:
-        world.Step(1 / 30, 5, 2)
-        contact_listener.remove_bodies()
-        clock.tick(60)
+        rooms[room_id].game.world.Step(1 / 30, 5, 2)
+        rooms[room_id].game.world.contactListener.remove_bodies()
+        rooms[room_id].game.clock.tick(60)
 
         try:
             # send the world data to the clients
-            player0_data = []
+            p0_body = rooms[room_id].game.p0_body
+            position0 = p0_body.transform * p0_body.fixtures[0].shape.pos * 10
+            player0_data = {"x": int(position0[0]), "y": int(position0[1])}
 
-            for i, player_body in enumerate(p0_player_bodies):
-                position = (
-                    player_body.transform * player_body.fixtures[0].shape.pos * 10
-                )
-                player0_data.append(
-                    {"x": int(position[0]), "y": int(position[1]), "id": i}
-                )
-
-            player1_data = []
-
-            for i, player_body in enumerate(p1_player_bodies):
-                position = (
-                    player_body.transform * player_body.fixtures[0].shape.pos * 10
-                )
-                player1_data.append(
-                    {"x": int(position[0]), "y": int(position[1]), "id": i}
-                )
+            p1_body = rooms[room_id].game.p1_body
+            position1 = p1_body.transform * p1_body.fixtures[0].shape.pos * 10
+            player1_data = {"x": int(position1[0]), "y": int(position1[1])}
 
             balls_data = []
 
-            for i, (body, shape) in enumerate(balls):
+            for i, (body, shape) in enumerate(rooms[room_id].game.balls):
                 position = body.transform * shape.shape.pos * 10
                 balls_data.append(
                     {"x": int(position[0]), "y": int(position[1]), "id": i}
@@ -212,22 +186,22 @@ def echo(connection):
 
             message = {
                 "player0": player0_data,
-                "balls": balls_data,
                 "player1": player1_data,
-                "scores": scores,
+                "balls": balls_data,
+                "scores": rooms[room_id].game.scores,
             }
 
-            if scores[0] >= 5:
+            if rooms[room_id].game.scores[0] >= 5:
                 # User 0 wins
                 # if current user team is 0, current_user.points increase by 200
                 print("User 0 wins")
-                redirect("127.0.0.1:5000")
+                connection.send(json.dumps({"winner": 0}))
 
-            elif scores[1] >= 5:
+            elif rooms[room_id].game.scores[1] >= 5:
                 # User 1 wins
                 # if current user team is 0, current_user.points increase by 200
                 print("User 1 wins")
-                redirect("127.0.0.1:5000")
+                connection.send(json.dumps({"winner": 1}))
 
             connection.send(json.dumps(message))
         except (ConnectionClosed, ConnectionError):
@@ -235,43 +209,42 @@ def echo(connection):
             break
 
 
-teams = {}
-clients = {}
-
-# TODO map the current user to the team they control
-
-
-@sock.route("/input")
-def input(connection):
-    if len(clients) >= 2:
+@sock.route("/input/<string:room_id>")
+def input(connection, room_id: str):
+    if room_id not in rooms:
         connection.send(json.dumps({"error": "Game is full"}))
         return
 
-    if teams.get(0) is None:
-        teams[0] = connection
-        clients[connection] = 0
-        print(teams)
+    if rooms[room_id].player0 is None:
+        rooms[room_id].player0 = connection
+    elif rooms[room_id].player1 is None:
+        rooms[room_id].player1 = connection
     else:
-        teams[1] = connection
-        clients[connection] = 1
-        print(teams)
+        connection.send(json.dumps({"error": "Game is full"}))
+        return
 
     while True:
         try:
             message = connection.receive()
             data = json.loads(message)
 
-            if clients[connection] == 0:
-                p0_player_bodies[0].ApplyLinearImpulse(
-                    b2Vec2(data["x"], data["y"]), p0_player_bodies[0].worldCenter, True
+            if rooms[room_id].player0 == connection:
+                rooms[room_id].game.p0_body.ApplyLinearImpulse(
+                    b2Vec2(data["x"], data["y"]),
+                    rooms[room_id].game.p0_body.worldCenter,
+                    True,
                 )
-            else:
-                p1_player_bodies[0].ApplyLinearImpulse(
-                    b2Vec2(data["x"], data["y"]), p1_player_bodies[0].worldCenter, True
+            elif rooms[room_id].player1 == connection:
+                rooms[room_id].game.p1_body.ApplyLinearImpulse(
+                    b2Vec2(data["x"], data["y"]),
+                    rooms[room_id].game.p1_body.worldCenter,
+                    True,
                 )
+
         except Exception as e:
             print(e)
-            team = clients[connection]
-            teams.pop(team)
-            clients.pop(connection)
+            if rooms[room_id].player0 == connection:
+                rooms[room_id].player0 = None
+            elif rooms[room_id].player1 == connection:
+                rooms[room_id].player1 = None
             break

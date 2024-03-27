@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed, ConnectionError
 import json
-import requests
 import random
 from functools import wraps
 
@@ -234,7 +233,7 @@ def handle_start(data, room_manager):
 
         handle_delete(data, room_manager)
 
-        user_response = {"type": "start"}
+        user_response = {"type": "start", "room": room_name}
         for user in room.users:
             room_manager.users[user].send(json.dumps(user_response))
 

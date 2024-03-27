@@ -19,20 +19,20 @@ db = TriviaDB(csv_file_path)
 
 users = {}
 user_queue = []
-game_info = {"num_questions": 10, "timer": 10, "game_id": 0}
+game_info = {"num_questions": 10, "timer": 10}
 
 current_user = {"username": "JOE"}
 
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+@app.route("/<string:game_id>", methods=["GET", "POST"])
+def index(game_id: str):
     if request.method == "POST":
         print("Got HERE")
         current_user["username"] = request.json["username"]
 
     print("got a connection")
     return render_template(
-        "trivia_waiting_room.html", username=current_user["username"]
+        "trivia_waiting_room.html", username=current_user["username"], game_id=game_id
     )
 
 
@@ -41,21 +41,20 @@ def handle_connect():
     print("Client connected to /trivia:", request.sid)
 
 
-@app.route("/trivia/game")
-def render_game():
-    return render_template("trivia_game.html", game_id=game_info["game_id"])
+@app.route("/trivia/game/<string:game_id>")
+def render_game(game_id: str):
+    return render_template("trivia_game.html", game_id=game_id)
 
 
 @socketio.on("start_game", namespace="/trivia")
-def start_game():
+def start_game(game_id):
     print("Starting the game")
-    game_info["game_id"] += 1
     socketio.start_background_task(
-        trivia_game(socketio, users.copy(), game_info.copy(), db)
+        trivia_game(socketio, users.copy(), game_info.copy(), game_id, db)
     )
     socketio.emit(
         "switch_page",
-        {"url": "trivia/game", "game_id": game_info["game_id"]},
+        {"url": "trivia/game", "game_id": game_id},
         namespace="/trivia",
     )
 

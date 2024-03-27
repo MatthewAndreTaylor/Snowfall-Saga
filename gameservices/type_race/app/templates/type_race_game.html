@@ -15,14 +15,15 @@
     <a id="lobbyButton" href="http://127.0.0.1:5000">Return to Lobby</a>
     <p id="text">{{ text }}</p>
     <div id="accuracy"></div>
-    <div id="countdown"></div>
     <div id="game-over"></div>
     <div class="progress-container">
-      <ul id="progress-list"></ul>
       <div class="finish-line"></div>
-      <ul id="finished-list"></ul>
     </div>
     <div id="snowflakes"></div>
+    <script>
+      const username = "{{ username }}";
+      const gameId = "{{ game_id }}";
+    </script>
     <script src="{{ url_for('static', filename='type_race.js') }}"></script>
     <script src="{{ url_for('static', filename='snow.js') }}"></script>
   </body>

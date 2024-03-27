@@ -1,6 +1,6 @@
 from lobby_service.app import create_app
 from gameservices.trivia.app import app
-from gameservices.type_race.app import create_type_race_app
+from gameservices.type_race.app import app as type_race_app
 from gameservices.chess.app import create_chess_app
 from lobby_service.app.messages import send_message
 from lobby_service.app.store import process_purchase
@@ -152,7 +152,7 @@ def test_trivia_page(trivia_client):
 
 @pytest.fixture
 def type_client():
-    type_app = create_type_race_app()
+    type_app = type_race_app
     with type_app.test_client() as type_client:
         yield type_client
 
