@@ -3,14 +3,7 @@ const socket = new WebSocket(`ws://${location.host}/room_events/${game}`);
 const roomContainer = document.querySelector(".room-container");
 const createRoomButton = document.querySelector("#create-room");
 
-const game_service_hosts = {
-  blizzard_bounce: "127.0.0.1:8001",
-  trivia: "127.0.0.1:8002",
-  type_race: "127.0.0.1:8003",
-  chess: "127.0.0.1.:8004",
-};
-
-socket.addEventListener("open", (event) => {
+socket.addEventListener("open", () => {
   socket.send(JSON.stringify({ type: "load", user: username }));
 });
 
@@ -71,7 +64,7 @@ socket.addEventListener("message", (event) => {
     case "start":
       console.log("Here");
       window.location.replace(
-        `http://${game_service_hosts[game]}/${data.room}`,
+        `http://${location.host}/join/${game}/${data.room}`,
       );
       break;
   }

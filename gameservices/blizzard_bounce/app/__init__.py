@@ -13,7 +13,7 @@ from Box2D import (
 )
 import json
 import random
-import pygame
+import time
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -139,12 +139,12 @@ class BlizzardBounceGame:
         self.world.contactListener = GoalContactListener(
             self.top_goal, self.bottom_goal, self.balls, self.scores
         )
-        self.clock = pygame.time.Clock()
 
 
 class BlizzardBounceRoom:
     def __init__(self):
         self.game = BlizzardBounceGame()
+        self.last_frame_time = time.time()
         self.player0 = None
         self.player1 = None
 
@@ -164,7 +164,10 @@ def echo(connection, room_id: str):
     while True:
         rooms[room_id].game.world.Step(1 / 30, 5, 2)
         rooms[room_id].game.world.contactListener.remove_bodies()
-        rooms[room_id].game.clock.tick(60)
+        elapsed_time = time.time() - rooms[room_id].last_frame_time
+        time_to_sleep = max(0, 1.0/60 - elapsed_time)
+        time.sleep(time_to_sleep)
+        rooms[room_id].last_frame_time = time.time()
 
         try:
             # send the world data to the clients

@@ -1,17 +1,8 @@
-.colored-text::incorrect {
-  content: attr(data-incorrect);
-  color: red;
-}
-
-.colored-text::correct {
-  content: attr(data-correct);
-  color: green;
-}
-
 html,
 body {
   height: 100%;
   margin: 0;
+  padding: 0;
 }
 
 body {
@@ -34,9 +25,18 @@ p {
     1px 1px 0 #000;
 }
 
+.colored-text::incorrect {
+  content: attr(data-incorrect);
+  color: red;
+}
+
+.colored-text::correct {
+  content: attr(data-correct);
+  color: green;
+}
+
 #text {
   width: 100%;
-
   color: white;
   text-shadow:
     -1px -1px 0 #000,
@@ -47,6 +47,7 @@ p {
 
 #accuracy {
   font-size: 20px;
+  padding: 20px;
   color: white;
   text-shadow:
     -1px -1px 0 #000,
@@ -65,43 +66,61 @@ p {
     1px 1px 0 #000;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-ul li {
-  font-size: 30px;
-  margin-bottom: 5px;
-}
-
-.progress-container {
+#progress-container {
   position: relative;
-  width: 100%;
+  image-rendering: pixelated;
+}
+
+.progress {
+  padding-top: 30px;
 }
 
 .progress-bar {
-  position: relative;
-  width: 0%;
   height: 30px;
+}
+
+.progress-bar-correct, .progress-bar-wrong {
+  height: 30px;
+  display: inline-block;
+}
+
+.progress-bar-correct {
   background-color: #8ac6d0;
 }
 
-.reindeer-image {
-  width: 50px;
-  height: auto; /* Maintain aspect ratio */
+.progress-bar-wrong {
+  background-color: #ff984a;
+}
+
+.reindeer {
+  margin-top: -50px;
   position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(-50%, -50%);
-  z-index: 2;
+  background: url(/static/reindeer.png) no-repeat no-repeat;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  scale: 1.75;
+  z-index: 100;
+  animation: rotateBackground 10s ease-in-out infinite;
+}
+
+@keyframes rotateBackground {
+  0% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(15deg);
+  }
 }
 
 .finish-line {
   position: absolute;
   top: 0;
   right: 0;
-  width: 50px; /* Adjust the width of each stripe */
+  width: 50px;
   height: 100%;
   background: conic-gradient(
     white 90deg,

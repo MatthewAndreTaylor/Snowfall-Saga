@@ -1,18 +1,24 @@
 from flask import Flask, render_template, request, redirect
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed, ConnectionError
+from flask_login import LoginManager, UserMixin, current_user
 import json
 import random
-from functools import wraps
 
-app = Flask(
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-)
+app = Flask(__name__)
+app.secret_key = "MYSECRET"
 
 sock = Sock(app)
 
+login_manager = LoginManager(app)
+
+@login_manager.user_loader
+def load_user(username):
+    return User(username)
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
 
 class RoomManager:
     def __init__(self):
@@ -281,20 +287,20 @@ def handle_matchmaking(connection, game: str):
             break
 
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if "Authorization" in request.cookies:
-            token = request.cookies["Authorization"]
-            return f(token, *args, **kwargs)
-        else:
-            redirect("127.0.0.1:5000")
+game_service_hosts = {
+  "blizzard_bounce": "127.0.0.1:8001",
+  "trivia": "127.0.0.1:8002",
+  "type_race": "127.0.0.1:8003",
+  "chess": "127.0.0.1.:8004",
+}
 
-    return decorated
+@app.route("/join/<string:game>/<string:game_id>", methods=["GET"])
+def trivia(game: str, game_id: str):
+    if game not in game_service_hosts:
+        return "Invalid game", 404
 
+    return redirect(f"http://{game_service_hosts[game]}/{game_id}")
 
 @app.route("/matchmaking/<string:game>", methods=["GET"])
-@token_required
-def index(token: str, game: str):
-    return render_template("waiting_room.html", username=token, game=game)
+def index(game: str):
+    return render_template("waiting_room.html", username=current_user.id, game=game)

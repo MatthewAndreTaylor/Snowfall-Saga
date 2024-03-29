@@ -2,9 +2,9 @@ let textElement = document.getElementById("text");
 const text = textElement.innerHTML;
 let characters = text.split("");
 const accuracyElement = document.getElementById("accuracy");
+const progressContainer = document.getElementById("progress-container");
 
 const socket = new WebSocket(`ws://${location.host}/type_race/echo/${gameId}`);
-
 const playerElements = {};
 
 socket.addEventListener("open", () => {
@@ -21,24 +21,33 @@ socket.addEventListener("message", (message) => {
       Object.keys(updates).forEach((key) => {
         if (key in playerElements) {
           let el = playerElements[key];
-          el.textContent =
-            key +
-            ": wpm: " +
-            updates[key][0] +
-            ", characters typed: " +
-            updates[key][1];
+          el.style.backgroundColor = key === username ? "#96b4e08c" : "";
+          el.querySelector(".progress-bar-correct").style.width = `${(updates[key][1] / text.length) * 90}%`;
+          el.querySelector(".progress-bar-wrong").style.width = `${(updates[key][2] / text.length) * 90}%`;
+          let reindeer = el.querySelector(".reindeer");
+          reindeer.style.left = `${((updates[key][1] + updates[key][2]) / text.length) * 90 + 1}%`;
+          reindeer.style.animationDuration = `${(40/(updates[key][0]+0.01)).toFixed(1)}s`;
+          el.querySelector("strong").textContent = `${key}: wpm: ${updates[key][0]}`;
+
         } else {
           let el = document.createElement("div");
-          if (key === username) {
-            el.classList.add("you");
-          }
-          el.textContent =
-            key +
-            ": wpm: " +
-            updates[key][0] +
-            ", characters typed: " +
-            updates[key][1];
-          document.body.appendChild(el);
+          el.classList.add("progress");
+          let progress = document.createElement("div");
+          progress.classList.add("progress-bar");
+          let corr = document.createElement("div");
+          corr.classList.add("progress-bar-correct");
+          let wrong = document.createElement("div");
+          wrong.classList.add("progress-bar-wrong");
+          let reindeer = document.createElement("div");
+          reindeer.classList.add("reindeer");
+          let strong = document.createElement("strong");
+          el.appendChild(progress);
+          progress.appendChild(corr);
+          progress.appendChild(wrong);
+          progress.appendChild(reindeer);
+          el.appendChild(strong);
+          
+          progressContainer.appendChild(el);
           playerElements[key] = el;
         }
       });
@@ -58,8 +67,6 @@ const inputSocket = new WebSocket(
 
 window.addEventListener("keydown", (event) => {
   event.preventDefault();
-  console.log(event.key);
-
   if (/^[a-zA-Z\s,.!?'":;]$/.test(event.key) || event.key == "Backspace") {
     inputSocket.send(JSON.stringify({ key: event.key }));
   } else {
@@ -80,21 +87,19 @@ inputSocket.addEventListener("message", (message) => {
           characters[i] = text[i];
         } else {
           if (progress.typed[i] === text[i]) {
-            characters[i] = `<span style="color: green">${text[i]}</span>`;
+            characters[i] = `<span style="color: green; text-decoration: underline;">${text[i]}</span>`;
           } else {
-            characters[i] = `<span style="color: red">${text[i]}</span>`;
+            characters[i] = `<span style="color: red; text-decoration: underline;">${text[i]}</span>`;
           }
         }
       }
       updateAccuracy(progress.correct, progress.incorrect);
       slideText(index);
-
-      console.log(progress);
       break;
 
     case "gameOver":
       let gameOver = document.getElementById("game-over");
-      gameOver.innerHTML = "The game is over!";
+      gameOver.innerHTML = `The game is over! You placed in position <b>${data.place}</b> out of ${data.total} players. WPM: ${data.score}`;
       break;
   }
 });

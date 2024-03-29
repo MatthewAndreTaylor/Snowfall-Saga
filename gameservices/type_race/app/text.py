@@ -53,9 +53,9 @@ paragraphs = [
 ]
 
 
-def sample_paragraph() -> list:
+def sample_paragraph() -> str:
     """
     Returns:
-        list: A list of characters from a random paragraph.
+        str: A random paragraph from the list of paragraphs.
     """
-    return list(random.choice(paragraphs))
+    return random.choice(paragraphs)
