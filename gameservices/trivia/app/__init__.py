@@ -1,14 +1,12 @@
 import os
-from flask import Flask, render_template, request, session
-from flask_socketio import SocketIO
-from .trivia_game_server import trivia_game
+from flask import Flask, render_template, request
+from flask_login import LoginManager, UserMixin, current_user
+from flask_socketio import SocketIO, join_room
 from .questions import TriviaDB
+import requests
+import random
 
-app = Flask(
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-)
+app = Flask(__name__)
 app.config["SECRET KEY"] = "SECRET"
 socketio = SocketIO(app)
 
@@ -21,18 +19,22 @@ users = {}
 user_queue = []
 game_info = {"num_questions": 10, "timer": 10}
 
-current_user = {"username": "JOE"}
+login_manager = LoginManager(app)
+
+@login_manager.user_loader
+def load_user(username):
+    return User(username)
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
 
 
-@app.route("/<string:game_id>", methods=["GET", "POST"])
+@app.route("/<string:game_id>", methods=["GET"])
 def index(game_id: str):
-    if request.method == "POST":
-        print("Got HERE")
-        current_user["username"] = request.json["username"]
-
     print("got a connection")
     return render_template(
-        "trivia_waiting_room.html", username=current_user["username"], game_id=game_id
+        "trivia_waiting_room.html", username=current_user.id, game_id=game_id
     )
 
 
@@ -61,7 +63,6 @@ def start_game(game_id):
 
 @socketio.on("username", namespace="/trivia")
 def get_username(username):
-    session["username"] = username
     users[username] = request.sid
     user_queue.append(request.sid)
     print("Received username", username)
@@ -79,13 +80,11 @@ def get_username(username):
 
 @socketio.on("disconnect", namespace="/trivia")
 def handle_disconnect():
-    if session.get("username") in users:
-        print("Client disconnected from /trivia:", request.sid)
-        users.pop(session.get("username"))
-        user_queue.remove(request.sid)
-        update_users()
-        update_party_leader()
-
+    print("Client disconnected from /trivia:", request.sid)
+    users.pop(current_user.id)
+    user_queue.remove(request.sid)
+    update_users()
+    update_party_leader()
 
 @socketio.on("num_questions", namespace="/trivia")
 def update_num_questions(new_num):
@@ -106,3 +105,81 @@ def update_users():
 def update_party_leader():
     if len(user_queue) > 0:
         socketio.emit("party_leader", room=user_queue[0], namespace="/trivia")
+
+
+def trivia_game(
+    socketio: SocketIO, users: dict, game_info: dict, game_id: str, db: TriviaDB
+):
+    points = {}
+    namespace = "/trivia/game/" + game_id
+
+    def update_room_user_list():
+        socketio.emit(
+            "user_list",
+            list(users.keys()),
+            room=game_id,
+            namespace=namespace,
+        )
+
+    @socketio.on("connect", namespace=namespace)
+    def connect():
+        print("Client joined the game")
+        socketio.emit("hi", namespace=namespace)
+        join_room(game_id)
+        print(f"Users in room {game_id}, {users.keys()}")
+        socketio.emit(
+            "user_list", list(users.keys()), room=request.sid, namespace=namespace
+        )
+
+    @socketio.on("disconnect", namespace=namespace)
+    def disconnect():
+        # Remove the user from users
+        print(f"Users in room {game_id}, {users.keys()}")
+        if current_user.id in users:
+            users.pop(current_user.id)
+            update_room_user_list()
+
+    @socketio.on("register", namespace=namespace)
+    def register_user(username):
+        users[username] = request.sid
+        points[username] = 0
+        if len(points) == len(users):
+            socketio.start_background_task(run_main_game)
+
+    def run_main_game():
+        question_number = 1
+        while question_number <= game_info["num_questions"]:
+            categories = db.get_categories()
+            question = db.get_question_by_category(random.choice(categories))
+            socketio.emit("question", question, room=game_id, namespace=namespace)
+
+            answers = {}
+
+            @socketio.on("answer", namespace=namespace)
+            def receive_answer(answer):
+                if current_user.id in users:
+                    print("Received answer from", current_user.id)
+                    answers[current_user.id] = answer
+
+            while len(answers) < len(users):
+                socketio.sleep(1)
+
+            print("Received answers", answers)
+            for user in users:
+                if answers[user] == question["correct"]:
+                    points[user] += 10
+                    socketio.emit(
+                        "correct", points, room=users[user], namespace=namespace
+                    )
+                else:
+                    socketio.emit(
+                        "incorrect", points, room=users[user], namespace=namespace
+                    )
+
+            question_number += 1
+
+        send_points(points)
+
+
+def send_points(points):
+    requests.post("http://127.0.0.1:5000/points", json=points)
