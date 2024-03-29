@@ -245,7 +245,6 @@ def input(connection, room_id: str):
                 )
 
         except Exception as e:
-            print(e)
             if rooms[room_id].player0 == connection:
                 rooms[room_id].player0 = None
             elif rooms[room_id].player1 == connection:

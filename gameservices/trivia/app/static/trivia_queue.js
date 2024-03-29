@@ -82,6 +82,5 @@ document.getElementById("startButton").addEventListener("click", () => {
 });
 
 socket.on("switch_page", (data) => {
-  sessionStorage.setItem("username", username);
-  window.location.href = data.url;
+  window.location.href = data.url + "/" + data.game_id;
 });

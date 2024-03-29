@@ -2,21 +2,16 @@ import json
 import random
 from collections import defaultdict
 
-from flask import Flask, Blueprint, render_template, request
+from flask import Flask, render_template, request
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
-
 import chess
 
-chess_game = Blueprint(
-    "chess_game",
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-    static_url_path="/assets/chess",
-)
-
-sock = Sock(chess_game)
+app = Flask(__name__)
+app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+sock = Sock(app)
 
 players_waiting = {}
 
@@ -31,19 +26,7 @@ boards = {}
 turns = {}
 
 
-def create_chess_app():
-    app = Flask(__name__)
-    app.secret_key = "MYSECRET"
-    app.config["SESSION_COOKIE_SECURE"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-
-    with app.app_context():
-        app.register_blueprint(chess_game)
-
-    return app
-
-
-@chess_game.route("/chess", methods=["GET", "POST"])
+@app.route("/chess", methods=["GET", "POST"])
 def enter_chess():
     if request.method == "POST":
         print("Got HERE")
@@ -57,17 +40,15 @@ def enter_chess():
     )
 
 
-@chess_game.route("/chess/game/<game_id>", methods=["GET"])
+@app.route("/chess/game/<string:game_id>", methods=["GET"])
 def send_to_game(game_id):
     return render_template("chess_game.html")
 
 
-@sock.route("/chess")
+@sock.route("/chess/<string:game_id>")
 def waiting_room(connection):
     print("Got a connection")
     clients.add(connection)
-    if len(clients) % 2 == 0:
-        current_user["game_id"] += 1
 
     while True:
         try:

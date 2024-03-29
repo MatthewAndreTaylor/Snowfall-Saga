@@ -11,6 +11,10 @@ socket.addEventListener("open", () => {
   console.log("Connected to server");
 });
 
+socket.addEventListener("close", () => {
+  console.log("Disconnected from server");
+});
+
 socket.addEventListener("message", (message) => {
   const data = JSON.parse(message.data);
 
@@ -22,11 +26,11 @@ socket.addEventListener("message", (message) => {
         if (key in playerElements) {
           let el = playerElements[key];
           el.style.backgroundColor = key === username ? "#96b4e08c" : "";
-          el.querySelector(".progress-bar-correct").style.width = `${(updates[key][1] / text.length) * 90}%`;
-          el.querySelector(".progress-bar-wrong").style.width = `${(updates[key][2] / text.length) * 90}%`;
+          el.querySelector(".progress-bar-correct").style.width = `${(updates[key][1] / updates[key][3]) * 90}%`;
+          el.querySelector(".progress-bar-wrong").style.width = `${(updates[key][2] / updates[key][3]) * 90}%`;
           let reindeer = el.querySelector(".reindeer");
-          reindeer.style.left = `${((updates[key][1] + updates[key][2]) / text.length) * 90 + 1}%`;
-          reindeer.style.animationDuration = `${(40/(updates[key][0]+0.01)).toFixed(1)}s`;
+          reindeer.style.left = `${((updates[key][1] + updates[key][2]) / updates[key][3]) * 90 + 2}%`;
+          reindeer.style.animationDuration = `${(40/(updates[key][0]+0.01)).toFixed(0)}s`;
           el.querySelector("strong").textContent = `${key}: wpm: ${updates[key][0]}`;
 
         } else {

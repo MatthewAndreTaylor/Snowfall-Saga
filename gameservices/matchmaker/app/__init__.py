@@ -7,6 +7,8 @@ import random
 
 app = Flask(__name__)
 app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 sock = Sock(app)
 
@@ -283,7 +285,18 @@ def handle_matchmaking(connection, game: str):
 
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost matchmaking socket connection")
+            
             manager.clients.remove(connection)
+            del manager.users[user]
+            
+            if user in manager.hosts:
+                for room_name, room in manager.rooms.items():
+                    if room.host == user:
+                        del manager.rooms[room_name]
+                        del manager.hosts[user]
+                
+                print("Deleted room")
+                
             break
 
 

@@ -7,7 +7,9 @@ import requests
 import random
 
 app = Flask(__name__)
-app.config["SECRET KEY"] = "SECRET"
+app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 socketio = SocketIO(app)
 
 csv_file_path = os.path.join(
@@ -23,7 +25,9 @@ login_manager = LoginManager(app)
 
 @login_manager.user_loader
 def load_user(username):
-    return User(username)
+    if username not in users:
+        users[username] = User(username)
+    return users[username]
 
 class User(UserMixin):
     def __init__(self, username):
@@ -56,14 +60,13 @@ def start_game(game_id):
     )
     socketio.emit(
         "switch_page",
-        {"url": "trivia/game", "game_id": game_id},
+        {"url": "", "game_id": f"trivia/game/{game_id}"},
         namespace="/trivia",
     )
 
 
 @socketio.on("username", namespace="/trivia")
 def get_username(username):
-    users[username] = request.sid
     user_queue.append(request.sid)
     print("Received username", username)
     update_users()
@@ -141,7 +144,6 @@ def trivia_game(
 
     @socketio.on("register", namespace=namespace)
     def register_user(username):
-        users[username] = request.sid
         points[username] = 0
         if len(points) == len(users):
             socketio.start_background_task(run_main_game)
@@ -165,12 +167,14 @@ def trivia_game(
                 socketio.sleep(1)
 
             print("Received answers", answers)
+            print("Correct answer", question["correct"])
             for user in users:
                 if answers[user] == question["correct"]:
                     points[user] += 10
                     socketio.emit(
                         "correct", points, room=users[user], namespace=namespace
                     )
+                    print("Correct answer", user, "Got some points")
                 else:
                     socketio.emit(
                         "incorrect", points, room=users[user], namespace=namespace

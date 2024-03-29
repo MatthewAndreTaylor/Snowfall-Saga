@@ -1,11 +1,16 @@
 from lobby_service.app import create_app
-from gameservices.trivia.app import app
+from gameservices.trivia.app import app as trivia_app
 from gameservices.type_race.app import app as type_race_app
-from gameservices.chess.app import create_chess_app
+from gameservices.chess.app import app as chess_app
 from lobby_service.app.messages import send_message
 from lobby_service.app.store import process_purchase
+from flask_login import UserMixin, FlaskLoginClient
 import pytest
 import json
+
+trivia_app.test_client_class = FlaskLoginClient
+type_race_app.test_client_class = FlaskLoginClient
+chess_app.test_client_class = FlaskLoginClient
 
 
 @pytest.fixture
@@ -136,35 +141,39 @@ def test_store_websocket(client):
     process_purchase(store_client, curr_user=None)
 
 
+class MockUser(UserMixin):
+    def __init__(self, id=1):
+        self.id = id
+
 @pytest.fixture
 def trivia_client():
     """
     Fixture that creates a test client for the trivia app
     """
-    with app.test_client() as trivia_client:
+    user = MockUser()
+    with trivia_app.test_client(user=user) as trivia_client:
         yield trivia_client
 
 
 def test_trivia_page(trivia_client):
-    response = trivia_client.get("/")
+    response = trivia_client.get("/1")
     assert response.status_code == 200
 
 
 @pytest.fixture
 def type_client():
-    type_app = type_race_app
-    with type_app.test_client() as type_client:
+    user = MockUser()
+    with type_race_app.test_client(user=user) as type_client:
         yield type_client
 
 
 def test_type_connect(type_client):
-    response = type_client.get("/type_race")
+    response = type_client.get("/1")
     assert response.status_code == 200
 
 
 @pytest.fixture
 def chess_client():
-    chess_app = create_chess_app()
     with chess_app.test_client() as chess_client:
         yield chess_client
 
