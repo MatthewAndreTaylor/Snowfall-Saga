@@ -17,6 +17,7 @@ sock = Sock(app)
 login_manager = LoginManager(app)
 users = {}
 
+
 def is_plain_char(char: str) -> bool:
     return re.match(r'[a-zA-Z\s,.!?\'":;]', char)
 
@@ -26,6 +27,7 @@ def load_user(username):
     if username not in users:
         users[username] = TypeRacer(username)
     return users[username]
+
 
 class TypeRacer(UserMixin):
     def __init__(self, username: str):
@@ -71,13 +73,22 @@ def echo(connection, game_id: str):
             time.sleep(1 / 20)
             current_user.latest_timestamp = time.perf_counter_ns()
             current_user.wpm = round(
-                ((current_user.correct // 5) / (current_user.latest_timestamp - current_user.first_timestamp))
+                (
+                    (current_user.correct // 5)
+                    / (current_user.latest_timestamp - current_user.first_timestamp)
+                )
                 * 60e9,
                 2,
             )
 
             updates = {
-                id: [users[id].wpm, users[id].correct, users[id].incorrect, len(users[id].text)] for id in type_race_room.type_racers
+                id: [
+                    users[id].wpm,
+                    users[id].correct,
+                    users[id].incorrect,
+                    len(users[id].text),
+                ]
+                for id in type_race_room.type_racers
             }
             connection.send(json.dumps({"type": "updates", "updates": updates}))
 
@@ -105,7 +116,10 @@ def input(connection, game_id: str):
 
             if "key" in data and current_user.score is None:
                 if data["key"] == "Backspace" and len(current_user.typed) > 0:
-                    if current_user.typed[-1] == current_user.text[len(current_user.typed) - 1]:
+                    if (
+                        current_user.typed[-1]
+                        == current_user.text[len(current_user.typed) - 1]
+                    ):
                         current_user.correct -= 1
                     else:
                         current_user.incorrect -= 1
@@ -113,7 +127,10 @@ def input(connection, game_id: str):
                 elif is_plain_char(data["key"]) and not data["key"] == "Backspace":
                     current_user.typed.append(data["key"])
 
-                    if current_user.typed[-1] == current_user.text[len(current_user.typed) - 1]:
+                    if (
+                        current_user.typed[-1]
+                        == current_user.text[len(current_user.typed) - 1]
+                    ):
                         current_user.correct += 1
                     else:
                         current_user.incorrect += 1
@@ -126,15 +143,34 @@ def input(connection, game_id: str):
 
                 connection.send(json.dumps({"type": "progress", "progress": progress}))
 
-            if len(current_user.typed) == len(current_user.text) and current_user.score is None:
-                current_user.score = current_user.wpm * current_user.correct / (current_user.correct + current_user.incorrect)
+            if (
+                len(current_user.typed) == len(current_user.text)
+                and current_user.score is None
+            ):
+                current_user.score = (
+                    current_user.wpm
+                    * current_user.correct
+                    / (current_user.correct + current_user.incorrect)
+                )
                 place = 1
                 players = type_race_room.type_racers
                 for id in players:
-                    if users[id].score is not None and users[id].score > current_user.score:
+                    if (
+                        users[id].score is not None
+                        and users[id].score > current_user.score
+                    ):
                         place += 1
 
-                connection.send(json.dumps({"type": "gameOver", "score": current_user.score, "place": place, "total": len(players)}))
+                connection.send(
+                    json.dumps(
+                        {
+                            "type": "gameOver",
+                            "score": current_user.score,
+                            "place": place,
+                            "total": len(players),
+                        }
+                    )
+                )
 
         except (KeyError, ConnectionError, ConnectionClosed):
             current_user.connected = False

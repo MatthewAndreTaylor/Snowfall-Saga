@@ -23,11 +23,13 @@ game_info = {"num_questions": 10, "timer": 10}
 
 login_manager = LoginManager(app)
 
+
 @login_manager.user_loader
 def load_user(username):
     if username not in users:
         users[username] = User(username)
     return users[username]
+
 
 class User(UserMixin):
     def __init__(self, username):
@@ -88,6 +90,7 @@ def handle_disconnect():
     user_queue.remove(request.sid)
     update_users()
     update_party_leader()
+
 
 @socketio.on("num_questions", namespace="/trivia")
 def update_num_questions(new_num):

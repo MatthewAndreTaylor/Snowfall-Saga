@@ -14,13 +14,16 @@ sock = Sock(app)
 
 login_manager = LoginManager(app)
 
+
 @login_manager.user_loader
 def load_user(username):
     return User(username)
 
+
 class User(UserMixin):
     def __init__(self, username):
         self.id = username
+
 
 class RoomManager:
     def __init__(self):
@@ -285,27 +288,28 @@ def handle_matchmaking(connection, game: str):
 
         except (KeyError, ConnectionError, ConnectionClosed):
             print("Lost matchmaking socket connection")
-            
+
             manager.clients.remove(connection)
             del manager.users[user]
-            
+
             if user in manager.hosts:
                 for room_name, room in manager.rooms.items():
                     if room.host == user:
                         del manager.rooms[room_name]
                         del manager.hosts[user]
-                
+
                 print("Deleted room")
-                
+
             break
 
 
 game_service_hosts = {
-  "blizzard_bounce": "127.0.0.1:8001",
-  "trivia": "127.0.0.1:8002",
-  "type_race": "127.0.0.1:8003",
-  "chess": "127.0.0.1.:8004",
+    "blizzard_bounce": "127.0.0.1:8001",
+    "trivia": "127.0.0.1:8002",
+    "type_race": "127.0.0.1:8003",
+    "chess": "127.0.0.1.:8004",
 }
+
 
 @app.route("/join/<string:game>/<string:game_id>", methods=["GET"])
 def trivia(game: str, game_id: str):
@@ -313,6 +317,7 @@ def trivia(game: str, game_id: str):
         return "Invalid game", 404
 
     return redirect(f"http://{game_service_hosts[game]}/{game_id}")
+
 
 @app.route("/matchmaking/<string:game>", methods=["GET"])
 def index(game: str):

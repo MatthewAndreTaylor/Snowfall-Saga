@@ -79,7 +79,8 @@ p {
   height: 30px;
 }
 
-.progress-bar-correct, .progress-bar-wrong {
+.progress-bar-correct,
+.progress-bar-wrong {
   height: 30px;
   display: inline-block;
 }

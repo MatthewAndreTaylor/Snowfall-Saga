@@ -53,7 +53,7 @@ class User(UserMixin, db.Model):
             dict: A dictionary containing user information.
         """
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
-    
+
     def get_id(self):
         return self.username
 

@@ -26,13 +26,22 @@ socket.addEventListener("message", (message) => {
         if (key in playerElements) {
           let el = playerElements[key];
           el.style.backgroundColor = key === username ? "#96b4e08c" : "";
-          el.querySelector(".progress-bar-correct").style.width = `${(updates[key][1] / updates[key][3]) * 90}%`;
-          el.querySelector(".progress-bar-wrong").style.width = `${(updates[key][2] / updates[key][3]) * 90}%`;
+          el.querySelector(".progress-bar-correct").style.width = `${
+            (updates[key][1] / updates[key][3]) * 90
+          }%`;
+          el.querySelector(".progress-bar-wrong").style.width = `${
+            (updates[key][2] / updates[key][3]) * 90
+          }%`;
           let reindeer = el.querySelector(".reindeer");
-          reindeer.style.left = `${((updates[key][1] + updates[key][2]) / updates[key][3]) * 90 + 2}%`;
-          reindeer.style.animationDuration = `${(40/(updates[key][0]+0.01)).toFixed(0)}s`;
-          el.querySelector("strong").textContent = `${key}: wpm: ${updates[key][0]}`;
-
+          reindeer.style.left = `${
+            ((updates[key][1] + updates[key][2]) / updates[key][3]) * 90 + 2
+          }%`;
+          reindeer.style.animationDuration = `${(
+            40 /
+            (updates[key][0] + 0.01)
+          ).toFixed(0)}s`;
+          el.querySelector("strong").textContent =
+            `${key}: wpm: ${updates[key][0]}`;
         } else {
           let el = document.createElement("div");
           el.classList.add("progress");
@@ -50,7 +59,7 @@ socket.addEventListener("message", (message) => {
           progress.appendChild(wrong);
           progress.appendChild(reindeer);
           el.appendChild(strong);
-          
+
           progressContainer.appendChild(el);
           playerElements[key] = el;
         }
@@ -91,9 +100,11 @@ inputSocket.addEventListener("message", (message) => {
           characters[i] = text[i];
         } else {
           if (progress.typed[i] === text[i]) {
-            characters[i] = `<span style="color: green; text-decoration: underline;">${text[i]}</span>`;
+            characters[i] =
+              `<span style="color: green; text-decoration: underline;">${text[i]}</span>`;
           } else {
-            characters[i] = `<span style="color: red; text-decoration: underline;">${text[i]}</span>`;
+            characters[i] =
+              `<span style="color: red; text-decoration: underline;">${text[i]}</span>`;
           }
         }
       }

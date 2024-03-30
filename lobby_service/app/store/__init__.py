@@ -24,6 +24,7 @@ users = {}
 # not for sale - add leading 1 to denote amount of costumes
 on_sale = 71  # 1 000 111 (leading purchasable default)
 
+
 # Renders the store page
 @store_view.route("/store")
 @login_required

@@ -79,7 +79,6 @@ def update_player_list():
 
 @sock.route("/chess/game/<game_id>")
 def run_game(connection, game_id):
-
     if len(players[game_id]) == 0:
         boards[game_id] = chess.Board()
         turns[game_id] = 0

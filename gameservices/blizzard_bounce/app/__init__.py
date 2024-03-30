@@ -1,7 +1,5 @@
-from collections import deque
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template
 from flask_sock import Sock
-from simple_websocket import ConnectionClosed
 from Box2D import (
     b2World,
     b2Vec2,
@@ -9,7 +7,6 @@ from Box2D import (
     b2FixtureDef,
     b2CircleShape,
     b2PolygonShape,
-    b2ContactListener,
 )
 import json
 import random
@@ -21,41 +18,6 @@ sock = Sock(app)
 rooms = {}
 
 WIDTH, HEIGHT = 800, 1000
-
-
-class GoalContactListener(b2ContactListener):
-    def __init__(self, top_goal, bottom_goal, balls, scores):
-        super(GoalContactListener, self).__init__()
-        self.top_goal = top_goal
-        self.bottom_goal = bottom_goal
-        self.balls = balls
-        self.scores = scores
-        self.bodies_to_remove = []
-
-    def BeginContact(self, contact):
-        fixtureA = contact.fixtureA
-        fixtureB = contact.fixtureB
-
-        # Check if one of the fixtures is a ball and the other is a goal
-        if fixtureA.body in [ball[0] for ball in self.balls] and fixtureB.body in [
-            self.top_goal,
-            self.bottom_goal,
-        ]:
-            self.bodies_to_remove.append(fixtureA.body)
-            self.scores[1 if fixtureB.body == self.bottom_goal else 0] += 1
-
-        elif fixtureB.body in [ball[0] for ball in self.balls] and fixtureA.body in [
-            self.top_goal,
-            self.bottom_goal,
-        ]:
-            self.bodies_to_remove.append(fixtureB.body)
-            self.scores[1 if fixtureA.body == self.bottom_goal else 0] += 1
-
-    def remove_bodies(self):
-        for body in self.bodies_to_remove:
-            # Instead of removing move the object very far away
-            body.position = (100, 100)
-        self.bodies_to_remove = []
 
 
 class BlizzardBounceGame:
@@ -102,8 +64,8 @@ class BlizzardBounceGame:
             body = self.world.CreateDynamicBody(
                 position=(x, y), linearDamping=0.1, angularDamping=0.4
             )
-            shape = body.CreateCircleFixture(radius=2, density=0.02, friction=0.3)
-            self.balls.append((body, shape))
+            body.CreateCircleFixture(radius=2, density=0.02, friction=0.3)
+            self.balls.append(body)
 
         self.world.CreateStaticBody(
             position=(0, HEIGHT / 10),
@@ -135,16 +97,21 @@ class BlizzardBounceGame:
 
         self.scores = [0, 0]
 
-        # Set up the contact listener
-        self.world.contactListener = GoalContactListener(
-            self.top_goal, self.bottom_goal, self.balls, self.scores
-        )
+    def update(self):
+        for contact in self.top_goal.contacts:
+            if contact.contact.touching and contact.other in self.balls:
+                self.scores[0] += 1
+                contact.other.position = (100, 100)
+
+        for contact in self.bottom_goal.contacts:
+            if contact.contact.touching and contact.other in self.balls:
+                self.scores[1] += 1
+                contact.other.position = (100, 100)
 
 
 class BlizzardBounceRoom:
     def __init__(self):
         self.game = BlizzardBounceGame()
-        self.last_frame_time = time.time()
         self.player0 = None
         self.player1 = None
 
@@ -162,14 +129,11 @@ def echo(connection, room_id: str):
         rooms[room_id] = BlizzardBounceRoom()
 
     while True:
-        rooms[room_id].game.world.Step(1 / 30, 5, 2)
-        rooms[room_id].game.world.contactListener.remove_bodies()
-        elapsed_time = time.time() - rooms[room_id].last_frame_time
-        time_to_sleep = max(0, 1.0/60 - elapsed_time)
-        time.sleep(time_to_sleep)
-        rooms[room_id].last_frame_time = time.time()
-
         try:
+            rooms[room_id].game.world.Step(1 / 30, 1, 1)
+            rooms[room_id].game.update()
+            time.sleep(1.0 / 60)
+
             # send the world data to the clients
             p0_body = rooms[room_id].game.p0_body
             position0 = p0_body.transform * p0_body.fixtures[0].shape.pos * 10
@@ -181,8 +145,8 @@ def echo(connection, room_id: str):
 
             balls_data = []
 
-            for i, (body, shape) in enumerate(rooms[room_id].game.balls):
-                position = body.transform * shape.shape.pos * 10
+            for i, body in enumerate(rooms[room_id].game.balls):
+                position = body.transform * body.fixtures[0].shape.pos * 10
                 balls_data.append(
                     {"x": int(position[0]), "y": int(position[1]), "id": i}
                 )
@@ -207,7 +171,7 @@ def echo(connection, room_id: str):
                 connection.send(json.dumps({"winner": 1}))
 
             connection.send(json.dumps(message))
-        except (ConnectionClosed, ConnectionError):
+        except Exception as e:
             print("Connection closed")
             break
 
@@ -245,6 +209,7 @@ def input(connection, room_id: str):
                 )
 
         except Exception as e:
+            print(e)
             if rooms[room_id].player0 == connection:
                 rooms[room_id].player0 = None
             elif rooms[room_id].player1 == connection:
