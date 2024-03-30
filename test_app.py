@@ -175,10 +175,11 @@ def test_type_connect(type_client):
 
 @pytest.fixture
 def chess_client():
-    with chess_app.test_client() as chess_client:
+    user = MockUser()
+    with chess_app.test_client(user=user) as chess_client:
         yield chess_client
 
 
 def test_chess_connect(chess_client):
-    response = chess_client.get("/chess")
+    response = chess_client.get("/1")
     assert response.status_code == 200

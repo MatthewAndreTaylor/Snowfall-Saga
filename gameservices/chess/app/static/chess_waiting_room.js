@@ -1,4 +1,4 @@
-const socket = new WebSocket(`ws://${location.host}/chess`);
+const socket = new WebSocket(`ws://${location.host}/chess/${gameId}`);
 
 socket.addEventListener("open", (event) => {
   socket.send(JSON.stringify({ type: "username", username: username }));

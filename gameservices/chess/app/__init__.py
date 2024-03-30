@@ -1,8 +1,7 @@
 import json
-import random
 from collections import defaultdict
-
 from flask import Flask, render_template, request
+from flask_login import LoginManager, current_user, UserMixin
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
 import chess
@@ -12,6 +11,7 @@ app.secret_key = "MYSECRET"
 app.config["SESSION_COOKIE_SECURE"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 sock = Sock(app)
+login_manager = LoginManager(app)
 
 players_waiting = {}
 
@@ -20,33 +20,36 @@ clients = set()
 usernames = defaultdict(dict)
 
 
-current_user = {"username": "JOE", "game_id": 0}
+@login_manager.user_loader
+def load_user(username):
+    return User(username)
+
+
+class User(UserMixin):
+    def __init__(self, username: str):
+        self.id = username
+
 
 boards = {}
 turns = {}
 
 
-@app.route("/chess", methods=["GET", "POST"])
-def enter_chess():
-    if request.method == "POST":
-        print("Got HERE")
-        current_user["username"] = request.json["username"]
-    else:
-        current_user["username"] = "JOE" + str(random.randint(1, 10000))
+@app.route("/<string:game_id>", methods=["GET"])
+def enter_chess(game_id: str):
     return render_template(
         "chess_waiting_room.html",
-        username=current_user["username"],
-        gameId=current_user["game_id"],
+        username=current_user.id,
+        gameId=game_id,
     )
 
 
 @app.route("/chess/game/<string:game_id>", methods=["GET"])
-def send_to_game(game_id):
-    return render_template("chess_game.html")
+def send_to_game(game_id: str):
+    return render_template("chess_game.html", game_id=game_id)
 
 
 @sock.route("/chess/<string:game_id>")
-def waiting_room(connection):
+def waiting_room(connection, game_id: str):
     print("Got a connection")
     clients.add(connection)
 
@@ -78,7 +81,7 @@ def update_player_list():
 
 
 @sock.route("/chess/game/<game_id>")
-def run_game(connection, game_id):
+def run_game(connection, game_id: str):
     if len(players[game_id]) == 0:
         boards[game_id] = chess.Board()
         turns[game_id] = 0
