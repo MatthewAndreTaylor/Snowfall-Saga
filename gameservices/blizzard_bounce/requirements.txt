@@ -12,4 +12,3 @@ SQLAlchemy==1.4.46
 swig==4.2.0
 urllib3==1.26.15
 Werkzeug==2.2.2
-WTForms==3.0.1

@@ -20,6 +20,7 @@ login_manager = LoginManager(app)
 
 users_s = {}
 
+
 @login_manager.user_loader
 def load_user(username):
     if username not in users_s:
@@ -31,6 +32,7 @@ class User(UserMixin):
     def __init__(self, username):
         self.id = username
 
+
 users = {}
 user_queue = []
 game_info = {"num_questions": 10, "timer": 10, "game_id": "1234"}
@@ -39,9 +41,7 @@ game_info = {"num_questions": 10, "timer": 10, "game_id": "1234"}
 @app.route("/<string:gameid>", methods=["GET"])
 def index(gameid: str):
     game_info["game_id"] = gameid
-    return render_template(
-        "trivia_waiting_room.html", username=current_user.id
-    )
+    return render_template("trivia_waiting_room.html", username=current_user.id)
 
 
 @socketio.on("connect", namespace="/trivia")

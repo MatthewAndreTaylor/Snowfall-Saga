@@ -1,8 +1,21 @@
-let gameId = sessionStorage.getItem("gameId");
+const gameId = sessionStorage.getItem("gameId");
 
 if (gameId === null) {
-  document.getElementById("status").innerText =
-    "Could not find a game to connect to.";
+  document.getElementById("status").innerText = "Could not connect to the game";
+}
+
+const pieces = {
+  p: "pawn",
+  r: "rook",
+  n: "knight",
+  b: "bishop",
+  q: "queen",
+  k: "king",
+};
+
+function getPieceName(piece) {
+  const color = piece === piece.toUpperCase() ? "white" : "black";
+  return color + " " + pieces[piece.toLowerCase()];
 }
 
 const socket = new WebSocket(`ws://${location.host}/chess/game/${gameId}`);
@@ -86,7 +99,7 @@ function displayChessBoard(chessBoardString) {
         const pieceFilename =
           piece === piece.toUpperCase() ? `${piece}w.png` : `${piece}b.png`;
         pieceImg.src = `../../static/${pieceFilename}`;
-        pieceImg.alt = piece;
+        pieceImg.alt = getPieceName(piece);
       }
 
       squareElement.appendChild(pieceImg);
@@ -107,8 +120,7 @@ function startTimer(seconds, container, oncomplete) {
   obj = {};
   obj.resume = function () {
     startTime = new Date().getTime();
-    timer = setInterval(obj.step, 250); // adjust this number to affect granularity
-    // lower numbers are more accurate, but more CPU-expensive
+    timer = setInterval(obj.step, 250);
   };
   obj.pause = function () {
     ms = obj.step();

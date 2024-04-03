@@ -39,7 +39,6 @@ function displayUsersList(userList) {
       usersList.appendChild(node);
     }
 
-    // Set display property to 'block' for the <ul> element
     usersList.style.display = "block";
   } else {
     console.log("User list is undefined or empty.");

@@ -1,6 +1,7 @@
 from lobby_service.app import create_app
 from gameservices.trivia.app import app as trivia_app
 from gameservices.type_race.app import app as type_race_app
+from gameservices.type_race.app import input
 from gameservices.chess.app import app as chess_app
 from lobby_service.app.messages import send_message
 from lobby_service.app.store import process_purchase
@@ -66,9 +67,9 @@ def test_login(client):
     assert response.status_code == 200
 
 
-class MockClient:
+class MockMessageClient:
     """
-    Mock client class for testing message sending and receiving
+    Mock Message client class for testing message sending and receiving messages.
     """
 
     def __init__(self):
@@ -101,7 +102,7 @@ class MockClient:
 
 
 def test_message_websocket():
-    message_client = MockClient()
+    message_client = MockMessageClient()
     send_message(message_client, curr_user=None)
 
 
@@ -144,6 +145,7 @@ def test_store_websocket(client):
 class MockUser(UserMixin):
     def __init__(self, id=1):
         self.id = id
+        self.username = "TestUser"
 
 
 @pytest.fixture
