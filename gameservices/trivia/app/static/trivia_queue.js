@@ -78,9 +78,10 @@ function displayTimer(timerValue) {
 }
 
 document.getElementById("startButton").addEventListener("click", () => {
-  socket.emit("start_game", game_id);
+  socket.emit("start_game");
 });
 
 socket.on("switch_page", (data) => {
-  window.location.href = data.url + "/" + data.game_id;
+  sessionStorage.setItem("username", username);
+  window.location.href = data.url;
 });

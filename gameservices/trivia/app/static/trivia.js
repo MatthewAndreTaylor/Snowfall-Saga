@@ -1,4 +1,6 @@
-const socket = io.connect(`ws://${location.host}/trivia/game/${id}`);
+const socket = io.connect(
+  `ws://${location.host}/trivia/game/${id}`,
+);
 let username;
 
 socket.on("connect", () => {
