@@ -1,4 +1,5 @@
 import json
+import threading
 from collections import defaultdict
 from flask import Flask, render_template, request
 from flask_login import LoginManager, current_user, UserMixin
@@ -14,6 +15,7 @@ sock = Sock(app)
 login_manager = LoginManager(app)
 
 players_waiting = {}
+resource_lock = threading.Lock()
 
 players = defaultdict(list)
 clients = set()
@@ -59,25 +61,28 @@ def waiting_room(connection, game_id: str):
             data = json.loads(event)
 
             if data["type"] == "username":
-                players_waiting[connection] = data["username"]
-                update_player_list()
+                with resource_lock:
+                    players_waiting[connection] = data["username"]
+                    update_player_list()
 
             elif data["type"] == "startGame":
                 for client in clients:
                     client.send(json.dumps({"type": "switchPage", "url": "chess/game"}))
 
         except (KeyError, ConnectionError, ConnectionClosed):
-            clients.remove(connection)
-            players_waiting.pop(connection)
-            update_player_list()
+            with resource_lock:
+                clients.remove(connection)
+                players_waiting.pop(connection)
+                update_player_list()
             break
 
 
 def update_player_list():
-    for client in players_waiting:
-        client.send(
-            json.dumps({"type": "playerList", "data": list(players_waiting.values())})
-        )
+    with resource_lock:
+        for client in players_waiting:
+            client.send(
+                json.dumps({"type": "playerList", "data": list(players_waiting.values())})
+            )
 
 
 @sock.route("/chess/game/<game_id>")
