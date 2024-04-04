@@ -81,7 +81,9 @@ def update_player_list():
     with resource_lock:
         for client in players_waiting:
             client.send(
-                json.dumps({"type": "playerList", "data": list(players_waiting.values())})
+                json.dumps(
+                    {"type": "playerList", "data": list(players_waiting.values())}
+                )
             )
 
 
