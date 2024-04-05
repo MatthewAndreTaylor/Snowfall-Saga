@@ -14,9 +14,6 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 sock = Sock(app)
 login_manager = LoginManager(app)
 
-players_waiting = {}
-resource_lock = threading.Lock()
-
 players = defaultdict(list)
 clients = set()
 usernames = defaultdict(dict)
@@ -60,31 +57,23 @@ def waiting_room(connection, game_id: str):
             event = connection.receive()
             data = json.loads(event)
 
-            if data["type"] == "username":
-                with resource_lock:
-                    players_waiting[connection] = data["username"]
-                    update_player_list()
+            update_player_list(clients)
 
-            elif data["type"] == "startGame":
+            if data["type"] == "startGame":
                 for client in clients:
                     client.send(json.dumps({"type": "switchPage", "url": "chess/game"}))
 
         except (KeyError, ConnectionError, ConnectionClosed):
-            with resource_lock:
-                clients.remove(connection)
-                players_waiting.pop(connection)
-                update_player_list()
+            clients.remove(connection)
+            update_player_list(clients)
             break
 
 
-def update_player_list():
-    with resource_lock:
-        for client in players_waiting:
-            client.send(
-                json.dumps(
-                    {"type": "playerList", "data": list(players_waiting.values())}
-                )
-            )
+def update_player_list(players_waiting):
+    for client in players_waiting:
+        client.send(
+            json.dumps({"type": "playerList", "data": list(players_waiting.values())})
+        )
 
 
 @sock.route("/chess/game/<game_id>")
