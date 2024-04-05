@@ -7,7 +7,7 @@ function createSnowflake() {
   document.getElementById("snowflakes").appendChild(snowflake);
 }
 
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 20; i++) {
   createSnowflake();
 }
 

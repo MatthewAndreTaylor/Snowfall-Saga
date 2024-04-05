@@ -54,6 +54,9 @@ class User(UserMixin, db.Model):
         """
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
 
+    def get_id(self):
+        return self.username
+
 
 class Friendship(db.Model):
     """Class representing a friendship between two users.

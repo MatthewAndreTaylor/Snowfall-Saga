@@ -17,8 +17,8 @@ login_view = Blueprint(
 
 
 @login_manager.user_loader
-def load_user(user_id: int):
-    return User.query.filter_by(id=int(user_id)).first()
+def load_user(username: str):
+    return User.query.filter_by(username=username).first()
 
 
 @login_view.route("/login", methods=["GET", "POST"])
@@ -32,6 +32,7 @@ def login():
         return redirect("/login")
 
     user = User.query.filter_by(username=username).first()
+
     # Hash the users password
     password = User.hash_password(password)
     if user and user.verify_password(password):

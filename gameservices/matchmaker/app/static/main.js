@@ -3,7 +3,7 @@ const socket = new WebSocket(`ws://${location.host}/room_events/${game}`);
 const roomContainer = document.querySelector(".room-container");
 const createRoomButton = document.querySelector("#create-room");
 
-socket.addEventListener("open", (event) => {
+socket.addEventListener("open", () => {
   socket.send(JSON.stringify({ type: "load", user: username }));
 });
 
@@ -62,7 +62,10 @@ socket.addEventListener("message", (event) => {
       break;
 
     case "start":
-      window.location.href = "http://127.0.0.1:9999/trivia";
+      console.log("Here");
+      window.location.replace(
+        `http://${location.host}/join/${game}/${data.room}`,
+      );
       break;
   }
 });

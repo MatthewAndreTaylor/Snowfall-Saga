@@ -1,104 +1,84 @@
 import json
-import random
+import threading
 from collections import defaultdict
-
-from flask import Flask, Blueprint, render_template, request
+from flask import Flask, render_template, request
+from flask_login import LoginManager, current_user, UserMixin
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
-
 import chess
 
-chess_game = Blueprint(
-    "chess_game",
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-    static_url_path="/assets/chess",
-)
+app = Flask(__name__)
+app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+sock = Sock(app)
+login_manager = LoginManager(app)
 
-sock = Sock(chess_game)
-
-players_waiting = {}
+players_waiting = defaultdict(list)
 
 players = defaultdict(list)
 clients = set()
 usernames = defaultdict(dict)
 
 
-current_user = {"username": "JOE", "game_id": 0}
+@login_manager.user_loader
+def load_user(username):
+    return User(username)
+
+
+class User(UserMixin):
+    def __init__(self, username: str):
+        self.id = username
+
 
 boards = {}
 turns = {}
 
 
-def create_chess_app():
-    app = Flask(__name__)
-    app.secret_key = "MYSECRET"
-    app.config["SESSION_COOKIE_SECURE"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-
-    with app.app_context():
-        app.register_blueprint(chess_game)
-
-    return app
-
-
-@chess_game.route("/chess", methods=["GET", "POST"])
-def enter_chess():
-    if request.method == "POST":
-        print("Got HERE")
-        current_user["username"] = request.json["username"]
-    else:
-        current_user["username"] = "JOE" + str(random.randint(1, 10000))
+@app.route("/<string:game_id>", methods=["GET"])
+def enter_chess(game_id: str):
     return render_template(
         "chess_waiting_room.html",
-        username=current_user["username"],
-        gameId=current_user["game_id"],
+        username=current_user.id,
+        gameId=game_id,
     )
 
 
-@chess_game.route("/chess/game/<game_id>", methods=["GET"])
-def send_to_game(game_id):
-    return render_template("chess_game.html")
+@app.route("/chess/game/<string:game_id>", methods=["GET"])
+def send_to_game(game_id: str):
+    return render_template("chess_game.html", game_id=game_id)
 
 
-@sock.route("/chess")
-def waiting_room(connection):
+@sock.route("/chess/<string:game_id>")
+def waiting_room(connection, game_id: str):
     print("Got a connection")
     clients.add(connection)
-    if len(clients) % 2 == 0:
-        current_user["game_id"] += 1
+    players_waiting[game_id].append(current_user.id)
 
     while True:
         try:
             event = connection.receive()
             data = json.loads(event)
 
-            if data["type"] == "username":
-                players_waiting[connection] = data["username"]
-                update_player_list()
+            update_player_list(clients, players_waiting[game_id])
 
-            elif data["type"] == "startGame":
+            if data["type"] == "startGame":
                 for client in clients:
                     client.send(json.dumps({"type": "switchPage", "url": "chess/game"}))
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
-            players_waiting.pop(connection)
-            update_player_list()
+            update_player_list(clients, [])
             break
 
 
-def update_player_list():
-    for client in players_waiting:
-        client.send(
-            json.dumps({"type": "playerList", "data": list(players_waiting.values())})
-        )
+def update_player_list(clients, players_waiting):
+    for client in clients:
+        client.send(json.dumps({"type": "playerList", "data": players_waiting}))
 
 
 @sock.route("/chess/game/<game_id>")
-def run_game(connection, game_id):
-
+def run_game(connection, game_id: str):
     if len(players[game_id]) == 0:
         boards[game_id] = chess.Board()
         turns[game_id] = 0

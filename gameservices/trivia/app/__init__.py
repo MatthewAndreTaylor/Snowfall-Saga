@@ -1,15 +1,14 @@
 import os
 from flask import Flask, render_template, request, session
+from flask_login import LoginManager, UserMixin, current_user
 from flask_socketio import SocketIO
 from .trivia_game_server import trivia_game
 from .questions import TriviaDB
 
-app = Flask(
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-)
-app.config["SECRET KEY"] = "SECRET"
+app = Flask(__name__)
+app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 socketio = SocketIO(app)
 
 csv_file_path = os.path.join(
@@ -17,23 +16,32 @@ csv_file_path = os.path.join(
 )
 db = TriviaDB(csv_file_path)
 
+login_manager = LoginManager(app)
+
+users_s = {}
+
+
+@login_manager.user_loader
+def load_user(username):
+    if username not in users_s:
+        users_s[username] = User(username)
+    return users_s[username]
+
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
+
+
 users = {}
 user_queue = []
-game_info = {"num_questions": 10, "timer": 10, "game_id": 0}
-
-current_user = {"username": "JOE"}
+game_info = {"num_questions": 10, "timer": 10, "game_id": "1234"}
 
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        print("Got HERE")
-        current_user["username"] = request.json["username"]
-
-    print("got a connection")
-    return render_template(
-        "trivia_waiting_room.html", username=current_user["username"]
-    )
+@app.route("/<string:gameid>", methods=["GET"])
+def index(gameid: str):
+    game_info["game_id"] = gameid
+    return render_template("trivia_waiting_room.html", username=current_user.id)
 
 
 @socketio.on("connect", namespace="/trivia")
@@ -49,7 +57,6 @@ def render_game():
 @socketio.on("start_game", namespace="/trivia")
 def start_game():
     print("Starting the game")
-    game_info["game_id"] += 1
     socketio.start_background_task(
         trivia_game(socketio, users.copy(), game_info.copy(), db)
     )

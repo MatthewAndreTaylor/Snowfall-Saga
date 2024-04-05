@@ -1,4 +1,4 @@
-const socket = new WebSocket(`ws://${document.domain}:${location.port}/chess`);
+const socket = new WebSocket(`ws://${location.host}/chess/${gameId}`);
 
 socket.addEventListener("open", (event) => {
   socket.send(JSON.stringify({ type: "username", username: username }));
@@ -39,7 +39,6 @@ function displayUsersList(userList) {
       usersList.appendChild(node);
     }
 
-    // Set display property to 'block' for the <ul> element
     usersList.style.display = "block";
   } else {
     console.log("User list is undefined or empty.");

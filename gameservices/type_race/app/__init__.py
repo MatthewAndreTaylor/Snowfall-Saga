@@ -1,188 +1,179 @@
 import json
-import random
+import re
 from collections import defaultdict
-
-from flask import Flask, Blueprint, render_template, request
+import time
+from flask import Flask, render_template
 from flask_sock import Sock
 from simple_websocket import ConnectionClosed
-from .user import User
-from .text import get_text
+from flask_login import LoginManager, UserMixin, current_user
+from .text import sample_paragraph
 
-type_race_game = Blueprint(
-    "type_race_game",
-    __name__,
-    template_folder="templates",
-    static_folder="static",
-    static_url_path="/assets/type_race",
-)
+app = Flask(__name__)
+app.secret_key = "MYSECRET"
+app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+sock = Sock(app)
 
-sock = Sock(type_race_game)
-
-players_waiting = {}
-clients = set()
-
-text = {}
-
-current_user = {"username": "JOE", "game_id": 0}
-
-players = defaultdict(dict)
-players_won = defaultdict(list)
-players_lost = defaultdict(list)
+login_manager = LoginManager(app)
+users = {}
 
 
-def create_type_race_app():
-    app = Flask(__name__)
-    app.secret_key = "MYSECRET"
-    app.config["SESSION_COOKIE_SECURE"] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-
-    with app.app_context():
-        app.register_blueprint(type_race_game)
-
-    return app
+def is_plain_char(char: str) -> bool:
+    return re.match(r'[a-zA-Z\s,.!?\'":;]', char)
 
 
-@type_race_game.route("/type_race", methods=["GET", "POST"])
-def type_race():
-    if request.method == "POST":
-        print("Got HERE")
-        current_user["username"] = request.json["username"]
-    else:
-        current_user["username"] = "JOE" + str(random.randint(1, 10000))
+@login_manager.user_loader
+def load_user(username):
+    if username not in users:
+        users[username] = TypeRacer(username)
+    return users[username]
+
+
+class TypeRacer(UserMixin):
+    def __init__(self, username: str):
+        self.id = username
+        self.text = sample_paragraph()
+        self.typed = []
+        self.correct = 0
+        self.incorrect = 0
+        self.wpm = 0
+        self.first_timestamp = time.perf_counter_ns()
+        self.latest_timestamp = self.first_timestamp
+        self.score = None
+        self.connected = False
+
+
+class TypeRaceRoom:
+    def __init__(self):
+        self.type_racers = set()
+
+
+rooms = defaultdict(TypeRaceRoom)
+
+
+@app.route("/<string:game_id>", methods=["GET"])
+def type_race(game_id: str):
+    type_race_room = rooms[game_id]
+    type_race_room.type_racers.add(current_user.id)
+
     return render_template(
-        "type_race_waiting_room.html",
-        username=current_user["username"],
-        gameId=current_user["game_id"],
+        "type_race_game.html",
+        username=current_user.id,
+        game_id=game_id,
+        text=current_user.text,
     )
 
 
-@type_race_game.route("/type_race/game/<game_id>", methods=["GET"])
-def send_to_game(game_id):
-    return render_template("type_race_game.html", text=text[int(game_id)][0])
-
-
-@sock.route("/type_race")
-def waiting_room(connection):
-    print("Got a connection")
-    clients.add(connection)
+@sock.route("/type_race/echo/<game_id>")
+def echo(connection, game_id: str):
+    type_race_room = rooms[game_id]
 
     while True:
         try:
-            event = connection.receive()
-            data = json.loads(event)
-
-            if data["type"] == "username":
-                players_waiting[connection] = data["username"]
-                update_player_list()
-
-            elif data["type"] == "startGame":
-                text[current_user["game_id"]] = get_text(3)
-                current_user["game_id"] += 1
-                for client in clients:
-                    client.send(
-                        json.dumps({"type": "switchPage", "url": "type_race/game"})
-                    )
-
-        except (KeyError, ConnectionError, ConnectionClosed):
-            clients.remove(connection)
-            players_waiting.pop(connection)
-            update_player_list()
-            break
-
-
-def update_player_list():
-    for client in players_waiting:
-        client.send(
-            json.dumps({"type": "playerList", "data": list(players_waiting.values())})
-        )
-
-
-@sock.route("/type_race/game/<game_id>")
-def run_game(connection, game_id):
-    game_id = int(game_id)
-    print("got a connection")
-    if connection in clients:
-        return
-
-    clients.add(connection)
-    players_here = players[game_id]
-
-    while True:
-        try:
-            event = connection.receive()
-            data = json.loads(event)
-
-            if data["type"] == "playerUpdate":
-                print("Received player update from", players_here[connection].username)
-                words_typed = (data["correct"] - players_here[connection].correct) / 5
-
-                if data["correct"] > 0:
-                    players_here[connection].wpm_queue.append(words_typed * 120)
-                    players_here[connection].wpm = round(
-                        sum(players_here[connection].wpm_queue)
-                        / len(players_here[connection].wpm_queue)
-                    )
-
-                players_here[connection].correct = data["correct"]
-                print("correct:", data["correct"], "wpm", players_here[connection].wpm)
-                update = {
-                    p.username: (p.correct // 2, p.wpm, p.standings)
-                    for p in players_here.values()
-                }
-                update["type"] = "playerUpdate"
-                connection.send(json.dumps(update))
-
-            elif data["type"] == "username":
-                players_here[connection] = User(data["username"])
-
-            elif data["type"] == "done":
-                print(
-                    "Player", players_here[connection].username, "finished a paragraph"
+            time.sleep(1 / 20)
+            current_user.latest_timestamp = time.perf_counter_ns()
+            current_user.wpm = round(
+                (
+                    (current_user.correct // 5)
+                    / (current_user.latest_timestamp - current_user.first_timestamp)
                 )
-                players_here[connection].text_pos += 1
-                if players_here[connection].text_pos < 3:
-                    update = {
-                        "type": "newText",
-                        "text": text[game_id][players_here[connection].text_pos],
-                    }
-                    connection.send(json.dumps(update))
-                else:
-                    # The player is done, calculate standings.
-                    players_lost[game_id].append(connection)
-                    players_here[connection].done = True
-                    update_standings(game_id)
+                * 60e9,
+                2,
+            )
 
-            elif data["type"] == "win":
-                print(players_here[connection].username, "won!")
-                players_won[game_id].append(connection)
-                players_here[connection].done = True
-                update_standings(game_id)
+            updates = {
+                id: [
+                    users[id].wpm,
+                    users[id].correct,
+                    users[id].incorrect,
+                    len(users[id].text),
+                ]
+                for id in type_race_room.type_racers
+            }
+            connection.send(json.dumps({"type": "updates", "updates": updates}))
 
         except (KeyError, ConnectionError, ConnectionClosed):
-            clients.remove(connection)
-            players_here.pop(connection)
-
-            if connection in players_won[game_id]:
-                players_won[game_id].remove(connection)
-            if connection in players_lost[game_id]:
-                players_lost[game_id].remove(connection)
-
             break
 
 
-def update_standings(game_id):
-    standings = players_won[game_id] + players_lost[game_id]
-    print(standings)
-    players_here = players[game_id]
-    players_here[standings[0]].standings = "1st"
-    if len(standings) > 1:
-        players_here[standings[1]].standings = "2nd"
-    if len(standings) > 2:
-        players_here[standings[2]].standings = "3rd"
-    i = 4
-    while i <= len(standings):
-        players_here[standings[i - 1]].standings = str(i) + "th"
+@sock.route("/type_race/input/<game_id>")
+def input(connection, game_id: str):
+    type_race_room = rooms[game_id]
+    current_user.connected = True
 
-    if len(standings) == len(players_here):
-        for client in players_here:
-            client.send(json.dumps({"type": "gameOver"}))
+    progress = {
+        "typed": current_user.typed,
+        "correct": current_user.correct,
+        "incorrect": current_user.incorrect,
+    }
+
+    connection.send(json.dumps({"type": "progress", "progress": progress}))
+
+    while True:
+        try:
+            event = connection.receive()
+            data = json.loads(event)
+
+            if "key" in data and current_user.score is None:
+                if data["key"] == "Backspace" and len(current_user.typed) > 0:
+                    if (
+                        current_user.typed[-1]
+                        == current_user.text[len(current_user.typed) - 1]
+                    ):
+                        current_user.correct -= 1
+                    else:
+                        current_user.incorrect -= 1
+                    current_user.typed.pop()
+                elif is_plain_char(data["key"]) and not data["key"] == "Backspace":
+                    current_user.typed.append(data["key"])
+
+                    if (
+                        current_user.typed[-1]
+                        == current_user.text[len(current_user.typed) - 1]
+                    ):
+                        current_user.correct += 1
+                    else:
+                        current_user.incorrect += 1
+
+                progress = {
+                    "typed": current_user.typed,
+                    "correct": current_user.correct,
+                    "incorrect": current_user.incorrect,
+                }
+
+                connection.send(json.dumps({"type": "progress", "progress": progress}))
+
+            if (
+                len(current_user.typed) == len(current_user.text)
+                and current_user.score is None
+            ):
+                current_user.score = (
+                    current_user.wpm
+                    * current_user.correct
+                    / (current_user.correct + current_user.incorrect)
+                )
+                place = 1
+                players = type_race_room.type_racers
+                for id in players:
+                    if (
+                        users[id].score is not None
+                        and users[id].score > current_user.score
+                    ):
+                        place += 1
+
+                connection.send(
+                    json.dumps(
+                        {
+                            "type": "gameOver",
+                            "score": current_user.score,
+                            "place": place,
+                            "total": len(players),
+                        }
+                    )
+                )
+
+        except (KeyError, ConnectionError, ConnectionClosed):
+            current_user.connected = False
+            if all(not users[id].connected for id in type_race_room.type_racers):
+                del rooms[game_id]
+            break

@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Snowfall-Saga-Team" />
+    <meta name="description" content="Snowfall-Saga trivia" />
     <title>Trivia Game</title>
     <link
       rel="stylesheet"
@@ -30,7 +32,7 @@
     <div id="snowflakes"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
     <script>
-      const id = `{{ game_id }}` || "0";
+      const id = `{{ game_id }}`;
       console.log(id);
     </script>
     <script src="{{ url_for('static', filename='trivia.js') }}"></script>

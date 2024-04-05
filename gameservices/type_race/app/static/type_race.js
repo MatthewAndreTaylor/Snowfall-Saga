@@ -1,207 +1,128 @@
-let gameId = sessionStorage.getItem("gameId");
-
-const socket = new WebSocket(
-  `ws://${document.domain}:${location.port}/type_race/game/${gameId}`,
-);
-
 let textElement = document.getElementById("text");
-
-let text = textElement.innerHTML;
-
-const accuracyElement = document.getElementById("accuracy");
-
-let progressList = document.getElementById("progress-list");
-
-let i = 0;
-
+const text = textElement.innerHTML;
 let characters = text.split("");
+const accuracyElement = document.getElementById("accuracy");
+const progressContainer = document.getElementById("progress-container");
 
-let inputtedString = "";
+const socket = new WebSocket(`ws://${location.host}/type_race/echo/${gameId}`);
+const playerElements = {};
 
-let totalCount = 0;
-
-let correct = 0;
-
-let incorrect = 0;
-
-let accuracy = 0;
-
-let countdownValue = 3;
-
-let done = false;
-
-slideText();
-
-socket.addEventListener("open", (event) => {
-  socket.send(
-    JSON.stringify({
-      type: "username",
-      username: sessionStorage.getItem("username"),
-    }),
-  );
+socket.addEventListener("open", () => {
+  console.log("Connected to server");
 });
 
-function handleKey(e) {
-  e.preventDefault();
-  document.getElementById("countdown").innerText = "";
-
-  console.log(e.key);
-
-  if (inputtedString.length >= text.length) {
-    return;
-  }
-  if (/^[a-zA-Z\s,.!?'":;]$/.test(e.key)) {
-    inputtedString = inputtedString + e.key;
-    console.log(inputtedString);
-    console.log(text);
-    if (inputtedString[i] == text[i]) {
-      characters[i] =
-        '<span style="color: #7fffd4;">' + characters[i] + "</span>";
-      if (i == totalCount) {
-        if (!done) {
-          correct = correct + 1;
-        }
-        totalCount = totalCount + 1;
-      }
-    } else {
-      characters[i] = '<span style="color: red;">' + characters[i] + "</span>";
-      if (i == totalCount) {
-        if (!done) {
-          incorrect = incorrect + 1;
-        }
-        totalCount = totalCount + 1;
-      }
-    }
-    updateAccuracy();
-    slideText();
-    i = i + 1;
-  } else if (e.key == "Backspace" && i > 0) {
-    i = i - 1;
-    characters[i] = characters[i].split(">")[1][0];
-    slideText();
-    inputtedString = inputtedString.slice(0, -1);
-  } else {
-    console.log("Invalid key");
-  }
-
-  if (correct >= 200 && !done) {
-    socket.send(JSON.stringify({ type: "win" }));
-    done = true;
-  }
-
-  if (inputtedString.length >= text.length) {
-    socket.send(JSON.stringify({ type: "done" }));
-  }
-}
+socket.addEventListener("close", () => {
+  console.log("Disconnected from server");
+});
 
 socket.addEventListener("message", (message) => {
   const data = JSON.parse(message.data);
 
   switch (data.type) {
-    case "playerUpdate":
-      progressList.innerHTML = "";
+    case "updates":
+      const updates = data.updates || {};
 
-      for (let username in data) {
-        if (data.hasOwnProperty(username) && username != "type") {
-          let numbers = data[username];
-          let n0 = numbers[0];
-          let n1 = numbers[1];
-          let n2 = numbers[2];
+      Object.keys(updates).forEach((key) => {
+        if (key in playerElements) {
+          let el = playerElements[key];
+          el.style.backgroundColor = key === username ? "#96b4e08c" : "";
+          el.querySelector(".progress-bar-correct").style.width = `${
+            (updates[key][1] / updates[key][3]) * 90
+          }%`;
+          el.querySelector(".progress-bar-wrong").style.width = `${
+            (updates[key][2] / updates[key][3]) * 90
+          }%`;
+          let reindeer = el.querySelector(".reindeer");
+          reindeer.style.left = `${
+            ((updates[key][1] + updates[key][2]) / updates[key][3]) * 90 + 2
+          }%`;
+          reindeer.style.animationDuration = `${(
+            40 /
+            (updates[key][0] + 0.01)
+          ).toFixed(0)}s`;
+          el.querySelector("strong").textContent =
+            `${key}: wpm: ${updates[key][0]}`;
+        } else {
+          let el = document.createElement("div");
+          el.classList.add("progress");
+          let progress = document.createElement("div");
+          progress.classList.add("progress-bar");
+          let corr = document.createElement("div");
+          corr.classList.add("progress-bar-correct");
+          let wrong = document.createElement("div");
+          wrong.classList.add("progress-bar-wrong");
+          let reindeer = document.createElement("div");
+          reindeer.classList.add("reindeer");
+          let strong = document.createElement("strong");
+          el.appendChild(progress);
+          progress.appendChild(corr);
+          progress.appendChild(wrong);
+          progress.appendChild(reindeer);
+          el.appendChild(strong);
 
-          let listItem = document.createElement("li");
-
-          listItem.textContent = `${username}     wpm: ${n1} ${n2}`;
-
-          progressList.appendChild(listItem);
-
-          appendProgressBar(n0);
+          progressContainer.appendChild(el);
+          playerElements[key] = el;
         }
-      }
-      break;
-
-    case "newText":
-      text = data["text"];
-      i = 0;
-      characters = text.split("");
-      inputtedString = "";
-      totalCount = 0;
-
-      slideText();
-      break;
-
-    case "gameOver":
-      let gameOver = document.getElementById("game-over");
-      gameOver.innerHTML = "The game is over!";
+      });
       break;
   }
 });
 
-function updateAccuracy() {
-  accuracy = correct / (correct + incorrect);
-  accuracyElement.textContent = `Accuracy: ${accuracy.toFixed(2) * 100}%`;
+function updateAccuracy(correct, incorrect) {
+  const accuracy =
+    correct + incorrect > 0 ? (correct / (correct + incorrect)) * 100 : 0;
+  accuracyElement.textContent = `Accuracy: ${accuracy.toFixed(2)}%`;
 }
 
-function updateServer() {
-  socket.send(
-    JSON.stringify({
-      type: "playerUpdate",
-      correct: correct,
-      incorrect: incorrect,
-    }),
-  );
-}
+const inputSocket = new WebSocket(
+  `ws://${location.host}/type_race/input/${gameId}`,
+);
 
-function updateCountdown() {
-  document.getElementById("countdown").innerText = countdownValue;
-  countdownValue--;
-
-  if (countdownValue < 0) {
-    clearInterval(timer);
-    document.getElementById("countdown").innerText = "Go!!!";
-    window.addEventListener("keydown", handleKey);
-    setInterval(updateServer, 500);
+window.addEventListener("keydown", (event) => {
+  event.preventDefault();
+  if (/^[a-zA-Z\s,.!?'":;]$/.test(event.key) || event.key == "Backspace") {
+    inputSocket.send(JSON.stringify({ key: event.key }));
+  } else {
+    console.log("Invalid key");
   }
-}
+});
 
-function slideText() {
+inputSocket.addEventListener("message", (message) => {
+  const data = JSON.parse(message.data);
+
+  switch (data.type) {
+    case "progress":
+      const progress = data.progress || {};
+      let index = progress.typed.length - 1;
+
+      for (let i = 0; i < text.length; i++) {
+        if (i > index) {
+          characters[i] = text[i];
+        } else {
+          if (progress.typed[i] === text[i]) {
+            characters[i] =
+              `<span style="color: green; text-decoration: underline;">${text[i]}</span>`;
+          } else {
+            characters[i] =
+              `<span style="color: red; text-decoration: underline;">${text[i]}</span>`;
+          }
+        }
+      }
+      updateAccuracy(progress.correct, progress.incorrect);
+      slideText(index);
+      break;
+
+    case "gameOver":
+      let gameOver = document.getElementById("game-over");
+      gameOver.innerHTML = `The game is over! You placed in position <b>${data.place}</b> out of ${data.total} players. WPM: ${data.score}`;
+      break;
+  }
+});
+
+function slideText(index) {
   let slice = characters.slice(
-    Math.max(0, i - 5),
-    Math.min(characters.length, i + 105),
+    Math.max(0, index - 10),
+    Math.min(characters.length, index + 105),
   );
   textElement.innerHTML = slice.join("");
 }
-
-function appendProgressBar(percentage) {
-  percentage = Math.max(0, Math.min(100, percentage));
-
-  var ul = document.getElementById("progress-list");
-  var li = document.createElement("li");
-  var divProgress = document.createElement("div");
-  divProgress.className = "progress-container";
-  var divBar = document.createElement("div");
-  divBar.className = "progress-bar";
-  divBar.style.width = percentage + "%"; // Set initial width
-  //  divBar.innerText = percentage + "%"; // Display progress percentage
-
-  var imgReindeer = document.createElement("img");
-  imgReindeer.src = "../../static/reindeer.png";
-  imgReindeer.alt = "Reindeer";
-  imgReindeer.className = "reindeer-image";
-
-  divProgress.appendChild(divBar);
-  divProgress.appendChild(imgReindeer);
-  li.appendChild(divProgress);
-  ul.appendChild(li);
-
-  var divProgressWidth = divProgress.offsetWidth;
-  var imgReindeerWidth = imgReindeer.offsetWidth;
-  var reindeerPosition =
-    (percentage / 100) * divProgressWidth - imgReindeerWidth;
-  imgReindeer.style.left = reindeerPosition + "px";
-}
-
-// Initial call to update countdown
-updateCountdown();
-
-// Update the countdown every second
-const timer = setInterval(updateCountdown, 1000);
