@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Snowfall-Saga-Team" />
+    <meta name="description" content="Snowfall-Saga type racer" />
+    <title>Reindeer Racing</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Reindeer Racing</h1>
+    <a id="lobbyButton" href="http://127.0.0.1:5000">Return to Lobby</a>
+    <p id="text">{{ text }}</p>
+    <div id="accuracy"></div>
+    <div id="game-over"></div>
+    <div id="progress-container">
+      <div class="finish-line"></div>
+    </div>
+    <div id="snowflakes"></div>
+    <script>
+      const username = "{{ username }}";
+      const gameId = "{{ game_id }}";
+    </script>
+    <script src="{{ url_for('static', filename='type_race.js') }}"></script>
+    <script src="{{ url_for('static', filename='snow.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #007ba7;
+  background-image: linear-gradient(to bottom, #3b42d9, #c7c9ed);
+}
+
+h1,
+h2,
+p {
+  font-size: 50px;
+  white-space: nowrap;
+  overflow-x: hidden;
+
+  color: #ff984a;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+.colored-text::incorrect {
+  content: attr(data-incorrect);
+  color: red;
+}
+
+.colored-text::correct {
+  content: attr(data-correct);
+  color: green;
+}
+
+#text {
+  width: 100%;
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+#accuracy {
+  font-size: 20px;
+  padding: 20px;
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+#game-over {
+  font-size: 20px;
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+#progress-container {
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.progress {
+  padding-top: 30px;
+}
+
+.progress-bar {
+  height: 30px;
+}
+
+.progress-bar-correct,
+.progress-bar-wrong {
+  height: 30px;
+  display: inline-block;
+}
+
+.progress-bar-correct {
+  background-color: #8ac6d0;
+}
+
+.progress-bar-wrong {
+  background-color: #ff984a;
+}
+
+.reindeer {
+  margin-top: -50px;
+  position: absolute;
+  background: url(/static/reindeer.png) no-repeat no-repeat;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  scale: 1.75;
+  z-index: 100;
+  animation: rotateBackground 10s ease-in-out infinite;
+}
+
+@keyframes rotateBackground {
+  0% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(15deg);
+  }
+}
+
+.finish-line {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 100%;
+  background: conic-gradient(
+    white 90deg,
+    black 90deg 180deg,
+    white 180deg 270deg,
+    black 270deg
+  );
+  background-repeat: repeat;
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0px;
+  z-index: 1;
+}
+
+.snowfall {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  animation: snowfall 5s linear infinite;
+}
+
+@keyframes snowfall {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(100vh);
+  }
+}
+
+#snowflakes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.snowflake {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: snowfall linear infinite;
+}
+
+/* Animation for snowfall */
+@keyframes snowfall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+#lobbyButton {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  transition:
+    background-color 0.3s,
+    transform 0.3s;
+}
+
+#lobbyButton:hover {
+  background-color: #555;
+}

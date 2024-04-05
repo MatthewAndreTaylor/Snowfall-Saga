@@ -1,4 +1,4 @@
-name: 'Assert Branch Naming Convention'
+name: "Assert Branch Naming Convention"
 on: pull_request
 
 jobs:
@@ -10,4 +10,4 @@ jobs:
           regex: '^.*-u\d+$'
           ignore: master,development
           min_length: 5
-          max_length: 20
+          max_length: 25

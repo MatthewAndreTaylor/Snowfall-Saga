@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Snowfall-Saga-Team" />
+    <meta name="description" content="Snowfall-Saga leaderboard" />
+    <title>Leaderboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('leaderboard_handler.static', filename='style.css') }}"
+    />
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+  </head>
+  <body>
+    <h1>Leaderboard</h1>
+
+    <table id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Username</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rank, username, points in ranked_users %} {% if current_user_name
+        == username %}
+        <tr class="highlighted-row">
+          {% else %}
+        </tr>
+
+        <tr>
+          {% endif %}
+          <td>{{ rank }}</td>
+          <td>{{ username }}</td>
+          <td>{{ points }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br />
+    <a href="/">Back</a>
+  </body>
+</html>

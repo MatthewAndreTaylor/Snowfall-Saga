@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Snowfall-Saga-Team" />
+    <meta name="description" content="Snowfall-Saga chess queue" />
+    <title>Chess - Player List</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Chess - Waiting Room</h1>
+    <a id="lobbyButton" href="http://127.0.0.1:5000">Return to Lobby</a>
+    <div class="player-container">
+      <ul id="player-list"></ul>
+    </div>
+    <button id="startButton">Start Game</button>
+    <script>
+      const username = `{{ username }}` || "Guest";
+      const gameId = `{{ gameId }}` || "0";
+    </script>
+    <script src="{{ url_for('static', filename='chess_waiting_room.js') }}"></script>
+  </body>
+</html>

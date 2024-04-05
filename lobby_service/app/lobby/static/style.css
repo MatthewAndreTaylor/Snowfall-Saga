@@ -1,0 +1,374 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Source Sans Pro", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url(/static/images/map.webp);
+  image-rendering: pixelated;
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+.player-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1em;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* players */
+.grid-cell {
+  position: absolute;
+  width: 22px;
+  height: 28px;
+}
+
+.player {
+  scale: 3;
+  transition: transform 1.1s ease-in-out;
+}
+
+.player.you {
+  z-index: 1;
+}
+
+.player:not(.you):hover {
+  filter: drop-shadow(0 0 0.1rem orchid);
+}
+
+.player.you .player_you-arrow {
+  display: block;
+}
+
+.player.throw .player_sprite {
+  background: url(/static/images/throw.gif);
+  [data-direction="right"] & {
+    background-position-x: 22px;
+    right: 5px;
+  }
+}
+
+.player_you-arrow {
+  display: none;
+  position: absolute;
+  top: -30px;
+  left: 5px;
+  width: 7px;
+  height: 5px;
+  background: url(/static/images/arrow.png) no-repeat no-repeat;
+}
+
+.player_name-container {
+  position: absolute;
+  top: -25px;
+  left: 40%;
+  transform: translateX(-50%);
+  font-size: 5px;
+  padding: 1px 2px 1px;
+  border-radius: 3px;
+  background: #333;
+  color: white;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.player_sprite {
+  overflow: hidden;
+  top: -14px;
+  background: url(/static/images/characters.png);
+}
+
+.player[data-direction="right"] .player_sprite {
+  background-position-x: 23px;
+}
+
+.player_shadow {
+  background: url(/static/images/shadow.png) no-repeat no-repeat;
+}
+
+.user-list {
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
+#user-container {
+  display: flex;
+  flex-direction: column;
+  height: clamp(10em, 14vh, 14em);
+  width: clamp(9em, 40vw, 16em);
+  background: rgba(119, 138, 198, 0.75);
+  border: 1px solid #3366cc;
+  border-radius: 0 0 0 10px;
+  overflow-y: scroll;
+}
+
+#user-container-collapse {
+  background-color: #778ac6bf;
+  color: white;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  float: right;
+  border-radius: 0 0 0 10px;
+}
+
+.user-box-item {
+  padding: 0.4em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid white;
+  color: white;
+  cursor: pointer;
+  background: rgba(119, 138, 198, 0.95);
+}
+
+.tab-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tab {
+  cursor: pointer;
+  margin: 0;
+  padding: 0.5em;
+  background: rgba(93, 104, 138, 0.95);
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border-bottom: 2px solid white;
+}
+
+.tab.active {
+  background: rgba(119, 138, 198, 0.95);
+  text-decoration: underline;
+  color: white;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* inventory */
+.inventory-container {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  margin-bottom: 4em;
+  padding-left: 0.2em;
+  image-rendering: pixelated;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#sprite-container {
+  background-color: rgba(119, 138, 198, 0.75);
+  padding: 10px;
+  border-radius: 10px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-item {
+  position: relative;
+  width: 66px;
+  height: 84px;
+  cursor: pointer;
+}
+
+.grid-item:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+
+.sprite {
+  position: relative;
+  background: url(/static/images/characters.png);
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.sprite-cell {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-5%, -15%);
+  width: 22px;
+  height: 28px;
+  scale: 3;
+}
+
+/* props */
+.christmas-tree-button {
+  position: fixed;
+  top: 200px;
+  left: 200px;
+  width: 50px;
+  height: 80px;
+  scale: 2;
+  background: url(/static/images/waypoint.png) no-repeat no-repeat;
+}
+
+.leaderboard-button {
+  position: fixed;
+  top: 110px;
+  left: 75px;
+  width: 40px;
+  height: 25px;
+  scale: 3;
+  background: url(/static/images/leaderboard.png) no-repeat no-repeat;
+}
+
+.blizzard_bounce-button {
+  position: fixed;
+  top: 110px;
+  left: 350px;
+  width: 24px;
+  height: 24px;
+  scale: 3;
+  background: url(/static/images/soccer_ball.png) no-repeat no-repeat;
+}
+
+.store-button {
+  position: fixed;
+  top: 300px;
+  left: 600px;
+  width: 30px;
+  height: 30px;
+  scale: 4;
+  background: url(/static/images/store.png) no-repeat no-repeat;
+}
+
+.type_race-button {
+  position: fixed;
+  top: 150px;
+  left: 600px;
+  width: 30px;
+  height: 30px;
+  scale: 4;
+  background: url(/static/images/sleigh.png) no-repeat no-repeat;
+}
+
+.chess-button {
+  position: fixed;
+  top: 400px;
+  left: 150px;
+  width: 30px;
+  height: 32px;
+  scale: 3;
+  background: url(/static/images/chess.png) no-repeat no-repeat;
+}
+
+.christmas-tree-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.leaderboard-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.blizzard_bounce-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.store-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.type_race-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+.chess-button:hover {
+  filter: drop-shadow(0 0 0.75rem yellow);
+}
+
+/* snowball */
+.snowball {
+  width: 32px;
+  height: 32px;
+  background: url(/static/images/snowball.png);
+  background-size: contain;
+  position: absolute;
+  transition: transform 0.5s linear;
+}
+
+.snowball.explode {
+  background: url(/static/images/explosion.png);
+  background-size: contain;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+/* navbar */
+.navbar {
+  background: #3399ff79;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4em;
+  box-shadow: 0px -0.125em 0.3125em rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.navbar button,
+input {
+  border: none;
+  border-radius: 0.3125em;
+  padding: 0.3em 0.2em;
+}
+
+.navbar button {
+  background: #778ac6bf;
+  color: white;
+  padding: 0.7em 0.9em;
+  cursor: pointer;
+}
+
+.navbar button#toggleButton.active {
+  background: #1f3d7a;
+}
+
+.navbar button:hover {
+  background: #3366cc;
+}
+
+.navbar div {
+  display: flex;
+  align-items: center;
+}
+
+.navbar div button {
+  background: #778ac6bf;
+  color: white;
+  border: 0.1em solid #3366cc;
+  padding: 0.2em 0.3em;
+  margin-left: 0.1em;
+}

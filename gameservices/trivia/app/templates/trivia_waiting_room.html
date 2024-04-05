@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Snowfall-Saga-Team" />
+    <meta name="description" content="Snowfall-Saga trivia queue" />
+    <title>Player List</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Player List</h1>
+    <a id="lobbyButton" href="http://127.0.0.1:5000">Return to Lobby</a>
+    <ul id="usersList"></ul>
+    <button id="startButton">Start Game</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+      const username = `{{ username }}` || "Guest";
+      const game_id = `{{ game_id }}`;
+    </script>
+    <script src="{{ url_for('static', filename='trivia_queue.js') }}"></script>
+  </body>
+</html>
