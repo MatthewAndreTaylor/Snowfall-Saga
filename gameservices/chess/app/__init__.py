@@ -72,7 +72,7 @@ def waiting_room(connection, game_id: str):
 def update_player_list(players_waiting):
     for client in players_waiting:
         client.send(
-            json.dumps({"type": "playerList", "data": list(players_waiting.values())})
+            json.dumps({"type": "playerList", "data": list(players_waiting)})
         )
 
 
