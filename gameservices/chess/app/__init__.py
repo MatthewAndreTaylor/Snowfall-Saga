@@ -14,6 +14,8 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 sock = Sock(app)
 login_manager = LoginManager(app)
 
+players_waiting = defaultdict(list)
+
 players = defaultdict(list)
 clients = set()
 usernames = defaultdict(dict)
@@ -51,13 +53,14 @@ def send_to_game(game_id: str):
 def waiting_room(connection, game_id: str):
     print("Got a connection")
     clients.add(connection)
+    players_waiting[game_id].append(current_user.id)
 
     while True:
         try:
             event = connection.receive()
             data = json.loads(event)
 
-            update_player_list(clients)
+            update_player_list(clients, players_waiting[game_id])
 
             if data["type"] == "startGame":
                 for client in clients:
@@ -65,15 +68,13 @@ def waiting_room(connection, game_id: str):
 
         except (KeyError, ConnectionError, ConnectionClosed):
             clients.remove(connection)
-            update_player_list(clients)
+            update_player_list(clients, [])
             break
 
 
-def update_player_list(players_waiting):
-    for client in players_waiting:
-        client.send(
-            json.dumps({"type": "playerList", "data": list(players_waiting)})
-        )
+def update_player_list(clients, players_waiting):
+    for client in clients:
+        client.send(json.dumps({"type": "playerList", "data": players_waiting}))
 
 
 @sock.route("/chess/game/<game_id>")
